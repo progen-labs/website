@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import * as THREE from 'three';
 import World, { SPECTRA_POS, FUNZONE_POS } from './game/World.jsx';
 import { useKeyboard } from './game/useKeyboard.js';
-import { sound } from './game/sound.js';
 import Joystick from './game/Joystick.jsx';
 import Hud from './components/Hud.jsx';
 import GateCompass from './components/GateCompass.jsx';
@@ -19,7 +18,6 @@ export default function App() {
   const [phase, setPhase] = useState('explore'); // explore | entering | spectra | funzone
   const [nearGate, setNearGate] = useState(null); // null | 'spectra' | 'funzone'
   const [enteringGate, setEnteringGate] = useState('spectra');
-  const [muted, setMuted] = useState(() => sound.isMuted());
   const [touch] = useState(
     () =>
       typeof window !== 'undefined' &&
@@ -36,29 +34,9 @@ export default function App() {
     return () => clearTimeout(t);
   }, []);
 
-  useEffect(() => {
-    const start = () => {
-      sound.init();
-      sound.startAmbient();
-      window.removeEventListener('pointerdown', start);
-      window.removeEventListener('keydown', start);
-    };
-    window.addEventListener('pointerdown', start);
-    window.addEventListener('keydown', start);
-    return () => {
-      window.removeEventListener('pointerdown', start);
-      window.removeEventListener('keydown', start);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (nearGate && phase === 'explore') sound.proximity();
-  }, [nearGate, phase]);
-
   const tryEnter = useCallback(() => {
     const g = nearRef.current;
     if (phaseRef.current === 'explore' && g) {
-      sound.gate();
       setEnteringGate(g);
       setPhase('entering');
       setTimeout(() => setPhase(g), 2600);
@@ -79,11 +57,6 @@ export default function App() {
     setNearGate(null);
     setPhase('explore');
   }, [enteringGate]);
-
-  const onMute = useCallback(() => {
-    sound.tap();
-    setMuted(sound.toggleMute());
-  }, []);
 
   const exploring = phase === 'explore' || phase === 'entering';
 
@@ -110,13 +83,8 @@ export default function App() {
         <Hud
           phase={phase}
           nearGate={nearGate}
-          muted={muted}
-          onMute={onMute}
           touch={touch}
-          onAction={() => {
-            sound.tap();
-            tryEnter();
-          }}
+          onAction={tryEnter}
         />
       )}
 

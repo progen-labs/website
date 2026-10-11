@@ -8,7 +8,7 @@ const GATE_LABELS = {
   funzone: 'THE CORE · browser & react internals',
 };
 
-export default function Hud({ phase, nearGate, muted, onMute, touch, onAction }) {
+export default function Hud({ phase, nearGate, touch, onAction }) {
   const show = phase === 'explore';
 
   return (
@@ -22,12 +22,6 @@ export default function Hud({ phase, nearGate, muted, onMute, touch, onAction })
             <span>a 3D world</span>
           </div>
         </motion.div>
-
-        <div className="hud-top-right">
-          <motion.button className="icon-btn panel" onClick={onMute} initial={{ y: -40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ ...spring, delay: 0.1 }} whileTap={{ scale: 0.88 }} aria-label="Toggle sound">
-            {muted ? '🔇' : '🔊'}
-          </motion.button>
-        </div>
       </div>
 
       {/* controls hint */}

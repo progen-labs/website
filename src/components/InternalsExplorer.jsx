@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { AnimatePresence, motion } from 'framer-motion';
 import * as THREE from 'three';
-import { sound } from '../game/sound.js';
 import InternalsWorld from '../game/InternalsWorld.jsx';
 import { CONCEPTS, CONCEPT_BY_ID, GROUPS, conceptsOf } from '../game/internals-data.js';
 
@@ -17,7 +16,6 @@ export default function InternalsExplorer({ onBack }) {
   const [hoveredId, setHoveredId] = useState(null);
   const [selectedSubId, setSelectedSubId] = useState(null);
   const [intro, setIntro] = useState(true);
-  const [muted, setMuted] = useState(() => sound.isMuted());
   const [touch] = useState(() => typeof window !== 'undefined' && (window.matchMedia?.('(pointer: coarse)').matches || 'ontouchstart' in window));
 
   const concept = focusId ? CONCEPT_BY_ID[focusId] : null;
@@ -26,7 +24,6 @@ export default function InternalsExplorer({ onBack }) {
   const onHover = useCallback(id => setHoveredId(id), []);
 
   const pickConcept = useCallback(id => {
-    sound.gate();
     setFocusId(id);
     setView('concept');
     setHoveredId(null);
@@ -34,12 +31,10 @@ export default function InternalsExplorer({ onBack }) {
   }, []);
 
   const pickSub = useCallback(id => {
-    sound.tap();
     setSelectedSubId(id);
   }, []);
 
   const toOverview = useCallback(() => {
-    sound.tap();
     setView('overview');
     setFocusId(null);
     setSelectedSubId(null);
@@ -54,17 +49,11 @@ export default function InternalsExplorer({ onBack }) {
       setSelectedSubId(cur => {
         const list = concept.children;
         const i = list.findIndex(c => c.id === cur);
-        sound.tap();
         return list[(i + dir + list.length) % list.length].id;
       });
     },
     [concept],
   );
-
-  const toggleMute = useCallback(() => {
-    sound.tap();
-    setMuted(sound.toggleMute());
-  }, []);
 
   const dolly = useCallback(f => {
     const c = controlsRef.current;
@@ -166,9 +155,8 @@ export default function InternalsExplorer({ onBack }) {
         </div>
       )}
 
-      {/* top-right: mute + zoom */}
+      {/* top-right: zoom */}
       <div className="ix-tools">
-        <button className="ix-tool" onClick={toggleMute} aria-label="Toggle sound">{muted ? '🔇' : '🔊'}</button>
         <button className="ix-tool" onClick={() => dolly(0.8)} aria-label="Zoom in">＋</button>
         <button className="ix-tool" onClick={() => dolly(1.25)} aria-label="Zoom out">－</button>
       </div>
@@ -253,7 +241,7 @@ export default function InternalsExplorer({ onBack }) {
                 <span style={{ color: GROUPS.browser.accent }}>● Browser</span>
                 <span style={{ color: GROUPS.react.accent }}>● React</span>
               </div>
-              <button className="btn btn-core" onClick={() => { sound.tap(); setIntro(false); }}>Enter the atlas →</button>
+              <button className="btn btn-core" onClick={() => setIntro(false)}>Enter the atlas →</button>
               <p className="fz-best">{touch ? 'Drag to orbit · pinch to zoom · tap nodes' : 'Drag to orbit · scroll to zoom · click nodes · Esc to go back'}</p>
             </motion.div>
           </motion.div>
