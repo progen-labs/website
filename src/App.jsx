@@ -9,6 +9,7 @@ import { TOTAL_ORBS } from './game/Collectibles.jsx';
 import Joystick from './game/Joystick.jsx';
 import Hud from './components/Hud.jsx';
 import GateCompass from './components/GateCompass.jsx';
+import WorldSky from './components/WorldSky.jsx';
 import SpectraWorld from './components/SpectraWorld.jsx';
 import FunZone from './components/FunZone.jsx';
 
@@ -99,6 +100,7 @@ export default function App() {
 
   return (
     <div className="game">
+      <WorldSky />
       <div className="game-canvas">
         {mounted && (
           <Canvas camera={{ position: [0, 8, 13], fov: 55 }} dpr={[1, 1.8]} gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}>

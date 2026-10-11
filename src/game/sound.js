@@ -5,6 +5,7 @@ let ctx = null;
 let master = null;
 let muted = false;
 let ambient = null;
+let music = null;
 
 function ensure() {
   if (!ctx) {
@@ -60,6 +61,69 @@ function noiseSweep({ dur = 0.6, from = 300, to = 2600, vol = 0.25 }) {
   src.stop(t0 + dur);
 }
 
+// ---- generative fantasy ambient music -----------------------------------
+function padChord(freqs, dur, vol = 0.045) {
+  const c = ensure();
+  if (!c) return;
+  const t0 = c.currentTime;
+  freqs.forEach(f => {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = 'sine';
+    o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.linearRampToValueAtTime(vol, t0 + dur * 0.35);
+    g.gain.linearRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g).connect(master);
+    o.start(t0);
+    o.stop(t0 + dur + 0.1);
+  });
+}
+
+function softNote(f, vol = 0.06) {
+  const c = ensure();
+  if (!c) return;
+  const t0 = c.currentTime;
+  // the note plus two quieter echoes for a dreamy tail
+  [[vol, 0], [vol * 0.5, 0.3], [vol * 0.25, 0.6]].forEach(([v, d]) => {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = 'triangle';
+    o.frequency.value = f;
+    const s = t0 + d;
+    g.gain.setValueAtTime(0.0001, s);
+    g.gain.exponentialRampToValueAtTime(v, s + 0.25);
+    g.gain.exponentialRampToValueAtTime(0.0001, s + 1.7);
+    o.connect(g).connect(master);
+    o.start(s);
+    o.stop(s + 1.8);
+  });
+}
+
+function startMusic() {
+  const c = ensure();
+  if (!c || music) return;
+  const scale = [220, 261.63, 293.66, 329.63, 392, 440, 523.25, 587.33]; // A pentatonic-ish
+  const chords = [
+    [110, 164.81, 220], // Am
+    [146.83, 220, 293.66], // Dm
+    [130.81, 196, 261.63], // C
+    [98, 146.83, 196], // G
+  ];
+  let ci = 0;
+  const pad = () => {
+    padChord(chords[ci % chords.length], 9.5, 0.045);
+    ci++;
+  };
+  pad();
+  music = {
+    padId: setInterval(pad, 9000),
+    melId: setInterval(() => {
+      if (Math.random() < 0.8) softNote(scale[Math.floor(Math.random() * scale.length)]);
+    }, 1800),
+  };
+}
+
 export const sound = {
   init() {
     ensure();
@@ -106,6 +170,7 @@ export const sound = {
     o2.start();
     lfo.start();
     ambient = { o1, o2, lfo, g };
+    startMusic();
   },
   toggleMute() {
     muted = !muted;

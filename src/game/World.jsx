@@ -8,6 +8,7 @@ import Portal from './Portal.jsx';
 import CameraRig from './CameraRig.jsx';
 import Collectibles from './Collectibles.jsx';
 import Decor from './Decor.jsx';
+import FantasyProps from './FantasyProps.jsx';
 
 export const SPECTRA_POS = [0, 0, -26];
 export const FUNZONE_POS = [-30, 0, -4];
@@ -60,13 +61,13 @@ function Crystal({ position, color }) {
 export default function World({ keys, move, posRef, phase, enteringGate, nearGate, setNearGate, onCollect }) {
   return (
     <>
-      <color attach="background" args={['#05060e']} />
-      <fog attach="fog" args={['#05060e', 32, 95]} />
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[12, 22, 10]} intensity={0.7} color="#9fb4ff" />
-      <pointLight position={[0, 7, -24]} intensity={60} distance={45} color="#39e0ff" />
-      <pointLight position={[-30, 5, -4]} intensity={25} distance={30} color="#7c7cff" />
-      <pointLight position={[30, 5, -4]} intensity={25} distance={30} color="#ff6ad5" />
+      <fog attach="fog" args={['#3a2360', 24, 82]} />
+      <ambientLight intensity={0.55} color="#c9b8ff" />
+      <directionalLight position={[14, 20, 6]} intensity={0.95} color="#ffe6bf" />
+      <directionalLight position={[-10, 14, -10]} intensity={0.4} color="#7c7cff" />
+      <pointLight position={[0, 7, -24]} intensity={50} distance={45} color="#39e0ff" />
+      <pointLight position={[-30, 6, -4]} intensity={30} distance={30} color="#ff9a3d" />
+      <pointLight position={[30, 6, -4]} intensity={25} distance={30} color="#ff6ad5" />
 
       <Stars radius={130} depth={60} count={2600} factor={4} fade speed={0.4} />
 
@@ -76,10 +77,10 @@ export default function World({ keys, move, posRef, phase, enteringGate, nearGat
         cellThickness={0.6}
         sectionSize={10}
         sectionThickness={1.3}
-        cellColor="#141d3a"
-        sectionColor="#2f6bff"
-        fadeDistance={80}
-        fadeStrength={1.4}
+        cellColor="#3a2e6b"
+        sectionColor="#8a6bd8"
+        fadeDistance={78}
+        fadeStrength={1.6}
         infiniteGrid
         position={[0, 0.01, 0]}
       />
@@ -99,6 +100,7 @@ export default function World({ keys, move, posRef, phase, enteringGate, nearGat
       </Text>
 
       <Decor />
+      <FantasyProps />
       <Collectibles posRef={posRef} onCollect={onCollect} />
 
       <Character keys={keys} move={move} posRef={posRef} frozen={phase !== 'explore'} />
