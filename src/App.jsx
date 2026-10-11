@@ -5,7 +5,6 @@ import * as THREE from 'three';
 import World, { SPECTRA_POS, FUNZONE_POS } from './game/World.jsx';
 import { useKeyboard } from './game/useKeyboard.js';
 import { sound } from './game/sound.js';
-import { TOTAL_ORBS } from './game/Collectibles.jsx';
 import Joystick from './game/Joystick.jsx';
 import Hud from './components/Hud.jsx';
 import GateCompass from './components/GateCompass.jsx';
@@ -20,7 +19,6 @@ export default function App() {
   const [phase, setPhase] = useState('explore'); // explore | entering | spectra | funzone
   const [nearGate, setNearGate] = useState(null); // null | 'spectra' | 'funzone'
   const [enteringGate, setEnteringGate] = useState('spectra');
-  const [coins, setCoins] = useState(0);
   const [muted, setMuted] = useState(false);
   const [touch] = useState(
     () =>
@@ -75,15 +73,6 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [tryEnter]);
 
-  const onCollect = useCallback(() => {
-    sound.pickup();
-    setCoins(c => {
-      const n = c + 1;
-      if (n === TOTAL_ORBS) setTimeout(() => sound.win(), 120);
-      return n;
-    });
-  }, []);
-
   const back = useCallback(() => {
     const p = enteringGate === 'funzone' ? FUNZONE_POS : SPECTRA_POS;
     posRef.current.set(p[0], 0, p[2] + 13);
@@ -112,7 +101,6 @@ export default function App() {
               enteringGate={enteringGate}
               nearGate={nearGate}
               setNearGate={setNearGate}
-              onCollect={onCollect}
             />
           </Canvas>
         )}
@@ -122,8 +110,6 @@ export default function App() {
         <Hud
           phase={phase}
           nearGate={nearGate}
-          coins={coins}
-          total={TOTAL_ORBS}
           muted={muted}
           onMute={onMute}
           touch={touch}

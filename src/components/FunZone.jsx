@@ -3,183 +3,369 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { sound } from '../game/sound.js';
 import FantasyScene from './FantasyScene.jsx';
 
-const GAME_MS = 32000;
-const LIFE = 1300;
 const spring = { type: 'spring', stiffness: 420, damping: 20 };
-let uid = 0;
+const STAGES = ['Baby', 'Juvenile', 'Adult', 'Elder', 'Ancient'];
+const XP_THRESH = [0, 30, 75, 140, 240];
 
-const ENEMY = {
-  goblin: { emoji: '👺', pts: 10 },
-  dragon: { emoji: '🐉', pts: 25 },
+const MONSTERS = {
+  goblin: { emoji: '👺', hp: 20, speed: 42, dmg: 8, r: 18, pts: 10, xp: 6 },
+  bat: { emoji: '🦇', hp: 12, speed: 88, dmg: 5, r: 15, pts: 8, xp: 5 },
+  ogre: { emoji: '👹', hp: 58, speed: 26, dmg: 18, r: 25, pts: 20, xp: 12 },
+  ghost: { emoji: '👻', hp: 28, speed: 56, dmg: 10, r: 18, pts: 14, xp: 8 },
 };
+const MKEYS = Object.keys(MONSTERS);
+const ORBS = [
+  { e: '🔥', xp: 12 },
+  { e: '❄️', xp: 12 },
+  { e: '⚡', xp: 12 },
+  { e: '✨', xp: 16 },
+];
 
-/**
- * Fun Zone → "Realm Rush": a fantasy realm overrun by creatures. Tap the
- * goblins and dragons before they drain the realm's life. A real, juicy game.
- */
 export default function FunZone({ onBack }) {
-  const [state, setState] = useState('ready'); // ready | playing | over
-  const [mobs, setMobs] = useState([]);
-  const [floats, setFloats] = useState([]);
-  const [gold, setGold] = useState(0);
-  const [combo, setCombo] = useState(0);
-  const [life, setLife] = useState(100);
-  const [timeLeft, setTimeLeft] = useState(GAME_MS);
-  const best = useRef(Number((typeof localStorage !== 'undefined' && localStorage.getItem('realm_best')) || 0));
+  const canvasRef = useRef();
+  const game = useRef(null);
+  const pointer = useRef({ x: 0, y: 0 });
+  const [phase, setPhase] = useState('ready'); // ready | playing | over
+  const [hud, setHud] = useState({ score: 0, hp: 100, stage: 0, xp: 0 });
+  const best = useRef(Number((typeof localStorage !== 'undefined' && localStorage.getItem('dragon_best')) || 0));
 
-  const endGame = useCallback(() => {
-    setState('over');
-    setGold(g => {
-      if (g > best.current) {
-        best.current = g;
-        try {
-          localStorage.setItem('realm_best', String(g));
-        } catch {
-          /* ignore */
-        }
-      }
-      return g;
-    });
-    sound.win();
+  const initGame = useCallback(() => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    game.current = {
+      dragon: { x: w / 2, y: h * 0.6, size: 34, stage: 0, xp: 0, fire: 0, flash: 0 },
+      monsters: [],
+      balls: [],
+      orbs: [],
+      parts: [],
+      castle: { x: w / 2, y: h - 66, hp: 100, max: 100, shake: 0 },
+      spawn: 0.6,
+      orbT: 1,
+      t: 0,
+      score: 0,
+    };
+    pointer.current = { x: w / 2, y: h * 0.6 };
   }, []);
 
-  useEffect(() => {
-    if (state !== 'playing') return;
-    let alive = true;
-    let delay = 820;
-    const spawn = () => {
-      if (!alive) return;
-      const type = Math.random() < 0.18 ? 'dragon' : 'goblin';
-      setMobs(p => [...p, { id: ++uid, x: 8 + Math.random() * 84, y: 20 + Math.random() * 62, born: Date.now(), type }]);
-      delay = Math.max(360, delay * 0.965);
-      spawnT = setTimeout(spawn, delay);
-    };
-    let spawnT = setTimeout(spawn, 500);
-
-    const expiry = setInterval(() => {
-      const now = Date.now();
-      setMobs(p => {
-        const dead = p.filter(m => now - m.born > LIFE).length;
-        if (dead) {
-          setLife(l => Math.max(0, l - dead * 9));
-          setCombo(0);
-        }
-        return p.filter(m => now - m.born <= LIFE);
-      });
-    }, 120);
-
-    const timer = setInterval(() => setTimeLeft(t => Math.max(0, t - 200)), 200);
-    return () => {
-      alive = false;
-      clearTimeout(spawnT);
-      clearInterval(expiry);
-      clearInterval(timer);
-    };
-  }, [state]);
-
-  useEffect(() => {
-    if (state === 'playing' && (timeLeft <= 0 || life <= 0)) endGame();
-  }, [timeLeft, life, state, endGame]);
-
-  const hit = (m, e) => {
-    e.stopPropagation();
-    setMobs(p => p.filter(x => x.id !== m.id));
-    setCombo(c => {
-      const nc = c + 1;
-      const mult = Math.max(1, Math.floor(nc / 4) + 1);
-      const pts = ENEMY[m.type].pts * mult;
-      setGold(v => v + pts);
-      const fid = ++uid;
-      setFloats(p => [...p, { id: fid, x: m.x, y: m.y, pts }]);
-      setTimeout(() => setFloats(p => p.filter(f => f.id !== fid)), 650);
-      return nc;
-    });
-    setLife(l => Math.min(100, l + 1));
-    sound.pickup();
-  };
-
   const start = () => {
-    setGold(0);
-    setCombo(0);
-    setLife(100);
-    setTimeLeft(GAME_MS);
-    setMobs([]);
-    setState('playing');
+    initGame();
+    setHud({ score: 0, hp: 100, stage: 0, xp: 0 });
+    setPhase('playing');
     sound.tap();
   };
 
-  const mult = Math.max(1, Math.floor(combo / 4) + 1);
+  useEffect(() => {
+    const move = e => {
+      const t = e.touches ? e.touches[0] : e;
+      pointer.current.x = t.clientX;
+      pointer.current.y = t.clientY;
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('touchmove', move, { passive: true });
+    return () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('touchmove', move);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (phase !== 'playing') return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    let raf;
+    let last = performance.now();
+    let alive = true;
+    let frame = 0;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      game.current.castle.x = canvas.width / 2;
+      game.current.castle.y = canvas.height - 66;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    const dist = (ax, ay, bx, by) => Math.hypot(ax - bx, ay - by);
+
+    const loop = now => {
+      if (!alive) return;
+      const dt = Math.min(0.04, (now - last) / 1000);
+      last = now;
+      const g = game.current;
+      const w = canvas.width;
+      const h = canvas.height;
+      g.t += dt;
+
+      // dragon follows pointer
+      const d = g.dragon;
+      d.x += (pointer.current.x - d.x) * Math.min(1, dt * 6);
+      d.y += (pointer.current.y - d.y) * Math.min(1, dt * 6);
+      d.x = Math.max(20, Math.min(w - 20, d.x));
+      d.y = Math.max(20, Math.min(h - 120, d.y));
+      if (d.flash > 0) d.flash -= dt;
+
+      // spawn monsters
+      g.spawn -= dt;
+      if (g.spawn <= 0) {
+        g.spawn = Math.max(0.42, 1.5 - g.t * 0.015);
+        const key = MKEYS[Math.floor(Math.random() * MKEYS.length)];
+        const m = { ...MONSTERS[key], x: 40 + Math.random() * (w - 80), y: -24, maxHp: MONSTERS[key].hp };
+        g.monsters.push(m);
+      }
+      // spawn orbs
+      g.orbT -= dt;
+      if (g.orbT <= 0 && g.orbs.length < 6) {
+        g.orbT = 1.8 + Math.random();
+        const o = ORBS[Math.floor(Math.random() * ORBS.length)];
+        g.orbs.push({ ...o, x: 40 + Math.random() * (w - 80), y: 80 + Math.random() * (h * 0.5), life: 9 });
+      }
+
+      // auto-fire at nearest monster
+      const range = 260 + d.stage * 45;
+      d.fire -= dt;
+      if (d.fire <= 0) {
+        let near = null;
+        let nd = range;
+        for (const m of g.monsters) {
+          const dd = dist(d.x, d.y, m.x, m.y);
+          if (dd < nd) {
+            nd = dd;
+            near = m;
+          }
+        }
+        if (near) {
+          const ang = Math.atan2(near.y - d.y, near.x - d.x);
+          g.balls.push({ x: d.x, y: d.y, vx: Math.cos(ang) * 520, vy: Math.sin(ang) * 520, dmg: 12 + d.stage * 7, life: 1.6 });
+          d.fire = Math.max(0.3, 0.85 - d.stage * 0.13);
+        }
+      }
+
+      // update balls
+      for (let i = g.balls.length - 1; i >= 0; i--) {
+        const b = g.balls[i];
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+        b.life -= dt;
+        let hitIdx = -1;
+        for (let j = 0; j < g.monsters.length; j++) {
+          const m = g.monsters[j];
+          if (dist(b.x, b.y, m.x, m.y) < m.r + 8) {
+            hitIdx = j;
+            break;
+          }
+        }
+        if (hitIdx >= 0) {
+          const m = g.monsters[hitIdx];
+          m.hp -= b.dmg;
+          g.balls.splice(i, 1);
+          if (m.hp <= 0) {
+            g.score += m.pts;
+            d.xp += m.xp;
+            for (let k = 0; k < 7; k++) g.parts.push({ x: m.x, y: m.y, vx: (Math.random() - 0.5) * 160, vy: (Math.random() - 0.5) * 160, life: 0.5, c: '#ff9a3d' });
+            g.monsters.splice(hitIdx, 1);
+            sound.pickup();
+            // evolve?
+            if (d.stage < STAGES.length - 1 && d.xp >= XP_THRESH[d.stage + 1]) {
+              d.stage++;
+              d.size += 11;
+              d.flash = 0.5;
+              sound.win();
+            }
+          }
+          continue;
+        }
+        if (b.life <= 0 || b.x < -30 || b.x > w + 30 || b.y < -30 || b.y > h + 30) g.balls.splice(i, 1);
+      }
+
+      // update monsters -> castle
+      for (let i = g.monsters.length - 1; i >= 0; i--) {
+        const m = g.monsters[i];
+        const ang = Math.atan2(g.castle.y - m.y, g.castle.x - m.x);
+        m.x += Math.cos(ang) * m.speed * dt;
+        m.y += Math.sin(ang) * m.speed * dt;
+        if (dist(m.x, m.y, g.castle.x, g.castle.y) < 54) {
+          g.castle.hp -= m.dmg;
+          g.castle.shake = 0.3;
+          g.monsters.splice(i, 1);
+          sound.proximity();
+        }
+      }
+
+      // orbs
+      for (let i = g.orbs.length - 1; i >= 0; i--) {
+        const o = g.orbs[i];
+        o.life -= dt;
+        if (dist(d.x, d.y, o.x, o.y) < d.size + 16) {
+          d.xp += o.xp;
+          g.score += 5;
+          for (let k = 0; k < 6; k++) g.parts.push({ x: o.x, y: o.y, vx: (Math.random() - 0.5) * 120, vy: (Math.random() - 0.5) * 120, life: 0.5, c: '#ffe08a' });
+          g.orbs.splice(i, 1);
+          sound.pickup();
+          if (d.stage < STAGES.length - 1 && d.xp >= XP_THRESH[d.stage + 1]) {
+            d.stage++;
+            d.size += 11;
+            d.flash = 0.5;
+            sound.win();
+          }
+          continue;
+        }
+        if (o.life <= 0) g.orbs.splice(i, 1);
+      }
+
+      // particles
+      for (let i = g.parts.length - 1; i >= 0; i--) {
+        const p = g.parts[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.life -= dt;
+        if (p.life <= 0) g.parts.splice(i, 1);
+      }
+      if (g.castle.shake > 0) g.castle.shake -= dt;
+
+      // ---- draw ----
+      ctx.clearRect(0, 0, w, h);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // orbs
+      for (const o of g.orbs) {
+        ctx.globalAlpha = o.life < 2 ? Math.max(0.2, o.life / 2) : 1;
+        ctx.font = '30px serif';
+        ctx.shadowColor = '#ffe08a';
+        ctx.shadowBlur = 16;
+        ctx.fillText(o.e, o.x, o.y);
+        ctx.shadowBlur = 0;
+      }
+      ctx.globalAlpha = 1;
+
+      // castle
+      const sh = g.castle.shake > 0 ? (Math.random() - 0.5) * 6 : 0;
+      ctx.font = '52px serif';
+      ctx.fillText('🏰', g.castle.x + sh, g.castle.y);
+
+      // monsters + hp bars
+      for (const m of g.monsters) {
+        ctx.font = `${m.r * 1.8}px serif`;
+        ctx.fillText(m.emoji, m.x, m.y);
+        if (m.hp < m.maxHp) {
+          ctx.fillStyle = 'rgba(0,0,0,0.5)';
+          ctx.fillRect(m.x - 16, m.y - m.r - 8, 32, 4);
+          ctx.fillStyle = '#ff6a7a';
+          ctx.fillRect(m.x - 16, m.y - m.r - 8, 32 * (m.hp / m.maxHp), 4);
+        }
+      }
+
+      // fireballs
+      for (const b of g.balls) {
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, 7, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffb347';
+        ctx.shadowColor = '#ff7a2f';
+        ctx.shadowBlur = 18;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      // particles
+      for (const p of g.parts) {
+        ctx.globalAlpha = Math.max(0, p.life * 2);
+        ctx.fillStyle = p.c;
+        ctx.fillRect(p.x, p.y, 4, 4);
+      }
+      ctx.globalAlpha = 1;
+
+      // dragon
+      if (d.flash > 0) {
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.size * 1.6, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,220,120,${d.flash})`;
+        ctx.fill();
+      }
+      ctx.font = `${d.size}px serif`;
+      ctx.shadowColor = '#ffcf4d';
+      ctx.shadowBlur = 14;
+      ctx.fillText('🐉', d.x, d.y);
+      ctx.shadowBlur = 0;
+
+      // HUD mirror (throttled)
+      if (++frame % 6 === 0) setHud({ score: g.score, hp: Math.max(0, g.castle.hp), stage: d.stage, xp: d.xp });
+
+      if (g.castle.hp <= 0) {
+        alive = false;
+        const fs = g.score;
+        if (fs > best.current) {
+          best.current = fs;
+          try {
+            localStorage.setItem('dragon_best', String(fs));
+          } catch {
+            /* ignore */
+          }
+        }
+        setHud(hh => ({ ...hh, score: fs, hp: 0 }));
+        setPhase('over');
+        sound.win();
+        return;
+      }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => {
+      alive = false;
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', resize);
+    };
+  }, [phase]);
+
+  const nextXp = XP_THRESH[Math.min(hud.stage + 1, XP_THRESH.length - 1)];
+  const curXp = XP_THRESH[hud.stage];
+  const xpPct = hud.stage >= STAGES.length - 1 ? 100 : Math.min(100, ((hud.xp - curXp) / (nextXp - curXp)) * 100);
 
   return (
-    <motion.div className="funzone" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
+    <motion.div className="funzone dragon" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
       <FantasyScene />
+      <canvas ref={canvasRef} className="dragon-canvas" />
       <button className="sw-back" onClick={onBack}>← Leave the realm</button>
 
-      <div className="fz-hud">
-        <div className="fz-stat panel"><span className="fz-label">🪙 GOLD</span><b>{gold}</b></div>
-        <div className="fz-fps panel">
-          <span className="fz-label">❤ REALM</span>
-          <div className="fz-bar"><div className="fz-bar-fill" style={{ width: `${life}%`, background: life > 40 ? 'var(--good)' : '#ff8da8' }} /></div>
+      {phase === 'playing' && (
+        <div className="fz-hud">
+          <div className="fz-stat panel"><span className="fz-label">🪙 SCORE</span><b>{hud.score}</b></div>
+          <div className="fz-fps panel">
+            <span className="fz-label">🏰 KINGDOM</span>
+            <div className="fz-bar"><div className="fz-bar-fill" style={{ width: `${hud.hp}%`, background: hud.hp > 35 ? 'var(--good)' : '#ff8da8' }} /></div>
+          </div>
+          <div className="fz-fps panel">
+            <span className="fz-label">🐉 {STAGES[hud.stage]} DRAGON</span>
+            <div className="fz-bar"><div className="fz-bar-fill" style={{ width: `${xpPct}%`, background: 'linear-gradient(90deg,#ffd978,#ff9a3d)' }} /></div>
+          </div>
         </div>
-        <div className="fz-stat panel"><span className="fz-label">⏳ TIME</span><b>{Math.ceil(timeLeft / 1000)}s</b></div>
-      </div>
-
-      {combo >= 4 && state === 'playing' && (
-        <motion.div className="fz-combo" key={mult} initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={spring}>
-          {mult}× COMBO
-        </motion.div>
       )}
 
-      <div className="fz-field">
-        <AnimatePresence>
-          {mobs.map(m => (
-            <motion.button
-              key={m.id}
-              className={`fz-mob ${m.type}`}
-              style={{ left: `${m.x}%`, top: `${m.y}%` }}
-              initial={{ scale: 0, rotate: -30 }}
-              animate={{ scale: 1, rotate: 0 }}
-              exit={{ scale: 0, opacity: 0 }}
-              transition={spring}
-              onPointerDown={e => hit(m, e)}
-            >
-              {ENEMY[m.type].emoji}
-            </motion.button>
-          ))}
-        </AnimatePresence>
-        {floats.map(f => (
-          <motion.span key={f.id} className="fz-float" style={{ left: `${f.x}%`, top: `${f.y}%` }} initial={{ y: 0, opacity: 1, scale: 0.8 }} animate={{ y: -42, opacity: 0, scale: 1.2 }} transition={{ duration: 0.65 }}>
-            +{f.pts}
-          </motion.span>
-        ))}
-      </div>
-
       <AnimatePresence>
-        {state === 'ready' && (
+        {phase === 'ready' && (
           <motion.div className="fz-modal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <motion.div className="fz-card panel" initial={{ scale: 0.8, y: 20 }} animate={{ scale: 1, y: 0 }} transition={spring}>
+              <div className="dragon-hero">🐉</div>
               <p className="fz-kicker">FUN ZONE · THE ENCHANTED REALM</p>
-              <h1 className="fz-title grad-gold">Realm Rush</h1>
+              <h1 className="fz-title grad-gold">Dragonheart</h1>
               <p className="fz-desc">
-                The realm is overrun! Tap the <b>goblins</b> 👺 and <b>dragons</b> 🐉 before they drain its life.
-                Chain strikes for combo multipliers and hoard gold. Hold the realm for {GAME_MS / 1000} seconds.
+                You've hatched a <b>baby dragon</b>. <b>Move</b> it with your cursor (or finger) to gather
+                elemental orbs 🔥❄️⚡✨ and <b>evolve</b> — Baby → Elder. Your dragon breathes fire on the
+                nearest threat; keep the monsters from reaching your <b>kingdom</b> 🏰.
               </p>
-              <button className="btn btn-gold fz-play" onClick={start}>⚔ Defend the realm</button>
-              {best.current > 0 && <p className="fz-best">Best gold: {best.current}</p>}
+              <button className="btn btn-gold fz-play" onClick={start}>🔥 Begin the legend</button>
+              {best.current > 0 && <p className="fz-best">Best score: {best.current}</p>}
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {state === 'over' && (
+        {phase === 'over' && (
           <motion.div className="fz-modal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <motion.div className="fz-card panel" initial={{ scale: 0.8, y: 20 }} animate={{ scale: 1, y: 0 }} transition={spring}>
-              <p className="fz-kicker">{life <= 0 ? '🏰 THE REALM HAS FALLEN' : "⏳ THE SIEGE IS OVER"}</p>
-              <h1 className="fz-title grad-gold">🪙 {gold}</h1>
-              <p className="fz-desc">{gold >= best.current ? '🏆 A new legend of the realm!' : `Best: ${best.current} gold`}</p>
+              <p className="fz-kicker">🏰 THE KINGDOM HAS FALLEN</p>
+              <h1 className="fz-title grad-gold">🪙 {hud.score}</h1>
+              <p className="fz-desc">Your dragon reached <b>{STAGES[hud.stage]}</b>. {hud.score >= best.current ? '🏆 A new legend!' : `Best: ${best.current}`}</p>
               <div className="fz-actions">
-                <button className="btn btn-gold fz-play" onClick={start}>↻ Rise again</button>
+                <button className="btn btn-gold fz-play" onClick={start}>↻ Hatch again</button>
                 <button className="btn btn-ghost" onClick={onBack}>Leave the realm</button>
               </div>
             </motion.div>

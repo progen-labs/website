@@ -8,9 +8,8 @@ const GATE_LABELS = {
   funzone: 'FUN ZONE · lag spike smash',
 };
 
-export default function Hud({ phase, nearGate, coins, total, muted, onMute, touch, onAction }) {
+export default function Hud({ phase, nearGate, muted, onMute, touch, onAction }) {
   const show = phase === 'explore';
-  const done = coins >= total;
 
   return (
     <div className="hud">
@@ -25,17 +24,6 @@ export default function Hud({ phase, nearGate, coins, total, muted, onMute, touc
         </motion.div>
 
         <div className="hud-top-right">
-          <motion.div
-            className="coin-counter panel"
-            initial={{ y: -40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ ...spring, delay: 0.05 }}
-            key={coins}
-          >
-            <motion.span className="coin-icon" animate={{ rotateY: coins * 180 }} transition={spring} />
-            <b>{coins}</b>
-            <span className="coin-total">/ {total}</span>
-          </motion.div>
           <motion.button className="icon-btn panel" onClick={onMute} initial={{ y: -40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ ...spring, delay: 0.1 }} whileTap={{ scale: 0.88 }} aria-label="Toggle sound">
             {muted ? '🔇' : '🔊'}
           </motion.button>
@@ -95,24 +83,6 @@ export default function Hud({ phase, nearGate, coins, total, muted, onMute, touc
         </motion.button>
       )}
 
-      {/* collect-all celebration */}
-      <AnimatePresence>
-        {done && (
-          <motion.div
-            className="hud-win panel"
-            initial={{ opacity: 0, scale: 0.7, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.7 }}
-            transition={spring}
-          >
-            <span className="win-emoji">✨</span>
-            <div>
-              <strong>All orbs collected!</strong>
-              <span>You explored the whole world — nice.</span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

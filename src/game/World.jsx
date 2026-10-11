@@ -6,7 +6,6 @@ import * as THREE from 'three';
 import Character from './Character.jsx';
 import Portal from './Portal.jsx';
 import CameraRig from './CameraRig.jsx';
-import Collectibles from './Collectibles.jsx';
 import Decor from './Decor.jsx';
 import FantasyProps from './FantasyProps.jsx';
 
@@ -58,7 +57,7 @@ function Crystal({ position, color }) {
   );
 }
 
-export default function World({ keys, move, posRef, phase, enteringGate, nearGate, setNearGate, onCollect }) {
+export default function World({ keys, move, posRef, phase, enteringGate, nearGate, setNearGate }) {
   return (
     <>
       <fog attach="fog" args={['#3a2360', 24, 82]} />
@@ -101,7 +100,6 @@ export default function World({ keys, move, posRef, phase, enteringGate, nearGat
 
       <Decor />
       <FantasyProps />
-      <Collectibles posRef={posRef} onCollect={onCollect} />
 
       <Character keys={keys} move={move} posRef={posRef} frozen={phase !== 'explore'} />
 
