@@ -8,6 +8,7 @@ import { sound } from './game/sound.js';
 import { TOTAL_ORBS } from './game/Collectibles.jsx';
 import Joystick from './game/Joystick.jsx';
 import Hud from './components/Hud.jsx';
+import GateCompass from './components/GateCompass.jsx';
 import SpectraWorld from './components/SpectraWorld.jsx';
 import FunZone from './components/FunZone.jsx';
 
@@ -130,6 +131,8 @@ export default function App() {
           }}
         />
       )}
+
+      {phase === 'explore' && <GateCompass posRef={posRef} />}
 
       {touch && phase === 'explore' && <Joystick moveRef={move} />}
 

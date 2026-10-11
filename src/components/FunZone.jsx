@@ -1,38 +1,44 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { sound } from '../game/sound.js';
+import FantasyScene from './FantasyScene.jsx';
 
 const GAME_MS = 32000;
-const SPIKE_LIFE = 1300;
+const LIFE = 1300;
 const spring = { type: 'spring', stiffness: 420, damping: 20 };
 let uid = 0;
 
+const ENEMY = {
+  goblin: { emoji: '👺', pts: 10 },
+  dragon: { emoji: '🐉', pts: 25 },
+};
+
 /**
- * Fun Zone → "Lag Spike Smash": optimize the app by smashing lag spikes and
- * memory leaks before they tank your frame rate. A real, juicy arcade game.
+ * Fun Zone → "Realm Rush": a fantasy realm overrun by creatures. Tap the
+ * goblins and dragons before they drain the realm's life. A real, juicy game.
  */
 export default function FunZone({ onBack }) {
   const [state, setState] = useState('ready'); // ready | playing | over
-  const [spikes, setSpikes] = useState([]);
+  const [mobs, setMobs] = useState([]);
   const [floats, setFloats] = useState([]);
-  const [score, setScore] = useState(0);
+  const [gold, setGold] = useState(0);
   const [combo, setCombo] = useState(0);
-  const [fps, setFps] = useState(60);
+  const [life, setLife] = useState(100);
   const [timeLeft, setTimeLeft] = useState(GAME_MS);
-  const best = useRef(Number((typeof localStorage !== 'undefined' && localStorage.getItem('funzone_best')) || 0));
+  const best = useRef(Number((typeof localStorage !== 'undefined' && localStorage.getItem('realm_best')) || 0));
 
   const endGame = useCallback(() => {
     setState('over');
-    setScore(s => {
-      if (s > best.current) {
-        best.current = s;
+    setGold(g => {
+      if (g > best.current) {
+        best.current = g;
         try {
-          localStorage.setItem('funzone_best', String(s));
+          localStorage.setItem('realm_best', String(g));
         } catch {
           /* ignore */
         }
       }
-      return s;
+      return g;
     });
     sound.win();
   }, []);
@@ -43,8 +49,8 @@ export default function FunZone({ onBack }) {
     let delay = 820;
     const spawn = () => {
       if (!alive) return;
-      const type = Math.random() < 0.18 ? 'leak' : 'spike';
-      setSpikes(p => [...p, { id: ++uid, x: 8 + Math.random() * 84, y: 16 + Math.random() * 70, born: Date.now(), type }]);
+      const type = Math.random() < 0.18 ? 'dragon' : 'goblin';
+      setMobs(p => [...p, { id: ++uid, x: 8 + Math.random() * 84, y: 20 + Math.random() * 62, born: Date.now(), type }]);
       delay = Math.max(360, delay * 0.965);
       spawnT = setTimeout(spawn, delay);
     };
@@ -52,18 +58,17 @@ export default function FunZone({ onBack }) {
 
     const expiry = setInterval(() => {
       const now = Date.now();
-      setSpikes(p => {
-        const dead = p.filter(s => now - s.born > SPIKE_LIFE).length;
+      setMobs(p => {
+        const dead = p.filter(m => now - m.born > LIFE).length;
         if (dead) {
-          setFps(f => Math.max(0, f - dead * 5));
+          setLife(l => Math.max(0, l - dead * 9));
           setCombo(0);
         }
-        return p.filter(s => now - s.born <= SPIKE_LIFE);
+        return p.filter(m => now - m.born <= LIFE);
       });
     }, 120);
 
     const timer = setInterval(() => setTimeLeft(t => Math.max(0, t - 200)), 200);
-
     return () => {
       alive = false;
       clearTimeout(spawnT);
@@ -73,32 +78,32 @@ export default function FunZone({ onBack }) {
   }, [state]);
 
   useEffect(() => {
-    if (state === 'playing' && (timeLeft <= 0 || fps <= 0)) endGame();
-  }, [timeLeft, fps, state, endGame]);
+    if (state === 'playing' && (timeLeft <= 0 || life <= 0)) endGame();
+  }, [timeLeft, life, state, endGame]);
 
-  const hit = (s, e) => {
+  const hit = (m, e) => {
     e.stopPropagation();
-    setSpikes(p => p.filter(x => x.id !== s.id));
+    setMobs(p => p.filter(x => x.id !== m.id));
     setCombo(c => {
       const nc = c + 1;
       const mult = Math.max(1, Math.floor(nc / 4) + 1);
-      const pts = (s.type === 'leak' ? 25 : 10) * mult;
-      setScore(v => v + pts);
+      const pts = ENEMY[m.type].pts * mult;
+      setGold(v => v + pts);
       const fid = ++uid;
-      setFloats(p => [...p, { id: fid, x: s.x, y: s.y, pts, type: s.type }]);
+      setFloats(p => [...p, { id: fid, x: m.x, y: m.y, pts }]);
       setTimeout(() => setFloats(p => p.filter(f => f.id !== fid)), 650);
       return nc;
     });
-    setFps(f => Math.min(60, f + 1));
+    setLife(l => Math.min(100, l + 1));
     sound.pickup();
   };
 
   const start = () => {
-    setScore(0);
+    setGold(0);
     setCombo(0);
-    setFps(60);
+    setLife(100);
     setTimeLeft(GAME_MS);
-    setSpikes([]);
+    setMobs([]);
     setState('playing');
     sound.tap();
   };
@@ -107,23 +112,16 @@ export default function FunZone({ onBack }) {
 
   return (
     <motion.div className="funzone" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
-      <div className="fz-bg" />
-      <button className="sw-back" onClick={onBack}>← Back to Progen Labs</button>
+      <FantasyScene />
+      <button className="sw-back" onClick={onBack}>← Leave the realm</button>
 
-      {/* top HUD */}
       <div className="fz-hud">
-        <div className="fz-stat panel">
-          <span className="fz-label">SCORE</span>
-          <b>{score}</b>
-        </div>
+        <div className="fz-stat panel"><span className="fz-label">🪙 GOLD</span><b>{gold}</b></div>
         <div className="fz-fps panel">
-          <span className="fz-label">FPS {fps}</span>
-          <div className="fz-bar"><div className="fz-bar-fill" style={{ width: `${(fps / 60) * 100}%`, background: fps > 30 ? 'var(--good)' : '#ff8da8' }} /></div>
+          <span className="fz-label">❤ REALM</span>
+          <div className="fz-bar"><div className="fz-bar-fill" style={{ width: `${life}%`, background: life > 40 ? 'var(--good)' : '#ff8da8' }} /></div>
         </div>
-        <div className="fz-stat panel">
-          <span className="fz-label">TIME</span>
-          <b>{Math.ceil(timeLeft / 1000)}s</b>
-        </div>
+        <div className="fz-stat panel"><span className="fz-label">⏳ TIME</span><b>{Math.ceil(timeLeft / 1000)}s</b></div>
       </div>
 
       {combo >= 4 && state === 'playing' && (
@@ -132,69 +130,57 @@ export default function FunZone({ onBack }) {
         </motion.div>
       )}
 
-      {/* play field */}
       <div className="fz-field">
         <AnimatePresence>
-          {spikes.map(s => (
+          {mobs.map(m => (
             <motion.button
-              key={s.id}
-              className={`fz-spike ${s.type}`}
-              style={{ left: `${s.x}%`, top: `${s.y}%` }}
+              key={m.id}
+              className={`fz-mob ${m.type}`}
+              style={{ left: `${m.x}%`, top: `${m.y}%` }}
               initial={{ scale: 0, rotate: -30 }}
               animate={{ scale: 1, rotate: 0 }}
               exit={{ scale: 0, opacity: 0 }}
               transition={spring}
-              onPointerDown={e => hit(s, e)}
+              onPointerDown={e => hit(m, e)}
             >
-              {s.type === 'leak' ? '🧠' : '⚡'}
+              {ENEMY[m.type].emoji}
             </motion.button>
           ))}
         </AnimatePresence>
         {floats.map(f => (
-          <motion.span
-            key={f.id}
-            className="fz-float"
-            style={{ left: `${f.x}%`, top: `${f.y}%`, color: f.type === 'leak' ? '#c9a8ff' : '#ffd98a' }}
-            initial={{ y: 0, opacity: 1, scale: 0.8 }}
-            animate={{ y: -40, opacity: 0, scale: 1.2 }}
-            transition={{ duration: 0.65 }}
-          >
-            +{(f.type === 'leak' ? 25 : 10) * mult}
+          <motion.span key={f.id} className="fz-float" style={{ left: `${f.x}%`, top: `${f.y}%` }} initial={{ y: 0, opacity: 1, scale: 0.8 }} animate={{ y: -42, opacity: 0, scale: 1.2 }} transition={{ duration: 0.65 }}>
+            +{f.pts}
           </motion.span>
         ))}
       </div>
 
-      {/* start screen */}
       <AnimatePresence>
         {state === 'ready' && (
           <motion.div className="fz-modal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <motion.div className="fz-card panel" initial={{ scale: 0.8, y: 20 }} animate={{ scale: 1, y: 0 }} transition={spring}>
-              <p className="fz-kicker">FUN ZONE</p>
-              <h1 className="fz-title grad-text">Lag Spike Smash</h1>
+              <p className="fz-kicker">FUN ZONE · THE ENCHANTED REALM</p>
+              <h1 className="fz-title grad-gold">Realm Rush</h1>
               <p className="fz-desc">
-                Your app is drowning in <b>lag spikes</b> ⚡ and <b>memory leaks</b> 🧠. Smash them before they tank your
-                frame rate! Chain hits for combo multipliers. Keep the FPS above zero for {GAME_MS / 1000} seconds.
+                The realm is overrun! Tap the <b>goblins</b> 👺 and <b>dragons</b> 🐉 before they drain its life.
+                Chain strikes for combo multipliers and hoard gold. Hold the realm for {GAME_MS / 1000} seconds.
               </p>
-              <button className="btn btn-primary fz-play" onClick={start}>▶ Start optimizing</button>
-              {best.current > 0 && <p className="fz-best">Best score: {best.current}</p>}
+              <button className="btn btn-gold fz-play" onClick={start}>⚔ Defend the realm</button>
+              {best.current > 0 && <p className="fz-best">Best gold: {best.current}</p>}
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* game over */}
       <AnimatePresence>
         {state === 'over' && (
           <motion.div className="fz-modal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <motion.div className="fz-card panel" initial={{ scale: 0.8, y: 20 }} animate={{ scale: 1, y: 0 }} transition={spring}>
-              <p className="fz-kicker">{fps <= 0 ? 'FRAME RATE CRASHED' : "TIME'S UP"}</p>
-              <h1 className="fz-title">{score}</h1>
-              <p className="fz-desc">
-                {score >= best.current ? '🏆 New best score!' : `Best: ${best.current}`}
-              </p>
+              <p className="fz-kicker">{life <= 0 ? '🏰 THE REALM HAS FALLEN' : "⏳ THE SIEGE IS OVER"}</p>
+              <h1 className="fz-title grad-gold">🪙 {gold}</h1>
+              <p className="fz-desc">{gold >= best.current ? '🏆 A new legend of the realm!' : `Best: ${best.current} gold`}</p>
               <div className="fz-actions">
-                <button className="btn btn-primary fz-play" onClick={start}>↻ Play again</button>
-                <button className="btn btn-ghost" onClick={onBack}>Leave Fun Zone</button>
+                <button className="btn btn-gold fz-play" onClick={start}>↻ Rise again</button>
+                <button className="btn btn-ghost" onClick={onBack}>Leave the realm</button>
               </div>
             </motion.div>
           </motion.div>

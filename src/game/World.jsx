@@ -11,7 +11,13 @@ import Decor from './Decor.jsx';
 
 export const SPECTRA_POS = [0, 0, -26];
 export const FUNZONE_POS = [-30, 0, -4];
-const COMMUNITY_POS = [30, 0, -4];
+export const COMMUNITY_POS = [30, 0, -4];
+
+export const GATE_MARKERS = [
+  { id: 'spectra', name: 'Spectra', color: '#39e0ff', pos: SPECTRA_POS },
+  { id: 'funzone', name: 'Fun Zone', color: '#ff9a3d', pos: FUNZONE_POS },
+  { id: 'community', name: 'Community', color: '#ff6ad5', pos: COMMUNITY_POS },
+];
 
 const GATES = [
   { id: 'spectra', pos: SPECTRA_POS, radius: 11 },

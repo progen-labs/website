@@ -724,3 +724,70 @@ strong { color: var(--text); font-weight: 600; }
   .fz-hud { flex-wrap: wrap; justify-content: center; width: 92vw; }
   .fz-spike { width: 58px; height: 58px; font-size: 1.6rem; }
 }
+
+/* ================= FANTASY REALM (Fun Zone backdrop) ================= */
+.fantasy { position: absolute; inset: 0; overflow: hidden; z-index: 0; }
+.fy-sky {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, #170d38 0%, #35195c 34%, #6e2a6b 60%, #b3476b 80%, #e7935a 100%);
+}
+.fy-stars {
+  position: absolute; inset: 0 0 45% 0; opacity: 0.8;
+  background:
+    radial-gradient(1.4px 1.4px at 12% 18%, #fff, transparent),
+    radial-gradient(1.4px 1.4px at 28% 32%, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 46% 12%, #ffe9c8, transparent),
+    radial-gradient(1.4px 1.4px at 63% 26%, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 78% 14%, #fff, transparent),
+    radial-gradient(1.4px 1.4px at 88% 30%, #cfe3ff, transparent);
+}
+.fy-aurora { position: absolute; width: 70vw; height: 50vh; border-radius: 50%; filter: blur(70px); mix-blend-mode: screen; opacity: 0.5; animation: aurora 16s ease-in-out infinite alternate; }
+.fy-aurora.a1 { top: -10%; left: -5%; background: radial-gradient(circle, #46e2a0, transparent 65%); }
+.fy-aurora.a2 { top: -6%; right: -8%; background: radial-gradient(circle, #7c7cff, transparent 65%); animation-delay: -6s; }
+@keyframes aurora { from { transform: translateX(-4%) scale(1); opacity: 0.4; } to { transform: translateX(8%) scale(1.12); opacity: 0.6; } }
+.fy-moon {
+  position: absolute; top: 9%; right: 16%; width: 120px; height: 120px; border-radius: 50%;
+  background: radial-gradient(circle at 38% 34%, #fff7e6, #ffe3b0 55%, #f3c27a 100%);
+  box-shadow: 0 0 80px 20px rgba(255, 220, 160, 0.4), inset -10px -10px 24px rgba(180, 130, 70, 0.3);
+}
+.fy-island { position: absolute; animation: floatY 7s ease-in-out infinite; }
+.fy-island.i1 { top: 30%; left: 12%; transform: scale(1); }
+.fy-island.i2 { top: 44%; right: 14%; transform: scale(0.72); animation-delay: -3s; }
+.fy-rock { width: 150px; height: 46px; background: linear-gradient(180deg, #3a2a6b, #150f33); clip-path: polygon(10% 0, 90% 0, 100% 40%, 60% 100%, 40% 100%, 0 40%); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+.fy-tree { position: absolute; top: -34px; left: 54px; width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-bottom: 44px solid #16633f; filter: drop-shadow(0 0 10px rgba(70, 226, 160, 0.5)); }
+.fy-tree.small { top: -26px; border-left: 14px solid transparent; border-right: 14px solid transparent; border-bottom: 32px solid #16633f; }
+@keyframes floatY { 0%, 100% { translate: 0 0; } 50% { translate: 0 -16px; } }
+.fy-scape { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 56%; }
+.fy-mist { position: absolute; left: 0; right: 0; bottom: 0; height: 30%; background: linear-gradient(180deg, transparent, rgba(120, 90, 160, 0.25) 60%, rgba(20, 12, 40, 0.5)); pointer-events: none; }
+.fy-fly { position: absolute; border-radius: 50%; background: #ffe9a8; box-shadow: 0 0 10px 2px rgba(255, 220, 130, 0.9); animation: fly linear infinite; }
+@keyframes fly { 0% { transform: translate(0, 0); opacity: 0.2; } 25% { opacity: 1; } 50% { transform: translate(24px, -20px); opacity: 0.5; } 75% { opacity: 1; } 100% { transform: translate(-10px, -8px); opacity: 0.2; } }
+
+/* fantasy game pieces */
+.fz-mob {
+  position: absolute; transform: translate(-50%, -50%);
+  width: 66px; height: 66px; border: none; background: none; cursor: pointer;
+  display: grid; place-items: center; font-size: 2.3rem; touch-action: manipulation;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6));
+}
+.fz-mob::before { content: ''; position: absolute; inset: 6px; border-radius: 50%; z-index: -1; }
+.fz-mob.goblin::before { background: radial-gradient(circle, rgba(120, 220, 120, 0.35), transparent 70%); box-shadow: 0 0 22px rgba(90, 200, 90, 0.5); }
+.fz-mob.dragon::before { background: radial-gradient(circle, rgba(255, 120, 60, 0.4), transparent 70%); box-shadow: 0 0 26px rgba(255, 120, 40, 0.6); }
+.fz-float { position: absolute; transform: translate(-50%, -50%); font-family: var(--font-display); font-weight: 700; font-size: 1.25rem; pointer-events: none; z-index: 4; color: #ffe08a; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7); }
+
+.grad-gold { background: linear-gradient(100deg, #ffe9a8, #ffcf4d 45%, #ff9a3d 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.btn-gold { background: linear-gradient(180deg, #ffd978, #f5a623); color: #3a2200; box-shadow: 0 8px 26px rgba(245, 166, 35, 0.4); }
+.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 12px 34px rgba(245, 166, 35, 0.55); }
+
+/* ================= GATE COMPASS (directional arrows) ================= */
+.compass { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
+.compass-marker {
+  position: absolute; top: 0; left: 0; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  transition: opacity 0.25s ease; will-change: transform; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
+}
+.compass-arrow { font-size: 1.4rem; line-height: 1; }
+.compass-info {
+  display: flex; flex-direction: column; align-items: center; line-height: 1.2;
+  background: rgba(5, 6, 14, 0.62); border: 1px solid currentColor; border-radius: 10px; padding: 3px 10px; backdrop-filter: blur(6px);
+}
+.compass-name { font-family: var(--font-display); font-weight: 600; font-size: 0.78rem; color: #fff; }
+.compass-dist { font-family: var(--font-mono); font-size: 0.68rem; color: currentColor; }
