@@ -5,7 +5,7 @@ const spring = { type: 'spring', stiffness: 400, damping: 22 };
 
 const GATE_LABELS = {
   spectra: 'SPECTRA · performance profiler',
-  funzone: 'FUN ZONE · lag spike smash',
+  funzone: 'THE CORE · browser & react internals',
 };
 
 export default function Hud({ phase, nearGate, muted, onMute, touch, onAction }) {

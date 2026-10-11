@@ -16,7 +16,9 @@ function ensure() {
     master.gain.value = muted ? 0 : 0.45;
     master.connect(ctx.destination);
   }
-  if (ctx.state === 'suspended') ctx.resume();
+  // Only wake the graph when we're meant to be audible — otherwise a scheduled
+  // note or SFX firing while muted would silently resume playback.
+  if (ctx.state === 'suspended' && !muted) ctx.resume();
   return ctx;
 }
 
@@ -175,6 +177,12 @@ export const sound = {
   toggleMute() {
     muted = !muted;
     if (master) master.gain.value = muted ? 0 : 0.45;
+    // Belt and suspenders: halt/resume the whole audio graph too, so nothing
+    // (drone, generative music, scheduled notes) can slip through while muted.
+    if (ctx) {
+      if (muted) ctx.suspend?.();
+      else if (ctx.state === 'suspended') ctx.resume?.();
+    }
     return muted;
   },
   isMuted() {

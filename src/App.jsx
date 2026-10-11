@@ -10,7 +10,7 @@ import Hud from './components/Hud.jsx';
 import GateCompass from './components/GateCompass.jsx';
 import WorldSky from './components/WorldSky.jsx';
 import SpectraWorld from './components/SpectraWorld.jsx';
-import FunZone from './components/FunZone.jsx';
+import InternalsExplorer from './components/InternalsExplorer.jsx';
 
 export default function App() {
   const keys = useKeyboard();
@@ -138,7 +138,7 @@ export default function App() {
 
       <AnimatePresence>
         {phase === 'spectra' && <SpectraWorld key="sw" onBack={back} />}
-        {phase === 'funzone' && <FunZone key="fz" onBack={back} />}
+        {phase === 'funzone' && <InternalsExplorer key="fz" onBack={back} />}
       </AnimatePresence>
     </div>
   );

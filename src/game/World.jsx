@@ -15,7 +15,7 @@ export const COMMUNITY_POS = [30, 0, -4];
 
 export const GATE_MARKERS = [
   { id: 'spectra', name: 'Spectra', color: '#39e0ff', pos: SPECTRA_POS },
-  { id: 'funzone', name: 'Fun Zone', color: '#ff9a3d', pos: FUNZONE_POS },
+  { id: 'funzone', name: 'The Core', color: '#ff9a3d', pos: FUNZONE_POS },
   { id: 'community', name: 'Community', color: '#ff6ad5', pos: COMMUNITY_POS },
 ];
 
@@ -104,7 +104,7 @@ export default function World({ keys, move, posRef, phase, enteringGate, nearGat
       <Character keys={keys} move={move} posRef={posRef} frozen={phase !== 'explore'} />
 
       <Portal position={SPECTRA_POS} label="SPECTRA" sub="frontend performance profiler" color="#39e0ff" active={nearGate === 'spectra'} open={phase === 'entering' && enteringGate === 'spectra'} />
-      <Portal position={FUNZONE_POS} label="FUN ZONE" sub="lag spike smash" color="#ff9a3d" active={nearGate === 'funzone'} open={phase === 'entering' && enteringGate === 'funzone'} />
+      <Portal position={FUNZONE_POS} label="THE CORE" sub="browser & react internals" color="#ff9a3d" active={nearGate === 'funzone'} open={phase === 'entering' && enteringGate === 'funzone'} />
       <Portal position={COMMUNITY_POS} label="COMMUNITY" sub="coming soon" color="#ff6ad5" locked />
 
       <GateSensor posRef={posRef} onNear={setNearGate} />
