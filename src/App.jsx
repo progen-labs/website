@@ -19,7 +19,7 @@ export default function App() {
   const [phase, setPhase] = useState('explore'); // explore | entering | spectra | funzone
   const [nearGate, setNearGate] = useState(null); // null | 'spectra' | 'funzone'
   const [enteringGate, setEnteringGate] = useState('spectra');
-  const [muted, setMuted] = useState(false);
+  const [muted, setMuted] = useState(() => sound.isMuted());
   const [touch] = useState(
     () =>
       typeof window !== 'undefined' &&

@@ -3,9 +3,23 @@
 
 let ctx = null;
 let master = null;
-let muted = false;
+let muted = (() => {
+  try {
+    return localStorage.getItem('pl_muted') === '1';
+  } catch {
+    return false;
+  }
+})();
 let ambient = null;
 let music = null;
+
+function persistMute() {
+  try {
+    localStorage.setItem('pl_muted', muted ? '1' : '0');
+  } catch {
+    /* ignore */
+  }
+}
 
 function ensure() {
   if (!ctx) {
@@ -174,8 +188,19 @@ export const sound = {
     ambient = { o1, o2, lfo, g };
     startMusic();
   },
+  setMuted(v) {
+    muted = !!v;
+    persistMute();
+    if (master) master.gain.value = muted ? 0 : 0.45;
+    if (ctx) {
+      if (muted) ctx.suspend?.();
+      else if (ctx.state === 'suspended') ctx.resume?.();
+    }
+    return muted;
+  },
   toggleMute() {
     muted = !muted;
+    persistMute();
     if (master) master.gain.value = muted ? 0 : 0.45;
     // Belt and suspenders: halt/resume the whole audio graph too, so nothing
     // (drone, generative music, scheduled notes) can slip through while muted.

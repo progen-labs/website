@@ -1,207 +1,282 @@
-import { useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { Billboard, Line, Stars, Text } from '@react-three/drei';
+import { useEffect, useMemo, useRef } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import { Billboard, Line, OrbitControls, Stars, Text } from '@react-three/drei';
 import * as THREE from 'three';
-import { FLOW, GROUPS, NODES, NODE_BY_ID } from './internals-data.js';
+import { CONCEPT_BY_ID, GROUPS, conceptsOf } from './internals-data.js';
 
-const ACTIVATE_DIST = 6.8;
-const SPEED = 15;
-const BOUNDS = { x: 42, zMin: -54, zMax: 13 };
+const TILT = 0.52;
 
-function NodeShape({ idx, color, active }) {
+// phase offset of PI/n keeps the top and bottom of the ring clear (no node
+// sits dead-centre under the hub/star label).
+function ringPos(center, radius, i, n, phase = -Math.PI / 2 + Math.PI / n) {
+  const a = phase + (i / n) * Math.PI * 2;
+  return [
+    center[0] + radius * Math.cos(a),
+    center[1] + radius * Math.sin(a) * Math.sin(TILT),
+    center[2] + radius * Math.sin(a) * Math.cos(TILT),
+  ];
+}
+
+const easeInOut = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+// --- camera: smoothly fly to the pose for the current view, then hand back to OrbitControls
+function CameraManager({ pose, controlsRef }) {
+  const { camera } = useThree();
+  const anim = useRef(null);
+
+  useEffect(() => {
+    const from = camera.position.clone();
+    const fromT = controlsRef.current ? controlsRef.current.target.clone() : new THREE.Vector3();
+    anim.current = { t: 0, from, fromT, toP: new THREE.Vector3(...pose.pos), toT: new THREE.Vector3(...pose.tgt) };
+    if (controlsRef.current) controlsRef.current.enabled = false;
+  }, [pose.key]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useFrame((_, dt) => {
+    const a = anim.current;
+    if (!a) return;
+    a.t = Math.min(1, a.t + dt / 0.75);
+    const e = easeInOut(a.t);
+    camera.position.lerpVectors(a.from, a.toP, e);
+    if (controlsRef.current) {
+      controlsRef.current.target.lerpVectors(a.fromT, a.toT, e);
+      controlsRef.current.update();
+    }
+    if (a.t >= 1) {
+      anim.current = null;
+      if (controlsRef.current) controlsRef.current.enabled = true;
+    }
+  });
+  return null;
+}
+
+function Shape({ idx, color, scale, emissive }) {
   const ref = useRef();
   useFrame((_, dt) => {
-    if (!ref.current) return;
-    ref.current.rotation.y += dt * (active ? 0.9 : 0.35);
-    ref.current.rotation.x += dt * 0.15;
+    if (ref.current) {
+      ref.current.rotation.y += dt * 0.3;
+      ref.current.rotation.x += dt * 0.08;
+    }
   });
-  const geom = idx % 5;
+  const g = idx % 5;
   return (
-    <mesh ref={ref}>
-      {geom === 0 && <icosahedronGeometry args={[1.25, 0]} />}
-      {geom === 1 && <octahedronGeometry args={[1.35, 0]} />}
-      {geom === 2 && <dodecahedronGeometry args={[1.2, 0]} />}
-      {geom === 3 && <torusGeometry args={[1.0, 0.34, 12, 28]} />}
-      {geom === 4 && <boxGeometry args={[1.7, 1.7, 1.7]} />}
-      <meshStandardMaterial
-        color="#0a1024"
-        emissive={color}
-        emissiveIntensity={active ? 2.3 : 1.1}
-        roughness={0.25}
-        metalness={0.5}
-        flatShading
-      />
+    <mesh ref={ref} scale={scale}>
+      {g === 0 && <icosahedronGeometry args={[1, 0]} />}
+      {g === 1 && <octahedronGeometry args={[1.1, 0]} />}
+      {g === 2 && <dodecahedronGeometry args={[0.95, 0]} />}
+      {g === 3 && <torusGeometry args={[0.8, 0.3, 14, 32]} />}
+      {g === 4 && <boxGeometry args={[1.35, 1.35, 1.35]} />}
+      <meshStandardMaterial color="#0a1024" emissive={color} emissiveIntensity={emissive} roughness={0.25} metalness={0.5} flatShading />
     </mesh>
   );
 }
 
-function Station({ node, idx, active }) {
-  const accent = GROUPS[node.group].accent;
+function Node({ position, idx, color, title, tag, baseSize, hovered, active, showTag, onOver, onOut, onClick, clickGuard }) {
   const ref = useRef();
+  const lift = hovered || active;
   useFrame(({ clock }) => {
     if (!ref.current) return;
     const t = clock.getElapsedTime();
-    // gentle float, with a stronger bob when you're parked next to it
-    ref.current.position.y = node.pos[1] + Math.sin(t * 1.1 + idx) * (active ? 0.4 : 0.22);
-    const s = active ? 1.14 + Math.sin(t * 4) * 0.04 : 1;
-    ref.current.scale.setScalar(s);
+    ref.current.position.y = position[1] + Math.sin(t * 1.2 + idx) * 0.18;
+    const target = lift ? 1.28 : 1;
+    ref.current.scale.x = THREE.MathUtils.lerp(ref.current.scale.x, target, 0.15);
+    ref.current.scale.y = ref.current.scale.x;
+    ref.current.scale.z = ref.current.scale.x;
   });
   return (
-    <group position={node.pos}>
-      <group ref={ref}>
-        <NodeShape idx={idx} color={accent} active={active} />
-        {/* halo ring */}
+    <group position={position}>
+      <group
+        ref={ref}
+        onPointerOver={e => {
+          e.stopPropagation();
+          onOver();
+          document.body.style.cursor = 'pointer';
+        }}
+        onPointerOut={() => {
+          onOut();
+          document.body.style.cursor = '';
+        }}
+        onClick={e => {
+          e.stopPropagation();
+          if (clickGuard.current && clickGuard.current.drag) return;
+          onClick();
+        }}
+      >
+        <Shape idx={idx} color={color} scale={baseSize} emissive={lift ? 2.3 : 1.15} />
         <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[2.1, 0.035, 8, 48]} />
-          <meshBasicMaterial color={accent} transparent opacity={active ? 0.9 : 0.4} />
+          <torusGeometry args={[baseSize * 1.6, 0.03, 8, 48]} />
+          <meshBasicMaterial color={color} transparent opacity={lift ? 0.95 : 0.4} />
         </mesh>
-        <pointLight color={accent} intensity={active ? 26 : 10} distance={14} />
+        <pointLight color={color} intensity={lift ? 20 : 7} distance={12} />
       </group>
 
-      <Billboard position={[0, 2.9, 0]}>
-        <Text fontSize={0.62} color="#ffffff" anchorX="center" anchorY="bottom" outlineWidth={0.012} outlineColor="#05060e" maxWidth={7}>
-          {node.title}
+      <Billboard position={[0, baseSize * 1.9, 0]}>
+        <Text fontSize={0.6} color="#ffffff" anchorX="center" anchorY="bottom" outlineWidth={0.014} outlineColor="#05060e" maxWidth={7}>
+          {title}
         </Text>
-        <Text position={[0, -0.18, 0]} fontSize={0.34} color={accent} anchorX="center" anchorY="top" maxWidth={8}>
-          {node.tag}
+        {(showTag || lift) && tag && (
+          <Text position={[0, -0.16, 0]} fontSize={0.32} color={color} anchorX="center" anchorY="top" maxWidth={8}>
+            {tag}
+          </Text>
+        )}
+      </Billboard>
+    </group>
+  );
+}
+
+function Star({ position, color, label }) {
+  const ref = useRef();
+  useFrame((_, dt) => {
+    if (ref.current) ref.current.rotation.y += dt * 0.12;
+  });
+  return (
+    <group position={position}>
+      <mesh ref={ref}>
+        <icosahedronGeometry args={[1.7, 1]} />
+        <meshStandardMaterial color="#120a04" emissive={color} emissiveIntensity={1.8} roughness={0.4} metalness={0.3} flatShading />
+      </mesh>
+      <pointLight color={color} intensity={40} distance={30} />
+      <Billboard position={[0, 4.6, 0]}>
+        <Text fontSize={1.0} color={color} anchorX="center" outlineWidth={0.02} outlineColor="#05060e" letterSpacing={0.04}>
+          {label}
         </Text>
       </Billboard>
-
-      {active && (
-        <Billboard position={[0, -2.4, 0]}>
-          <Text fontSize={0.4} color="#dfe6ff" anchorX="center" anchorY="middle" outlineWidth={0.01} outlineColor="#05060e">
-            ▶ press ENTER
-          </Text>
-        </Billboard>
-      )}
     </group>
   );
 }
 
-function FlowLine({ ids, color }) {
-  const points = useMemo(
-    () => ids.map(id => new THREE.Vector3(...NODE_BY_ID[id].pos)),
-    [ids],
-  );
-  return <Line points={points} color={color} lineWidth={1.4} transparent opacity={0.3} dashed dashSize={0.6} gapSize={0.4} />;
+function Spokes({ from, tos, color }) {
+  return tos.map((to, i) => (
+    <Line key={i} points={[from, to]} color={color} lineWidth={1} transparent opacity={0.22} />
+  ));
 }
 
-function Probe({ input, posRef, frozen, onNear }) {
-  const body = useRef();
-  const vel = useRef(0);
-  const lastNear = useRef(undefined);
-  const dir = useRef(new THREE.Vector3(0, 0, -1));
+function Overview({ hoveredId, onHover, onPick, clickGuard }) {
+  const browser = conceptsOf('browser');
+  const react = conceptsOf('react');
 
-  useFrame((state, delta) => {
-    const dt = Math.min(delta, 0.05);
-    const p = posRef.current;
-    const i = input.current;
-
-    let mx = 0;
-    let mz = 0;
-    if (!frozen.current) {
-      mx = (i.right ? 1 : 0) - (i.left ? 1 : 0) + (i.x || 0);
-      mz = (i.down ? 1 : 0) - (i.up ? 1 : 0) + (i.z || 0);
-      const len = Math.hypot(mx, mz) || 1;
-      if (len > 1) {
-        mx /= len;
-        mz /= len;
-      }
-      p.x = THREE.MathUtils.clamp(p.x + mx * SPEED * dt, -BOUNDS.x, BOUNDS.x);
-      p.z = THREE.MathUtils.clamp(p.z + mz * SPEED * dt, BOUNDS.zMin, BOUNDS.zMax);
+  const layout = useMemo(() => {
+    const map = {};
+    for (const group of ['browser', 'react']) {
+      const list = conceptsOf(group);
+      list.forEach((c, i) => {
+        map[c.id] = ringPos(GROUPS[group].center, 13.5, i, list.length);
+      });
     }
+    return map;
+  }, []);
 
-    const moving = Math.hypot(mx, mz) > 0.05;
-    vel.current = THREE.MathUtils.lerp(vel.current, moving ? 1 : 0, 0.12);
-    if (moving) dir.current.set(mx, 0, mz).normalize();
+  const flow = group => {
+    const list = conceptsOf(group);
+    return list.map(c => layout[c.id]);
+  };
 
-    // place + animate the drone
-    if (body.current) {
-      const t = state.clock.getElapsedTime();
-      body.current.position.set(p.x, 2.2 + Math.sin(t * 2.4) * 0.18, p.z);
-      const targetYaw = Math.atan2(dir.current.x, dir.current.z);
-      body.current.rotation.y = THREE.MathUtils.lerp(body.current.rotation.y, targetYaw, 0.15);
-      body.current.rotation.z = -mx * 0.35;
-      body.current.rotation.x = mz * 0.22;
-    }
-
-    // chase camera
-    const cam = state.camera;
-    const camTarget = new THREE.Vector3(p.x, 2.2, p.z).add(new THREE.Vector3(0, 6.2, 12.5));
-    cam.position.lerp(camTarget, 1 - Math.pow(0.0025, dt));
-    cam.lookAt(p.x, 3.4, p.z - 6);
-
-    // nearest station
-    let near = null;
-    let best = ACTIVATE_DIST;
-    for (const n of NODES) {
-      const d = Math.hypot(p.x - n.pos[0], (2.2 - n.pos[1]) * 0.6, p.z - n.pos[2]);
-      if (d < best) {
-        best = d;
-        near = n.id;
-      }
-    }
-    if (near !== lastNear.current) {
-      lastNear.current = near;
-      onNear(near);
-    }
-  });
-
-  return (
-    <group ref={body}>
-      {/* glowing core */}
-      <mesh>
-        <icosahedronGeometry args={[0.5, 1]} />
-        <meshStandardMaterial color="#071225" emissive="#8fdcff" emissiveIntensity={2.4} roughness={0.2} metalness={0.6} flatShading />
-      </mesh>
-      {/* orbiting ring */}
-      <mesh rotation={[Math.PI / 2.3, 0, 0]}>
-        <torusGeometry args={[0.95, 0.06, 8, 40]} />
-        <meshBasicMaterial color="#9ad8ff" transparent opacity={0.85} />
-      </mesh>
-      {/* twin thrusters */}
-      <mesh position={[0, -0.05, 0.75]}>
-        <coneGeometry args={[0.18, 0.6, 10]} />
-        <meshBasicMaterial color="#59e3ff" transparent opacity={0.5 + vel.current * 0.5} />
-      </mesh>
-      <pointLight color="#8fdcff" intensity={18} distance={16} />
-    </group>
-  );
-}
-
-export default function InternalsWorld({ input, posRef, frozen, onNear, activeId }) {
   return (
     <>
-      <fog attach="fog" args={['#05070f', 28, 90]} />
-      <ambientLight intensity={0.5} color="#c7d4ff" />
-      <directionalLight position={[12, 24, 10]} intensity={0.7} color="#cfe0ff" />
-      <directionalLight position={[-14, 10, -20]} intensity={0.35} color="#ff9a6b" />
-
-      <Stars radius={150} depth={70} count={2600} factor={4} fade speed={0.3} />
-
-      {/* reflective floor grid plane */}
-      <gridHelper args={[180, 90, '#20305c', '#141d38']} position={[0, 0, -18]} />
-
-      {/* group banners */}
-      <Billboard position={[-19, 9.5, -4]}>
-        <Text fontSize={1.1} color={GROUPS.browser.accent} anchorX="center" outlineWidth={0.02} outlineColor="#05060e">
-          BROWSER INTERNALS
-        </Text>
-      </Billboard>
-      <Billboard position={[19, 9.5, -4]}>
-        <Text fontSize={1.1} color={GROUPS.react.accent} anchorX="center" outlineWidth={0.02} outlineColor="#05060e">
-          REACT INTERNALS
-        </Text>
-      </Billboard>
-
-      <FlowLine ids={FLOW.browser} color={GROUPS.browser.accent} />
-      <FlowLine ids={FLOW.react} color={GROUPS.react.accent} />
-
-      {NODES.map((n, i) => (
-        <Station key={n.id} node={n} idx={i} active={activeId === n.id} />
+      {['browser', 'react'].map(group => (
+        <group key={group}>
+          <Star position={GROUPS[group].center} color={GROUPS[group].accent} label={GROUPS[group].label.toUpperCase()} />
+          <Line points={[...flow(group), layout[conceptsOf(group)[0].id]]} color={GROUPS[group].accent} lineWidth={1.2} transparent opacity={0.22} dashed dashSize={0.6} gapSize={0.4} />
+        </group>
       ))}
+      {[...browser, ...react].map((c, i) => (
+        <Node
+          key={c.id}
+          position={layout[c.id]}
+          idx={i}
+          color={GROUPS[c.group].accent}
+          title={c.title}
+          tag={c.tag}
+          baseSize={1.15}
+          hovered={hoveredId === c.id}
+          active={false}
+          showTag={false}
+          onOver={() => onHover(c.id)}
+          onOut={() => onHover(null)}
+          onClick={() => onPick(c.id)}
+          clickGuard={clickGuard}
+        />
+      ))}
+    </>
+  );
+}
 
-      <Probe input={input} posRef={posRef} frozen={frozen} onNear={onNear} />
+function ConceptView({ concept, hoveredId, selectedSubId, onHover, onPick, clickGuard }) {
+  const accent = GROUPS[concept.group].accent;
+  const hub = [0, 2.5, 0];
+  const childPos = useMemo(
+    () => concept.children.map((_, i) => ringPos(hub, 9, i, concept.children.length)),
+    [concept.id], // eslint-disable-line react-hooks/exhaustive-deps
+  );
+
+  return (
+    <>
+      <Star position={hub} color={accent} label={concept.title.toUpperCase()} />
+      <Billboard position={[0, hub[1] - 2.6, 0]}>
+        <Text fontSize={0.4} color="#c7d2f0" anchorX="center" anchorY="middle" maxWidth={16} outlineWidth={0.008} outlineColor="#05060e">
+          {concept.blurb}
+        </Text>
+      </Billboard>
+      <Spokes from={hub} tos={childPos} color={accent} />
+      {concept.children.map((ch, i) => (
+        <Node
+          key={ch.id}
+          position={childPos[i]}
+          idx={i + 2}
+          color={accent}
+          title={ch.title}
+          tag={ch.blurb}
+          baseSize={0.95}
+          hovered={hoveredId === ch.id}
+          active={selectedSubId === ch.id}
+          showTag
+          onOver={() => onHover(ch.id)}
+          onOut={() => onHover(null)}
+          onClick={() => onPick(ch.id)}
+          clickGuard={clickGuard}
+        />
+      ))}
+    </>
+  );
+}
+
+export default function InternalsWorld({ view, focusId, hoveredId, selectedSubId, onHover, onPickConcept, onPickSub, controlsRef, clickGuard }) {
+  const concept = focusId ? CONCEPT_BY_ID[focusId] : null;
+
+  const pose = useMemo(() => {
+    if (view === 'concept') return { key: `c:${focusId}`, pos: [0, 12, 24], tgt: [0, 2.5, 0] };
+    return { key: 'overview', pos: [0, 34, 55], tgt: [0, 1, -1] };
+  }, [view, focusId]);
+
+  return (
+    <>
+      <color attach="background" args={['#05060f']} />
+      <fog attach="fog" args={['#05060f', 55, 130]} />
+      <ambientLight intensity={0.5} color="#c7d4ff" />
+      <directionalLight position={[16, 28, 12]} intensity={0.6} color="#dfe8ff" />
+      <directionalLight position={[-18, 12, -22]} intensity={0.3} color="#ffac7a" />
+
+      <Stars radius={180} depth={80} count={3200} factor={4} fade speed={0.25} />
+      <gridHelper args={[200, 80, '#1b2748', '#111a33']} position={[0, -6, 0]} />
+
+      {view === 'concept' && concept ? (
+        <ConceptView concept={concept} hoveredId={hoveredId} selectedSubId={selectedSubId} onHover={onHover} onPick={onPickSub} clickGuard={clickGuard} />
+      ) : (
+        <Overview hoveredId={hoveredId} onHover={onHover} onPick={onPickConcept} clickGuard={clickGuard} />
+      )}
+
+      <CameraManager pose={pose} controlsRef={controlsRef} />
+      <OrbitControls
+        ref={controlsRef}
+        makeDefault
+        enablePan={false}
+        enableDamping
+        dampingFactor={0.08}
+        minDistance={7}
+        maxDistance={90}
+        maxPolarAngle={Math.PI * 0.49}
+        rotateSpeed={0.6}
+        zoomSpeed={0.9}
+      />
     </>
   );
 }
