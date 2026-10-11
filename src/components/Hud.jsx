@@ -1,54 +1,110 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { Logo } from './Icons.jsx';
 
-/** On-screen UI for the explore phase: title, controls, and the gate prompt. */
-export default function Hud({ phase, nearSpectra }) {
+const spring = { type: 'spring', stiffness: 400, damping: 22 };
+
+export default function Hud({ phase, nearSpectra, coins, total, muted, onMute, touch, onAction }) {
   const show = phase === 'explore';
+  const done = coins >= total;
+
   return (
     <div className="hud">
+      {/* top bar */}
       <div className="hud-top">
-        <div className="hud-brand">
+        <motion.div className="hud-brand panel" initial={{ y: -40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={spring}>
           <Logo size={22} />
           <div>
             <strong>PROGEN LABS</strong>
-            <span>a 3D world · nonprofit · open source · always free</span>
+            <span>a 3D world</span>
           </div>
+        </motion.div>
+
+        <div className="hud-top-right">
+          <motion.div
+            className="coin-counter panel"
+            initial={{ y: -40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ ...spring, delay: 0.05 }}
+            key={coins}
+          >
+            <motion.span className="coin-icon" animate={{ rotateY: coins * 180 }} transition={spring} />
+            <b>{coins}</b>
+            <span className="coin-total">/ {total}</span>
+          </motion.div>
+          <motion.button className="icon-btn panel" onClick={onMute} initial={{ y: -40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ ...spring, delay: 0.1 }} whileTap={{ scale: 0.88 }} aria-label="Toggle sound">
+            {muted ? '🔇' : '🔊'}
+          </motion.button>
         </div>
       </div>
 
+      {/* controls hint */}
       <AnimatePresence>
         {show && !nearSpectra && (
-          <motion.div
-            className="hud-controls"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 12 }}
-          >
-            <div className="keys">
-              <span className="key">W</span>
-              <span className="key">A</span>
-              <span className="key">S</span>
-              <span className="key">D</span>
-              <em>/ arrow keys to move</em>
-            </div>
-            <p>Explore the world and find the glowing project gates.</p>
+          <motion.div className="hud-controls panel" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }}>
+            {touch ? (
+              <p>
+                <b>Drag</b> the pad to move · <b>tap</b> the button to enter a gate. Collect the glowing orbs!
+              </p>
+            ) : (
+              <div className="keys-row">
+                <span className="keycap">W</span>
+                <span className="keycap">A</span>
+                <span className="keycap">S</span>
+                <span className="keycap">D</span>
+                <em>move · collect the orbs · find the gates</em>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
 
+      {/* gate prompt */}
       <AnimatePresence>
         {show && nearSpectra && (
           <motion.div
-            className="hud-prompt"
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="hud-prompt panel"
+            initial={{ opacity: 0, scale: 0.8, y: 24 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            exit={{ opacity: 0, scale: 0.8, y: 24 }}
+            transition={spring}
           >
-            <span className="prompt-label">SPECTRA — frontend performance profiler</span>
+            <span className="prompt-label">SPECTRA · performance profiler</span>
             <span className="prompt-key">
-              Press <kbd>Enter</kbd> to open the gate
+              {touch ? 'Tap the button to open the gate' : <>Press <kbd>Enter</kbd> to open the gate</>}
             </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* mobile action button */}
+      {touch && show && (
+        <motion.button
+          className={`action-btn ${nearSpectra ? 'ready' : ''}`}
+          onClick={onAction}
+          whileTap={{ scale: 0.86 }}
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={spring}
+        >
+          <span>{nearSpectra ? 'ENTER' : '◎'}</span>
+        </motion.button>
+      )}
+
+      {/* collect-all celebration */}
+      <AnimatePresence>
+        {done && (
+          <motion.div
+            className="hud-win panel"
+            initial={{ opacity: 0, scale: 0.7, y: 30 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.7 }}
+            transition={spring}
+          >
+            <span className="win-emoji">✨</span>
+            <div>
+              <strong>All orbs collected!</strong>
+              <span>You explored the whole world — nice.</span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

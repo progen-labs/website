@@ -6,6 +6,8 @@ import * as THREE from 'three';
 import Character from './Character.jsx';
 import Portal from './Portal.jsx';
 import CameraRig from './CameraRig.jsx';
+import Collectibles from './Collectibles.jsx';
+import Decor from './Decor.jsx';
 
 export const SPECTRA_POS = [0, 0, -26];
 const LOCKED_1 = [-30, 0, -4];
@@ -38,7 +40,7 @@ function Crystal({ position, color }) {
   );
 }
 
-export default function World({ keys, posRef, phase, nearSpectra, setNearSpectra }) {
+export default function World({ keys, move, posRef, phase, nearSpectra, setNearSpectra, onCollect }) {
   return (
     <>
       <color attach="background" args={['#05060e']} />
@@ -79,15 +81,14 @@ export default function World({ keys, posRef, phase, nearSpectra, setNearSpectra
         PROGEN LABS
       </Text>
 
-      <Crystal position={[-12, 2.4, -14]} color="#7c7cff" />
-      <Crystal position={[13, 2.2, -16]} color="#36d6ff" />
-      <Crystal position={[-7, 2.1, 6]} color="#ff6ad5" />
+      <Decor />
+      <Collectibles posRef={posRef} onCollect={onCollect} />
 
-      <Character keys={keys} posRef={posRef} frozen={phase !== 'explore'} />
+      <Character keys={keys} move={move} posRef={posRef} frozen={phase !== 'explore'} />
 
       <Portal position={SPECTRA_POS} label="SPECTRA" sub="frontend performance profiler" color="#39e0ff" active={nearSpectra} open={phase === 'entering'} />
-      <Portal position={LOCKED_1} label="COMING SOON" color="#7c7cff" locked />
-      <Portal position={LOCKED_2} label="COMING SOON" color="#ff6ad5" locked />
+      <Portal position={LOCKED_1} label="ARCADE" sub="coming soon" color="#7c7cff" locked />
+      <Portal position={LOCKED_2} label="COMMUNITY" sub="coming soon" color="#ff6ad5" locked />
 
       <Proximity posRef={posRef} target={SPECTRA_POS} radius={11} onChange={setNearSpectra} />
       <CameraRig posRef={posRef} phase={phase} spectraPos={SPECTRA_POS} />

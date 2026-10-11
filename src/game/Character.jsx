@@ -11,7 +11,7 @@ const vel = new THREE.Vector3();
  * world (frozen during cinematics). Position is written to posRef so the camera
  * and proximity checks can follow it.
  */
-export default function Character({ keys, posRef, frozen }) {
+export default function Character({ keys, move, posRef, frozen }) {
   const group = useRef();
   const ring = useRef();
   const angle = useRef(0);
@@ -30,11 +30,17 @@ export default function Character({ keys, posRef, frozen }) {
       if (k['s'] || k['arrowdown']) iz += 1;
       if (k['a'] || k['arrowleft']) ix -= 1;
       if (k['d'] || k['arrowright']) ix += 1;
+      // joystick (touch) input
+      if (move) {
+        ix += move.current.x;
+        iz += move.current.z;
+      }
     }
-    const len = Math.hypot(ix, iz);
-    if (len > 0) {
+    let len = Math.hypot(ix, iz);
+    if (len > 1) {
       ix /= len;
       iz /= len;
+      len = 1;
     }
     vel.x += (ix * SPEED - vel.x) * 0.2;
     vel.z += (iz * SPEED - vel.z) * 0.2;
