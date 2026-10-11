@@ -1,12 +1,21 @@
 # Progen Labs — website
 
 The official website of **Progen Labs**, a nonprofit, completely open-source,
-always-free developer community — and home of [Spectra](https://github.com/progen-labs/spectra),
-the frontend performance profiler.
+always-free developer community — built as an explorable **3D game world**.
 
-Built with **React + Vite**, **Three.js** (react-three-fiber) for the animated
-spectrum field and infinity brand mark, **Framer Motion** for section reveals and
-interactions, and **GSAP** (ScrollTrigger) for scroll-driven motion.
+Drive a character around the Progen Labs world with the keyboard, find the
+glowing project gates, and walk up to **Spectra**. Press **Enter** at the gate
+for a cinematic entry into the Spectra world, where everything about the
+project — what it does, how to use it, framework support — is laid out.
+
+Built with **React + Vite**, **Three.js** (react-three-fiber + drei) for the
+world, character, portals and camera, **Framer Motion** for the UI/overlays,
+and **GSAP** available for motion.
+
+## Controls
+
+- **W A S D** / **arrow keys** — move the character
+- **Enter** — open a gate when you're standing in front of it
 
 ## Develop
 
@@ -24,27 +33,28 @@ npm run preview  # preview the production build
 
 ## Deploy
 
-A GitHub Actions workflow (`.github/workflows/deploy.yml`) builds the site and
-publishes it to **GitHub Pages** on every push to `main`. To turn it on once:
+A GitHub Actions workflow (`.github/workflows/deploy.yml`) builds and publishes
+to **GitHub Pages** on every push to `main`. Enable it once under
 **Settings → Pages → Build and deployment → Source: GitHub Actions**. The site
-then serves from `https://progen-labs.github.io/website/` (the Vite `base` is
-relative, so a custom domain works too).
+serves from `https://progen-labs.github.io/website/` (relative Vite base, so a
+custom domain works too).
 
 ## Structure
 
 ```
 src/
-  App.jsx                 # layout + GSAP ScrollTrigger setup
-  data.js                 # all site copy (values, Spectra features, usage)
+  App.jsx                 # game state machine (explore → entering → inside) + canvas
+  data.js                 # all Spectra copy (features, usage, frameworks)
+  game/
+    World.jsx             # the 3D world: grid, stars, lights, portals, crystals
+    Character.jsx         # the player avatar + keyboard movement
+    Portal.jsx            # a project gate with sliding doors
+    CameraRig.jsx         # third-person follow camera + gate cinematic
+    useKeyboard.js        # key-state hook
   components/
-    Hero.jsx              # 3D spectrum hero + Framer Motion intro
-    SpectrumField.jsx     # Three.js spectrum-colored point wave
-    BrandMark.jsx         # the infinity brand moment
-    InfinityLogo.jsx      # Three.js animated infinity (lemniscate) mark
-    About.jsx             # what Progen Labs is (nonprofit / open / free / community)
-    SpectraSection.jsx    # Spectra features, golden-path matrix, frameworks
-    Install.jsx           # install & usage with tabbed code blocks
-    Footer.jsx            # contribute CTA + footer
+    Hud.jsx               # explore HUD: title, controls, gate prompt
+    SpectraWorld.jsx      # the world behind the Spectra gate (all the details)
+    Icons.jsx             # brand mark
 ```
 
 MIT licensed · © Progen Labs

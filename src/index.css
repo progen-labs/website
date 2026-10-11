@@ -29,7 +29,7 @@
 
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html, body, #root { height: 100%; }
 
 body {
   margin: 0;
@@ -39,7 +39,7 @@ body {
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 /* Ambient background glows */
@@ -142,21 +142,30 @@ strong { color: var(--text); font-weight: 600; }
 .btn-ghost { border-color: var(--border); color: var(--text); background: var(--surface); }
 .btn-ghost:hover { border-color: var(--border-bright); transform: translateY(-2px); }
 
+/* ---------- 3D experience layer ---------- */
+.experience {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.experience canvas { width: 100% !important; height: 100% !important; }
+
+.content { position: relative; z-index: 1; }
+
+/* Page content below the hero + brand gets a readable backdrop; the 3D glows
+   through faintly while text and cards stay legible. */
+.page-body {
+  position: relative;
+  background: linear-gradient(180deg, transparent 0, rgba(5, 6, 14, 0.86) 160px, rgba(5, 6, 14, 0.9) 100%);
+}
+
 /* ---------- hero ---------- */
 .hero {
   position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
-  overflow: hidden;
-}
-.hero-canvas { position: absolute; inset: 0; z-index: 0; }
-.hero-canvas canvas { width: 100% !important; height: 100% !important; }
-.hero-canvas-fade {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg, rgba(5, 6, 14, 0.4) 0%, transparent 25%, transparent 55%, var(--bg) 100%);
 }
 .hero-content {
   position: relative;
@@ -191,12 +200,14 @@ strong { color: var(--text); font-weight: 600; }
   line-height: 1.04;
   letter-spacing: -0.03em;
   margin: 22px 0 0;
+  text-shadow: 0 2px 40px rgba(0, 0, 0, 0.55);
 }
 .hero-sub {
   max-width: 620px;
   margin: 26px 0 0;
   font-size: clamp(1rem, 1.5vw, 1.22rem);
   color: var(--text-dim);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.6);
 }
 .hero-cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; }
 .scroll-hint {
@@ -259,9 +270,7 @@ strong { color: var(--text); font-weight: 600; }
   text-align: center;
   overflow: hidden;
 }
-.brand-canvas { position: absolute; inset: 0; z-index: 0; }
-.brand-canvas canvas { width: 100% !important; height: 100% !important; }
-.brand-overlay { position: relative; z-index: 2; padding: 0 24px; pointer-events: none; }
+.brand-overlay { position: relative; z-index: 2; padding: 0 24px; }
 .brand-kicker {
   font-family: var(--font-mono);
   letter-spacing: 0.3em;
@@ -276,8 +285,9 @@ strong { color: var(--text); font-weight: 600; }
   font-size: clamp(2.2rem, 5.5vw, 4.4rem);
   letter-spacing: -0.03em;
   margin: 0;
+  text-shadow: 0 2px 40px rgba(0, 0, 0, 0.6);
 }
-.brand-body { max-width: 440px; margin: 22px auto 0; color: var(--text-dim); }
+.brand-body { max-width: 440px; margin: 22px auto 0; color: var(--text-dim); text-shadow: 0 2px 20px rgba(0, 0, 0, 0.6); }
 
 /* ---------- value grid ---------- */
 .value-grid {
@@ -493,4 +503,76 @@ strong { color: var(--text); font-weight: 600; }
   .matrix-row span:last-child { display: none; }
   .footer-bar { flex-direction: column; align-items: flex-start; }
   .footer-meta { align-items: flex-start; }
+}
+
+/* ================= 3D GAME WORLD ================= */
+.game { position: fixed; inset: 0; }
+.game-canvas { position: absolute; inset: 0; }
+.game-canvas canvas { width: 100% !important; height: 100% !important; display: block; }
+
+.hud { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+.hud-top { position: absolute; top: 22px; left: 26px; }
+.hud-brand { display: flex; align-items: center; gap: 12px; }
+.hud-brand strong { font-family: var(--font-display); font-size: 1.05rem; letter-spacing: 0.1em; display: block; }
+.hud-brand span { display: block; font-size: 0.72rem; color: var(--text-dim); letter-spacing: 0.03em; }
+
+.hud-controls { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); text-align: center; color: var(--text-dim); }
+.keys { display: inline-flex; align-items: center; gap: 8px; }
+.key {
+  display: grid; place-items: center; width: 34px; height: 34px;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04); font-family: var(--font-mono); font-weight: 600; color: var(--text);
+}
+.keys em { margin-left: 10px; font-style: normal; font-size: 0.85rem; color: var(--text-dim); }
+.hud-controls p { margin: 14px 0 0; font-size: 0.85rem; }
+
+.hud-prompt {
+  position: absolute; bottom: 46px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 9px;
+  padding: 16px 30px; border: 1px solid var(--border-bright); border-radius: 16px;
+  background: rgba(5, 6, 14, 0.72); backdrop-filter: blur(12px);
+  box-shadow: 0 0 50px rgba(54, 214, 255, 0.28);
+}
+.prompt-label { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.12em; color: var(--cyan); text-transform: uppercase; }
+.prompt-key { font-size: 1.05rem; color: var(--text); }
+.prompt-key kbd {
+  font-family: var(--font-mono); padding: 3px 11px; border: 1px solid var(--border-bright);
+  border-radius: 6px; background: rgba(54, 214, 255, 0.16); color: var(--cyan);
+}
+
+.gate-flash {
+  position: absolute; inset: 0; z-index: 8; pointer-events: none;
+  background: radial-gradient(circle at 50% 44%, #e4faff 0%, #39e0ff 38%, #0a1330 100%);
+}
+
+/* ---- Spectra inner world ---- */
+.spectra-world { position: fixed; inset: 0; z-index: 20; background: #05060e; }
+.sw-stars {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(1.5px 1.5px at 18% 28%, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1.5px 1.5px at 72% 58%, rgba(255, 255, 255, 0.45), transparent),
+    radial-gradient(1.5px 1.5px at 42% 82%, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(1.5px 1.5px at 88% 20%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(ellipse at 50% -10%, rgba(54, 214, 255, 0.12), transparent 60%);
+}
+.sw-back {
+  position: fixed; top: 22px; left: 22px; z-index: 22;
+  padding: 10px 18px; border: 1px solid var(--border); border-radius: 999px;
+  background: rgba(5, 6, 14, 0.72); backdrop-filter: blur(10px); color: var(--text);
+  cursor: pointer; font-size: 0.9rem; font-family: var(--font-ui);
+}
+.sw-back:hover { border-color: var(--border-bright); }
+.sw-scroll { position: absolute; inset: 0; overflow-y: auto; }
+.sw-inner { max-width: 1040px; margin: 0 auto; padding: 120px 24px 100px; position: relative; }
+.sw-kicker { font-family: var(--font-mono); letter-spacing: 0.26em; text-transform: uppercase; color: var(--cyan); font-size: 0.78rem; margin: 0 0 12px; }
+.sw-title { font-family: var(--font-display); font-weight: 700; font-size: clamp(3rem, 10vw, 7rem); letter-spacing: -0.03em; margin: 0; line-height: 0.95; }
+.sw-lead { max-width: 690px; margin: 26px 0 0; font-size: clamp(1rem, 1.4vw, 1.18rem); color: var(--text-dim); }
+.sw-cta { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 32px; }
+.sw-section { margin-top: 72px; }
+.sw-h2 { font-family: var(--font-display); font-size: clamp(1.5rem, 3vw, 2.3rem); letter-spacing: -0.02em; margin: 0 0 30px; }
+.sw-foot { margin-top: 84px; padding-top: 32px; border-top: 1px solid var(--border); text-align: center; color: var(--text-dim); display: flex; flex-direction: column; align-items: center; gap: 20px; }
+
+@media (max-width: 860px) {
+  .hud-top { left: 16px; top: 16px; }
 }
