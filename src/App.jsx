@@ -2,20 +2,22 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { AnimatePresence, motion } from 'framer-motion';
 import * as THREE from 'three';
-import World from './game/World.jsx';
+import World, { SPECTRA_POS, FUNZONE_POS } from './game/World.jsx';
 import { useKeyboard } from './game/useKeyboard.js';
 import { sound } from './game/sound.js';
 import { TOTAL_ORBS } from './game/Collectibles.jsx';
 import Joystick from './game/Joystick.jsx';
 import Hud from './components/Hud.jsx';
 import SpectraWorld from './components/SpectraWorld.jsx';
+import FunZone from './components/FunZone.jsx';
 
 export default function App() {
   const keys = useKeyboard();
   const move = useRef({ x: 0, z: 0 });
   const posRef = useRef(new THREE.Vector3(0, 0, 0));
-  const [phase, setPhase] = useState('explore'); // explore | entering | inside
-  const [nearSpectra, setNearSpectra] = useState(false);
+  const [phase, setPhase] = useState('explore'); // explore | entering | spectra | funzone
+  const [nearGate, setNearGate] = useState(null); // null | 'spectra' | 'funzone'
+  const [enteringGate, setEnteringGate] = useState('spectra');
   const [coins, setCoins] = useState(0);
   const [muted, setMuted] = useState(false);
   const [touch] = useState(
@@ -24,19 +26,16 @@ export default function App() {
       (window.matchMedia?.('(pointer: coarse)').matches || 'ontouchstart' in window),
   );
   const phaseRef = useRef(phase);
-  const nearRef = useRef(nearSpectra);
+  const nearRef = useRef(nearGate);
   phaseRef.current = phase;
-  nearRef.current = nearSpectra;
+  nearRef.current = nearGate;
 
-  // Defer the canvas mount until the container is laid out (avoids R3F's
-  // initial-size black canvas).
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 150);
     return () => clearTimeout(t);
   }, []);
 
-  // Start audio on the first gesture (satisfies autoplay rules).
   useEffect(() => {
     const start = () => {
       sound.init();
@@ -52,16 +51,17 @@ export default function App() {
     };
   }, []);
 
-  // Ping when you reach a gate.
   useEffect(() => {
-    if (nearSpectra && phase === 'explore') sound.proximity();
-  }, [nearSpectra, phase]);
+    if (nearGate && phase === 'explore') sound.proximity();
+  }, [nearGate, phase]);
 
   const tryEnter = useCallback(() => {
-    if (phaseRef.current === 'explore' && nearRef.current) {
+    const g = nearRef.current;
+    if (phaseRef.current === 'explore' && g) {
       sound.gate();
+      setEnteringGate(g);
       setPhase('entering');
-      setTimeout(() => setPhase('inside'), 2600);
+      setTimeout(() => setPhase(g), 2600);
     }
   }, []);
 
@@ -83,15 +83,18 @@ export default function App() {
   }, []);
 
   const back = useCallback(() => {
-    posRef.current.set(0, 0, -12);
-    setNearSpectra(false);
+    const p = enteringGate === 'funzone' ? FUNZONE_POS : SPECTRA_POS;
+    posRef.current.set(p[0], 0, p[2] + 13);
+    setNearGate(null);
     setPhase('explore');
-  }, []);
+  }, [enteringGate]);
 
   const onMute = useCallback(() => {
     sound.tap();
     setMuted(sound.toggleMute());
   }, []);
+
+  const exploring = phase === 'explore' || phase === 'entering';
 
   return (
     <div className="game">
@@ -103,18 +106,19 @@ export default function App() {
               move={move}
               posRef={posRef}
               phase={phase}
-              nearSpectra={nearSpectra}
-              setNearSpectra={setNearSpectra}
+              enteringGate={enteringGate}
+              nearGate={nearGate}
+              setNearGate={setNearGate}
               onCollect={onCollect}
             />
           </Canvas>
         )}
       </div>
 
-      {phase !== 'inside' && (
+      {exploring && (
         <Hud
           phase={phase}
-          nearSpectra={nearSpectra}
+          nearGate={nearGate}
           coins={coins}
           total={TOTAL_ORBS}
           muted={muted}
@@ -133,6 +137,7 @@ export default function App() {
         {phase === 'entering' && (
           <motion.div
             className="gate-flash"
+            style={{ '--flash': enteringGate === 'funzone' ? '#ffb86b' : '#39e0ff' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 0, 0.1, 1] }}
             transition={{ duration: 2.6, times: [0, 0.45, 0.7, 1], ease: 'easeIn' }}
@@ -141,7 +146,8 @@ export default function App() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {phase === 'inside' && <SpectraWorld key="sw" onBack={back} />}
+        {phase === 'spectra' && <SpectraWorld key="sw" onBack={back} />}
+        {phase === 'funzone' && <FunZone key="fz" onBack={back} />}
       </AnimatePresence>
     </div>
   );

@@ -10,16 +10,27 @@ import Collectibles from './Collectibles.jsx';
 import Decor from './Decor.jsx';
 
 export const SPECTRA_POS = [0, 0, -26];
-const LOCKED_1 = [-30, 0, -4];
-const LOCKED_2 = [30, 0, -4];
+export const FUNZONE_POS = [-30, 0, -4];
+const COMMUNITY_POS = [30, 0, -4];
 
-function Proximity({ posRef, target, radius, onChange }) {
-  const inside = useRef(false);
+const GATES = [
+  { id: 'spectra', pos: SPECTRA_POS, radius: 11 },
+  { id: 'funzone', pos: FUNZONE_POS, radius: 11 },
+];
+
+function GateSensor({ posRef, onNear }) {
+  const cur = useRef(null);
   useFrame(() => {
-    const near = Math.hypot(posRef.current.x - target[0], posRef.current.z - target[2]) < radius;
-    if (near !== inside.current) {
-      inside.current = near;
-      onChange(near);
+    let found = null;
+    for (const g of GATES) {
+      if (Math.hypot(posRef.current.x - g.pos[0], posRef.current.z - g.pos[2]) < g.radius) {
+        found = g.id;
+        break;
+      }
+    }
+    if (found !== cur.current) {
+      cur.current = found;
+      onNear(found);
     }
   });
   return null;
@@ -40,7 +51,7 @@ function Crystal({ position, color }) {
   );
 }
 
-export default function World({ keys, move, posRef, phase, nearSpectra, setNearSpectra, onCollect }) {
+export default function World({ keys, move, posRef, phase, enteringGate, nearGate, setNearGate, onCollect }) {
   return (
     <>
       <color attach="background" args={['#05060e']} />
@@ -86,12 +97,12 @@ export default function World({ keys, move, posRef, phase, nearSpectra, setNearS
 
       <Character keys={keys} move={move} posRef={posRef} frozen={phase !== 'explore'} />
 
-      <Portal position={SPECTRA_POS} label="SPECTRA" sub="frontend performance profiler" color="#39e0ff" active={nearSpectra} open={phase === 'entering'} />
-      <Portal position={LOCKED_1} label="ARCADE" sub="coming soon" color="#7c7cff" locked />
-      <Portal position={LOCKED_2} label="COMMUNITY" sub="coming soon" color="#ff6ad5" locked />
+      <Portal position={SPECTRA_POS} label="SPECTRA" sub="frontend performance profiler" color="#39e0ff" active={nearGate === 'spectra'} open={phase === 'entering' && enteringGate === 'spectra'} />
+      <Portal position={FUNZONE_POS} label="FUN ZONE" sub="lag spike smash" color="#ff9a3d" active={nearGate === 'funzone'} open={phase === 'entering' && enteringGate === 'funzone'} />
+      <Portal position={COMMUNITY_POS} label="COMMUNITY" sub="coming soon" color="#ff6ad5" locked />
 
-      <Proximity posRef={posRef} target={SPECTRA_POS} radius={11} onChange={setNearSpectra} />
-      <CameraRig posRef={posRef} phase={phase} spectraPos={SPECTRA_POS} />
+      <GateSensor posRef={posRef} onNear={setNearGate} />
+      <CameraRig posRef={posRef} phase={phase} enterPos={enteringGate === 'funzone' ? FUNZONE_POS : SPECTRA_POS} />
 
       {BLOOM && (
         <EffectComposer>

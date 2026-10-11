@@ -3,7 +3,12 @@ import { Logo } from './Icons.jsx';
 
 const spring = { type: 'spring', stiffness: 400, damping: 22 };
 
-export default function Hud({ phase, nearSpectra, coins, total, muted, onMute, touch, onAction }) {
+const GATE_LABELS = {
+  spectra: 'SPECTRA · performance profiler',
+  funzone: 'FUN ZONE · lag spike smash',
+};
+
+export default function Hud({ phase, nearGate, coins, total, muted, onMute, touch, onAction }) {
   const show = phase === 'explore';
   const done = coins >= total;
 
@@ -39,11 +44,11 @@ export default function Hud({ phase, nearSpectra, coins, total, muted, onMute, t
 
       {/* controls hint */}
       <AnimatePresence>
-        {show && !nearSpectra && (
+        {show && !nearGate && (
           <motion.div className="hud-controls panel" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }}>
             {touch ? (
               <p>
-                <b>Drag</b> the pad to move · <b>tap</b> the button to enter a gate. Collect the glowing orbs!
+                <b>Drag</b> to move · roam the realm and step into a glowing <b>gate</b> to enter its world.
               </p>
             ) : (
               <div className="keys-row">
@@ -51,7 +56,7 @@ export default function Hud({ phase, nearSpectra, coins, total, muted, onMute, t
                 <span className="keycap">A</span>
                 <span className="keycap">S</span>
                 <span className="keycap">D</span>
-                <em>move · collect the orbs · find the gates</em>
+                <em>roam the realm · step into a glowing gate to enter its world</em>
               </div>
             )}
           </motion.div>
@@ -60,7 +65,7 @@ export default function Hud({ phase, nearSpectra, coins, total, muted, onMute, t
 
       {/* gate prompt */}
       <AnimatePresence>
-        {show && nearSpectra && (
+        {show && nearGate && (
           <motion.div
             className="hud-prompt panel"
             initial={{ opacity: 0, scale: 0.8, y: 24 }}
@@ -68,7 +73,7 @@ export default function Hud({ phase, nearSpectra, coins, total, muted, onMute, t
             exit={{ opacity: 0, scale: 0.8, y: 24 }}
             transition={spring}
           >
-            <span className="prompt-label">SPECTRA · performance profiler</span>
+            <span className="prompt-label">{GATE_LABELS[nearGate]}</span>
             <span className="prompt-key">
               {touch ? 'Tap the button to open the gate' : <>Press <kbd>Enter</kbd> to open the gate</>}
             </span>
@@ -79,14 +84,14 @@ export default function Hud({ phase, nearSpectra, coins, total, muted, onMute, t
       {/* mobile action button */}
       {touch && show && (
         <motion.button
-          className={`action-btn ${nearSpectra ? 'ready' : ''}`}
+          className={`action-btn ${nearGate ? 'ready' : ''}`}
           onClick={onAction}
           whileTap={{ scale: 0.86 }}
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={spring}
         >
-          <span>{nearSpectra ? 'ENTER' : '◎'}</span>
+          <span>{nearGate ? 'ENTER' : '◎'}</span>
         </motion.button>
       )}
 

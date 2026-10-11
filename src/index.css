@@ -542,7 +542,7 @@ strong { color: var(--text); font-weight: 600; }
 
 .gate-flash {
   position: absolute; inset: 0; z-index: 8; pointer-events: none;
-  background: radial-gradient(circle at 50% 44%, #e4faff 0%, #39e0ff 38%, #0a1330 100%);
+  background: radial-gradient(circle at 50% 44%, #ffffff 0%, var(--flash, #39e0ff) 38%, #0a1330 100%);
 }
 
 /* ---- Spectra inner world ---- */
@@ -674,4 +674,53 @@ strong { color: var(--text); font-weight: 600; }
   .hud-brand span { display: none; }
   .hud-prompt { bottom: 140px; padding: 13px 20px; }
   .hud-controls { bottom: 150px; }
+}
+
+/* ================= FUN ZONE (Lag Spike Smash) ================= */
+.funzone { position: fixed; inset: 0; z-index: 20; overflow: hidden; background: #070a16; user-select: none; -webkit-user-select: none; }
+.fz-bg {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(60vw 50vh at 20% 0%, rgba(255, 150, 60, 0.12), transparent 60%),
+    radial-gradient(60vw 50vh at 85% 100%, rgba(124, 124, 255, 0.14), transparent 60%),
+    linear-gradient(180deg, #0a0f20, #070a16);
+}
+.fz-hud {
+  position: absolute; top: 16px; left: 50%; transform: translateX(-50%); z-index: 3;
+  display: flex; gap: 10px; align-items: stretch;
+}
+.fz-stat { display: flex; flex-direction: column; align-items: center; padding: 8px 18px; }
+.fz-label { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.12em; color: var(--text-dim); }
+.fz-stat b { font-family: var(--font-display); font-size: 1.3rem; color: #fff; }
+.fz-fps { display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 8px 16px; min-width: 150px; }
+.fz-bar { height: 8px; border-radius: 6px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+.fz-bar-fill { height: 100%; border-radius: 6px; transition: width 0.2s ease, background 0.3s ease; }
+.fz-combo {
+  position: absolute; top: 96px; left: 50%; transform: translateX(-50%); z-index: 3;
+  font-family: var(--font-display); font-weight: 700; font-size: 1.6rem;
+  color: #ffd98a; text-shadow: 0 0 24px rgba(255, 180, 60, 0.7);
+}
+.fz-field { position: absolute; inset: 0; z-index: 2; }
+.fz-spike {
+  position: absolute; transform: translate(-50%, -50%);
+  width: 64px; height: 64px; border-radius: 50%; border: none; cursor: pointer;
+  display: grid; place-items: center; font-size: 1.8rem; touch-action: manipulation;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+.fz-spike.spike { background: radial-gradient(circle at 38% 32%, #ffcf8a, #ff7a2f 60%, #c23b00); box-shadow: 0 0 28px rgba(255, 120, 40, 0.6); }
+.fz-spike.leak { background: radial-gradient(circle at 38% 32%, #e3c9ff, #9a5cff 60%, #5b22c7); box-shadow: 0 0 28px rgba(150, 90, 255, 0.6); }
+.fz-float { position: absolute; transform: translate(-50%, -50%); font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; pointer-events: none; z-index: 4; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6); }
+
+.fz-modal { position: absolute; inset: 0; z-index: 6; display: grid; place-items: center; padding: 24px; background: rgba(5, 6, 14, 0.55); backdrop-filter: blur(6px); }
+.fz-card { max-width: 480px; width: 100%; text-align: center; padding: 34px 30px; }
+.fz-kicker { font-family: var(--font-mono); letter-spacing: 0.26em; text-transform: uppercase; color: #ff9a3d; font-size: 0.78rem; margin: 0 0 10px; }
+.fz-title { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.4rem, 8vw, 3.6rem); letter-spacing: -0.02em; margin: 0; line-height: 1; }
+.fz-desc { color: var(--text-dim); margin: 18px 0 26px; font-size: 0.98rem; }
+.fz-play { font-size: 1.05rem; }
+.fz-best { margin: 16px 0 0; color: var(--text-faint); font-size: 0.85rem; }
+.fz-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+@media (max-width: 560px) {
+  .fz-hud { flex-wrap: wrap; justify-content: center; width: 92vw; }
+  .fz-spike { width: 58px; height: 58px; font-size: 1.6rem; }
 }

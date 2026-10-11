@@ -6,14 +6,14 @@ const look = new THREE.Vector3();
 const curLook = new THREE.Vector3(0, 1.6, -3);
 
 /** Third-person follow camera; flies into the gate during the 'entering' cinematic. */
-export default function CameraRig({ posRef, phase, spectraPos }) {
+export default function CameraRig({ posRef, phase, enterPos }) {
   const { camera } = useThree();
   useFrame(() => {
     let lp = 0.08;
     let ll = 0.1;
     if (phase === 'entering') {
-      desired.set(spectraPos[0], 2.7, spectraPos[2] + 3);
-      look.set(spectraPos[0], 2.7, spectraPos[2] - 6);
+      desired.set(enterPos[0], 2.7, enterPos[2] + 3);
+      look.set(enterPos[0], 2.7, enterPos[2] - 6);
       lp = 0.035;
       ll = 0.05;
     } else {
