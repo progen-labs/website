@@ -1,71 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { SPECTRA_FEATURES, FRAMEWORKS, MATRIX, USAGE, LINKS } from '../data.js';
 import { ThemeToggle } from '../theme.jsx';
+import { CopyButton, commandsOf } from './CopyButton.jsx';
+import SpectraDocs from '../spectra-docs/SpectraDocs.jsx';
+import { DEFAULT_DOC, docFromHash } from '../spectra-docs/index.js';
 
 const ease = [0.22, 1, 0.36, 1];
 
-// the runnable lines of a snippet, without its # comments
-const commandsOf = code =>
-  code
-    .split('\n')
-    .map(l => l.trim())
-    .filter(l => l && !l.startsWith('#'))
-    .join('\n');
 const INSTALL = commandsOf(USAGE[0].code);
-
-async function copyText(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    // older browsers, or the clipboard API blocked outside a secure context
-    try {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.setAttribute('readonly', '');
-      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
-      document.body.appendChild(ta);
-      ta.select();
-      const ok = document.execCommand('copy');
-      ta.remove();
-      return ok;
-    } catch {
-      return false;
-    }
-  }
-}
-
-function CopyButton({ text, label, className = '' }) {
-  const [state, setState] = useState('idle'); // idle | copied | failed
-  const timer = useRef();
-  useEffect(() => () => clearTimeout(timer.current), []);
-  const copy = async () => {
-    setState((await copyText(text)) ? 'copied' : 'failed');
-    clearTimeout(timer.current);
-    timer.current = setTimeout(() => setState('idle'), 2000);
-  };
-  return (
-    <>
-      <button type="button" className={`copy-btn ${state === 'copied' ? 'is-copied' : ''} ${className}`} onClick={copy} aria-label={label} title={label}>
-        {state === 'copied' ? (
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="m5 12.5 4.5 4.5L19 7.5" />
-          </svg>
-        ) : (
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <rect x="8.5" y="8.5" width="11" height="11" rx="2.2" />
-            <path d="M15.5 8.5V6.2a1.7 1.7 0 0 0-1.7-1.7H6.2a1.7 1.7 0 0 0-1.7 1.7v7.6c0 .94.76 1.7 1.7 1.7h2.3" />
-          </svg>
-        )}
-        <span className="copy-text">{state === 'copied' ? 'Copied' : state === 'failed' ? 'Press Ctrl+C' : 'Copy'}</span>
-      </button>
-      <span className="sr-only" role="status">
-        {state === 'copied' ? 'Copied to clipboard' : state === 'failed' ? 'Copy failed. Select the command and copy it manually.' : ''}
-      </span>
-    </>
-  );
-}
 
 /** The world behind the Spectra gate: everything about Spectra. */
 export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) {
@@ -73,6 +16,39 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
   const current = USAGE.find(u => u.id === tab) || USAGE[0];
   const currentCommands = commandsOf(current.code);
   const many = currentCommands.includes('\n');
+
+  // Documentation: the page lives in the URL (#spectra/docs/<id>), so a docs
+  // link can be shared and the back button walks through visited pages.
+  const [docPage, setDocPage] = useState(() => docFromHash() || DEFAULT_DOC);
+  const docsRef = useRef(null);
+  const docTitleRef = useRef(null);
+  const showDocs = useCallback(focus => {
+    const smooth = !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    requestAnimationFrame(() => {
+      docsRef.current?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+      if (focus) docTitleRef.current?.focus({ preventScroll: true });
+    });
+  }, []);
+  const openDoc = useCallback(
+    id => {
+      setDocPage(id);
+      if (window.location.hash !== `#spectra/docs/${id}`) window.history.pushState(null, '', `#spectra/docs/${id}`);
+      showDocs(true);
+    },
+    [showDocs],
+  );
+  useEffect(() => {
+    if (docFromHash()) showDocs(false); // arrived through a docs link
+    const onPop = () => {
+      const id = docFromHash();
+      if (id) {
+        setDocPage(id);
+        showDocs(false);
+      }
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [showDocs]);
 
   return (
     <motion.div
@@ -105,7 +81,7 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
               auto-discovers the actionable elements on the page, drives a set of
               golden-path journeys, records each one, and reports a ranked list of
               culprits — each with the exact file, function and component costing
-              you time.
+              you time. Then it proves your fix worked, and keeps it that way in CI.
             </p>
             <div className="sw-install">
               <span className="sw-prompt" aria-hidden="true">$</span>
@@ -114,6 +90,16 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
             </div>
             <div className="sw-cta">
               <a className="btn btn-primary" href={LINKS.npm} target="_blank" rel="noreferrer">@progen-labs/spectra on npm ↗</a>
+              <a
+                className="btn btn-ghost"
+                href={`#spectra/docs/${docPage}`}
+                onClick={e => {
+                  e.preventDefault();
+                  openDoc(docPage);
+                }}
+              >
+                Documentation
+              </a>
               <a className="btn btn-ghost" href={LINKS.spectraRepo} target="_blank" rel="noreferrer">GitHub ↗</a>
             </div>
           </motion.header>
@@ -202,6 +188,11 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
               ))}
             </div>
             <p className="frameworks-note"><strong>Deep</strong> = per-component render counts & timings. <strong>Generic</strong> = source-mapped file/function attribution.</p>
+          </section>
+
+          <section className="sw-section sw-docs" id="spectra-docs" ref={docsRef} aria-labelledby="spectra-docs-heading">
+            <h2 className="sw-h2" id="spectra-docs-heading">Documentation</h2>
+            <SpectraDocs page={docPage} onNavigate={openDoc} titleRef={docTitleRef} />
           </section>
 
           <footer className="sw-foot">

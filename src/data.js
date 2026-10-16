@@ -45,6 +45,18 @@ export const SPECTRA_FEATURES = [
     body: 'Chrome DevTools Protocol tracing plus a framework-aware probe pinpoints the exact file, function and component costing you time.',
   },
   {
+    title: 'Proof, not guesses',
+    body: 'Record a few runs before and after a change. spectra compare reports what got faster or slower, beyond run-to-run noise.',
+  },
+  {
+    title: 'Budgets for CI',
+    body: 'Set limits in spectra.config.json. A run over budget exits with code 2, so your pipeline catches a regression before your users do.',
+  },
+  {
+    title: 'JSON for any tool',
+    body: '--json prints a versioned, schema-described result: every finding with its file, line, cost and fix, ready for scripts, editors and AI agents.',
+  },
+  {
     title: 'A full visual dashboard',
     body: 'Culprit visualizations, React/Vue/Angular re-renders, long tasks, network and memory — plus PDF export and commit-to-commit compare.',
   },
@@ -85,6 +97,24 @@ npx spectra performance`,
     note: 'Spectra self-boots your dev server, records a baseline load, runs golden-path journeys, and prints a performance matrix.',
   },
   {
+    id: 'verify',
+    label: 'Verify a fix',
+    lang: 'bash',
+    code: `# the median of 5 page loads, before and after your change
+npx spectra performance --quick --runs 5 --out before.json
+npx spectra performance --quick --runs 5 --out after.json
+npx spectra compare before.json after.json`,
+    note: 'Each side is reduced to its median, and a change only counts when it is bigger than the run-to-run noise. New in 0.2.0.',
+  },
+  {
+    id: 'budgets',
+    label: 'Budgets & CI',
+    lang: 'bash',
+    code: `# spectra.config.json: { "budgets": { "tbtMs": 200, "lcpMs": 2500, "criticalFindings": 0 } }
+npx spectra performance --quick --runs 3 --json > spectra-result.json`,
+    note: 'A run over budget exits with code 2, so CI fails the build. --json prints a versioned result for scripts, editors and agents. New in 0.2.0.',
+  },
+  {
     id: 'dashboard',
     label: 'Dashboard',
     lang: 'bash',
@@ -99,9 +129,12 @@ npx spectra dashboard`,
     code: `# evaluate an already-running server
 npx spectra performance --url http://localhost:3000/
 
-# cap the golden-path suite, or run a classic single profile
+# cap the golden-path suite, or profile a single page load
 npx spectra performance --paths 8
-npx spectra performance --mode load`,
+npx spectra performance --quick
+
+# list saved reports, to compare or open them
+npx spectra reports`,
     note: 'Reports land in .spectra/reports in your project — open any of them in the dashboard.',
   },
 ];

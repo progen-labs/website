@@ -1,0 +1,9 @@
+- **Do something.** A recording of an idle page is empty, and Spectra says so. Perform the exact interaction you suspect is slow while recording, or let a [scenario](doc:quick-profiles) do it.
+- **Keep it short and focused.** Ten to thirty seconds is plenty. Traces grow quickly on big pages, and every recording stops by itself after two minutes.
+- **Repeat the same scenario** before and after a change, and [compare](doc:compare) the runs instead of eyeballing two reports.
+- **Use CPU throttling** (`--throttle 4`, or 4× in the dashboard) to make marginal problems obvious on a fast machine.
+- **The first half second is ignored.** Starting the CPU profiler briefly stalls a large app; Spectra discards that stall and notes it in the report.
+- **Hunting a memory leak?** Repeat the same action several times in one recording and watch *JS heap growth*.
+- **Close other heavy tabs and apps** while recording. They compete for the same CPU.
+- **Profile a development build** with the same dev-server settings each time.
+- **Want Chrome's own Performance panel too?** Use **Trace for Chrome DevTools**, see [Report tabs](doc:dashboard-tabs).

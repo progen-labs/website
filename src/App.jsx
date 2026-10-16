@@ -7,7 +7,8 @@ import { useTheme } from './theme.jsx';
 
 const DESTINATIONS = ['spectra', 'core'];
 const fromHash = () => {
-  const h = typeof window !== 'undefined' ? window.location.hash.slice(1) : '';
+  // #spectra, #core, or a deeper link such as #spectra/docs/compare
+  const h = typeof window !== 'undefined' ? window.location.hash.slice(1).split('/')[0] : '';
   return DESTINATIONS.includes(h) ? h : null;
 };
 const reducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;

@@ -1,0 +1,179 @@
+/* Spectra documentation. Colours come only from the .spectra-world theme
+   tokens (src/index.css), so light and dark both follow automatically. */
+.sw-docs { scroll-margin-top: 80px; }
+.docs { display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: 44px; align-items: start; }
+
+/* ---- side: search + navigation ---- */
+.docs-side {
+  position: sticky; top: 84px; max-height: calc(100vh - 104px); overflow-y: auto;
+  padding: 4px 6px 16px 2px; scrollbar-width: thin;
+}
+.docs-search { position: sticky; top: 0; z-index: 1; margin-bottom: 14px; padding-bottom: 4px; background: var(--bg); }
+.docs-search svg {
+  position: absolute; left: 12px; top: calc(50% - 2px); width: 17px; height: 17px; transform: translateY(-50%);
+  fill: none; stroke: var(--text-faint); stroke-width: 2; stroke-linecap: round; pointer-events: none;
+}
+.docs-search input {
+  width: 100%; padding: 10px 12px 10px 38px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--panel); color: var(--text);
+  font: 400 0.92rem var(--font-ui);
+}
+.docs-search input::placeholder { color: var(--text-faint); opacity: 1; }
+.docs-search input:focus-visible { outline: 3px solid var(--cyan); outline-offset: 1px; }
+
+.docs-group + .docs-group { margin-top: 18px; }
+.docs-group-title {
+  margin: 0 0 6px; padding-left: 12px; font-family: var(--font-mono); font-size: 0.72rem;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint);
+}
+.docs-nav ul, .docs-results { list-style: none; margin: 0; padding: 0; }
+.docs-nav a {
+  display: block; padding: 6px 12px; border-radius: 8px; border-left: 2px solid transparent;
+  color: var(--text-dim); font-size: 0.92rem; line-height: 1.4;
+}
+.docs-nav a:hover { color: var(--text); background: var(--surface); }
+.docs-nav a[aria-current='page'] { color: var(--text); background: var(--surface-2); border-left-color: var(--cyan); font-weight: 600; }
+
+.docs-results li + li { margin-top: 4px; }
+.docs-results a { display: flex; flex-direction: column; gap: 2px; padding: 9px 12px; border-radius: 10px; border: 1px solid transparent; }
+.docs-results a:hover { background: var(--surface-2); border-color: var(--border); }
+.docs-result-title { color: var(--text); font-weight: 600; font-size: 0.93rem; }
+.docs-result-group { color: var(--text-faint); font-size: 0.75rem; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; }
+.docs-result-snippet { color: var(--text-dim); font-size: 0.83rem; line-height: 1.45; }
+.docs-empty { padding: 10px 12px; color: var(--text-dim); font-size: 0.9rem; }
+
+.docs-picker { display: none; }
+
+/* ---- the page ---- */
+.docs-page { min-width: 0; max-width: 780px; scroll-margin-top: 84px; }
+.docs-kicker { margin: 0 0 6px; font-family: var(--font-mono); font-size: 0.76rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--cyan); }
+.docs-title { margin: 0 0 18px; font-family: var(--font-display); font-size: clamp(1.7rem, 3vw, 2.2rem); letter-spacing: -0.02em; line-height: 1.15; color: var(--text); }
+.docs-title:focus { outline: none; }
+.docs-title:focus-visible { outline: 3px solid var(--cyan); outline-offset: 4px; border-radius: 4px; }
+
+.md { color: var(--text-dim); font-size: 1rem; line-height: 1.72; }
+.md > :first-child { margin-top: 0; }
+.md p { margin: 0 0 16px; }
+.md h4 { margin: 38px 0 12px; font-family: var(--font-display); font-size: 1.32rem; letter-spacing: -0.01em; line-height: 1.3; color: var(--text); }
+.md h5 { margin: 26px 0 10px; font-family: var(--font-display); font-size: 1.08rem; color: var(--text); }
+.md strong { color: var(--text); font-weight: 600; }
+.md a { color: var(--cyan); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.md a:hover { text-decoration-thickness: 2px; }
+.md code {
+  font-family: var(--font-mono); font-size: 0.86em; color: var(--code-cmd);
+  background: var(--chip-bg); padding: 1px 6px; border-radius: 5px; overflow-wrap: anywhere;
+}
+.md ul, .md ol { margin: 0 0 18px; padding-left: 1.4em; }
+.md li { margin: 6px 0; padding-left: 0.2em; }
+.md li > ul, .md li > ol { margin: 6px 0 0; }
+.md li::marker { color: var(--text-faint); }
+
+.md-note {
+  margin: 0 0 18px; padding: 12px 16px; border-radius: 10px;
+  border: 1px solid var(--border); border-left: 3px solid var(--cyan); background: var(--deep-bg);
+  color: var(--text-dim); font-size: 0.95rem;
+}
+
+.md-code {
+  position: relative; margin: 0 0 20px; border: 1px solid var(--border); border-radius: 12px;
+  background: var(--panel); box-shadow: 0 10px 30px var(--panel-shadow);
+}
+.md-code.is-output { box-shadow: none; background: var(--surface); }
+.md-code pre { margin: 0; padding: 18px 20px; overflow-x: auto; }
+.md-code:not(.is-output) pre { padding-right: 100px; }
+.md-code code { background: none; padding: 0; font-size: 0.86rem; line-height: 1.65; color: var(--code-cmd); white-space: pre; overflow-wrap: normal; }
+.md-code .code-comment { color: var(--code-comment); }
+.md-code-lang {
+  position: absolute; top: 8px; right: 112px; font-family: var(--font-mono); font-size: 0.7rem;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint); pointer-events: none;
+}
+.md-code.is-output .md-code-lang { right: 14px; }
+.md-code .copy-btn-float { top: 10px; right: 10px; }
+
+.md-table { margin: 0 0 22px; overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); }
+.md-table:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+.md-table table { width: 100%; border-collapse: collapse; font-size: 0.9rem; line-height: 1.55; }
+.md-table th { text-align: left; padding: 10px 14px; color: var(--text); font-weight: 600; background: var(--surface); border-bottom: 1px solid var(--border); white-space: nowrap; }
+.md-table td { padding: 10px 14px; vertical-align: top; border-top: 1px solid var(--row-line); }
+.md-table tr:first-child td { border-top: 0; }
+.md-table td:first-child { color: var(--text); min-width: 9em; }
+.md-table code { white-space: nowrap; }
+
+/* ---- annotated screenshots ----
+   The call-outs sit on the screenshots, which are dark in both site themes, so
+   they use one fixed amber that stands out against the dashboard's blues. */
+.shot { margin: 8px 0 28px; --callout: #ffb547; --callout-ink: #1d1300; }
+.shot-frame {
+  position: relative; border-radius: 12px; border: 1px solid var(--border);
+  box-shadow: 0 16px 44px var(--panel-shadow); background: #0d111c;
+}
+.shot-frame img { display: block; width: 100%; height: auto; border-radius: 11px; }
+.shot-box {
+  position: absolute; border: 2px solid var(--callout); border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+  transition: opacity 0.15s ease, box-shadow 0.15s ease;
+}
+.shot:not(.is-ready) .shot-box { visibility: hidden; }
+.shot.has-active .shot-box { opacity: 0.28; }
+.shot.has-active .shot-box.is-active { opacity: 1; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45), 0 0 0 4px rgba(255, 181, 71, 0.35); background: rgba(255, 181, 71, 0.08); }
+.shot-badge, .shot-num {
+  display: inline-grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--callout); color: var(--callout-ink); font: 700 0.74rem/1 var(--font-ui);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+.shot-badge { position: absolute; top: 0; left: 0; transform: translate(-45%, -45%); }
+.shot figcaption {
+  display: flex; justify-content: space-between; gap: 12px; margin-top: 10px;
+  font-size: 0.86rem; color: var(--text-faint);
+}
+.shot figcaption a { color: var(--text-dim); text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+.shot-legend {
+  list-style: none; margin: 14px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 6px 18px;
+}
+.shot-legend li {
+  display: flex; gap: 10px; align-items: flex-start; padding: 6px 8px; margin: 0; border-radius: 8px;
+  font-size: 0.92rem; line-height: 1.55; color: var(--text-dim);
+}
+.shot-legend li.is-active { background: var(--surface-2); }
+.shot-legend .shot-num { margin-top: 1px; box-shadow: none; }
+.md .shot-legend li::marker { content: none; }
+
+/* ---- previous / next, edit ---- */
+.docs-pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 44px; padding-top: 24px; border-top: 1px solid var(--border); }
+.docs-pager-link {
+  display: flex; flex-direction: column; gap: 3px; padding: 14px 16px; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--surface); transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.docs-pager-link:hover { border-color: var(--border-bright); transform: translateY(-2px); }
+.docs-pager-link.is-next { text-align: right; grid-column: 2; }
+.docs-pager-dir { font-size: 0.78rem; color: var(--text-faint); font-family: var(--font-mono); letter-spacing: 0.06em; }
+.docs-pager-title { color: var(--text); font-weight: 600; }
+.docs-edit { margin: 18px 0 0; font-size: 0.86rem; }
+.docs-edit a { color: var(--text-dim); text-decoration: underline; text-underline-offset: 3px; }
+.docs-edit a:hover { color: var(--text); }
+
+.spectra-world .docs a:focus-visible, .spectra-world .docs select:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+
+@media (max-width: 860px) {
+  .docs { grid-template-columns: 1fr; gap: 20px; }
+  .docs-side { position: static; max-height: none; overflow: visible; padding: 0; }
+  .docs-search { position: relative; }
+  .docs-nav { display: none; }
+  .docs-picker { display: flex; flex-direction: column; gap: 6px; font-size: 0.82rem; color: var(--text-faint); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.1em; }
+  .docs-picker select {
+    padding: 11px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--panel);
+    color: var(--text); font: 500 0.98rem var(--font-ui); text-transform: none; letter-spacing: 0;
+  }
+  .md-code:not(.is-output) pre { padding-right: 56px; }
+  .md-code-lang { display: none; }
+}
+@media (max-width: 560px) {
+  .shot.is-wide .shot-scroll { overflow-x: auto; padding: 12px 2px 4px 12px; margin: -12px -2px 0 -12px; }
+  .shot.is-wide .shot-frame { width: 600px; }
+  .shot-badge { width: 18px; height: 18px; font-size: 0.66rem; }
+  .shot-legend { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .docs-pager-link, .shot-box { transition: none; }
+}

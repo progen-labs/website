@@ -1,0 +1,8 @@
+- **Everything stays on your machine.** Spectra has no account, no telemetry and no server of its own. Nothing is uploaded; PDFs are printed locally.
+- **The dashboard listens on `127.0.0.1` only.** It reads files only inside your project root and refuses path traversal.
+- **No credentials.** Spectra never asks for, stores or logs a password or token. A [sign-in URL](doc:signing-in) must not contain one.
+- **Reports hold details of your app**: file paths, function names and URLs, including query strings that may contain ids. Review a report before sharing it.
+- **The page screenshot** (`<id>.page.jpg`) shows whatever was on screen, such as names, numbers or customer data. Treat it like the report. **Delete** in the dashboard removes it with the report.
+- **Spectra's Chrome profile** can hold your app's cookies after you sign in. It lives in your temp directory, separate from your own Chrome profile.
+- **Safe exploration.** The golden-path suite skips destructive controls (delete, pay, log out and similar) and never submits `POST`, `PUT` or `DELETE` forms. See [Golden paths](doc:golden-paths).
+- **Only author names** are read from git for comparisons, never email addresses.
