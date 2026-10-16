@@ -9,7 +9,7 @@ import Hud from './components/Hud.jsx';
 import GateCompass from './components/GateCompass.jsx';
 import WorldSky from './components/WorldSky.jsx';
 import SpectraWorld from './components/SpectraWorld.jsx';
-import InternalsExplorer from './components/InternalsExplorer.jsx';
+import InternalsExplorer from './internals/InternalsExplorer.jsx';
 
 export default function App() {
   const keys = useKeyboard();
