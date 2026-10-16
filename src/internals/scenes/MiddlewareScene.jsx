@@ -85,11 +85,11 @@ export default function MiddlewareScene() {
       </mesh>
 
       <Region id="chain" position={[ENTRY, Y, 0]} size={[2.6, 0.9, 0.6]} color={C.violet} label="store => next => action" labelY={0.6}>
-        {hot => <Chip size={[2.4, 0.7, 0.4]} color={C.violet} text="dispatch()" hot={hot} intensity={0.7} />}
+        {hot => <Chip size={[2.4, 0.7, 0.4]} color={C.violet} text="dispatch()" hot={hot} />}
       </Region>
       <Region id="chain" position={[-2.4, 4.1, 0]} size={[9.4, 1.3, 0.6]} color={C.violet}>
         {hot => (
-          <Chip size={[9.2, 1.1, 0.35]} color={C.violet} text={'const mw = store => next => action => {  /* before */  const r = next(action);  /* after */  return r; }'} textSize={0.2} hot={hot} intensity={0.3} />
+          <Chip size={[9.2, 1.1, 0.35]} color={C.violet} text={'const mw = store => next => action => {\n  /* before */  next(action);  /* after */\n}'} textSize={0.29} hot={hot} intensity={0.3} />
         )}
       </Region>
 
@@ -100,7 +100,7 @@ export default function MiddlewareScene() {
       ))}
 
       <Region id="next" position={[END, Y, 0]} size={[3.0, 1.2, 0.8]} color={C.yellow} label="next(action)" labelY={0.8}>
-        {hot => <Chip size={[2.8, 1.0, 0.5]} color={C.yellow} text={'rootReducer'} textSize={0.26} hot={hot} intensity={0.7} />}
+        {hot => <Chip size={[2.8, 1.0, 0.5]} color={C.yellow} text={'rootReducer'} textSize={0.32} hot={hot} />}
       </Region>
 
       {/* async work below the thunk ring */}
@@ -114,7 +114,7 @@ export default function MiddlewareScene() {
           </group>
         )}
       </Region>
-      <FaceText position={[0.4, -2.7, 0.3]} size={0.2} color="#a7f3d0" anchorX="left">fetch("/api/todos")</FaceText>
+      <FaceText position={[0.4, -2.7, 0.3]} size={0.3} color="#a7f3d0" anchorX="left">fetch("/api/todos")</FaceText>
 
       {/* packets */}
       <mesh ref={obj} raycast={noRaycast}>
@@ -130,10 +130,10 @@ export default function MiddlewareScene() {
         <meshStandardMaterial color="#0b1226" emissive={C.green} emissiveIntensity={2.2} />
       </mesh>
 
-      <Text ref={status} position={[-0.6, -0.95, 0.4]} fontSize={0.26} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.012} outlineColor="#05060e" raycast={noRaycast}>
+      <Text ref={status} position={[-0.6, -0.95, 0.4]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#05060e" raycast={noRaycast}>
         dispatch
       </Text>
-      <FaceText position={[-0.6, -4.95, 0]} size={0.2} color="#8f9bbb">pink cube = object action · amber pyramid = thunk (function) · green = fulfilled</FaceText>
+      <FaceText position={[-0.6, -4.95, 0]} size={0.28} color="#c3cbe2">pink cube = object action · amber pyramid = thunk (function) · green = fulfilled</FaceText>
     </group>
   );
 }

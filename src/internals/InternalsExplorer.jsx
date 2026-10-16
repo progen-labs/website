@@ -42,7 +42,7 @@ function Rich({ text }) {
  *  (`span` × `height`); the distance is solved so that content exactly fills
  *  the area left free by the side rail (desktop) or bottom sheet (mobile). */
 function CameraRig({ pose, controlsRef }) {
-  const { camera, size } = useThree();
+  const { camera, size, invalidate } = useThree();
   const anim = useRef(null);
 
   useEffect(() => {
@@ -68,12 +68,14 @@ function CameraRig({ pose, controlsRef }) {
     const fromT = pose.dive || !controlsRef.current ? tgt.clone() : controlsRef.current.target.clone();
     anim.current = { t: 0, from, fromT, toP: pos, toT: tgt, dur: pose.dive ? 1.1 : 0.9 };
     if (controlsRef.current) controlsRef.current.enabled = false;
+    invalidate();
   }, [pose.key, size.width, size.height]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useFrame((_, dt) => {
     const a = anim.current;
     if (!a) return;
-    a.t = Math.min(1, a.t + dt / a.dur);
+    a.t = Math.min(1, a.t + Math.min(dt, 1 / 30) / a.dur);
+    invalidate(); // keep flying even when the scene's own animations are paused
     const e = easeInOut(a.t);
     camera.position.lerpVectors(a.from, a.toP, e);
     if (controlsRef.current) {
@@ -141,6 +143,8 @@ export default function InternalsExplorer({ onBack }) {
   const [selected, setSelected] = useState(null);
   const [intro, setIntro] = useState(true);
   const [nonce, setNonce] = useState(0);
+  // WCAG 2.2.2 / 2.3.3: let people stop the motion; start paused if the OS asks for reduced motion
+  const [paused, setPaused] = useState(() => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
 
   const model = modelId ? MODELS[modelId] : null;
   const scene = sceneId ? SCENES[sceneId] : null;
@@ -277,8 +281,14 @@ export default function InternalsExplorer({ onBack }) {
 
   return (
     <motion.div className="ix" style={{ '--accent': accent }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
-      <div className="ix-canvas" onPointerDown={onPointerDown} onPointerMove={onPointerMove}>
-        <Canvas camera={{ position: [0, 2.5, 40], fov: 50 }} dpr={[1, 1.8]} gl={{ antialias: true, powerPreference: 'high-performance' }}>
+      <div
+        className="ix-canvas"
+        role="img"
+        aria-label="Interactive 3D model. Every part shown here is also listed in the side panel, which works with the keyboard and screen readers."
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+      >
+        <Canvas flat frameloop={paused ? 'demand' : 'always'} camera={{ position: [0, 2.5, 40], fov: 50 }} dpr={[1, 2]} gl={{ antialias: true, powerPreference: 'high-performance' }}>
           <PickContext.Provider value={pickValue}>
             <Stage level={level} modelId={modelId} sceneId={sceneId} pose={pose} controlsRef={controlsRef} />
           </PickContext.Provider>
@@ -290,8 +300,8 @@ export default function InternalsExplorer({ onBack }) {
 
       {/* top bar */}
       <div className="ix-topleft">
-        <button className="ix-pill" onClick={onBack} aria-label="Leave the realm">
-          ← <span className="ix-wide-only">Leave the realm</span>
+        <button className="ix-pill" onClick={onBack} aria-label="Back to Progen Labs home">
+          ← <span className="ix-wide-only">Home</span>
         </button>
         {level !== 'hub' && (
           <button className="ix-pill" onClick={back} aria-label="Back">
@@ -318,7 +328,10 @@ export default function InternalsExplorer({ onBack }) {
         )}
       </nav>
 
-      <div className="ix-tools">
+      <div className="ix-tools" role="toolbar" aria-label="View controls">
+        <button className="ix-tool" onClick={() => setPaused(p => !p)} aria-pressed={paused} aria-label={paused ? 'Play animations' : 'Pause animations'} title={paused ? 'Play animations' : 'Pause animations'}>
+          {paused ? '▶' : '❚❚'}
+        </button>
         <button className="ix-tool" onClick={() => setNonce(n => n + 1)} aria-label="Reset view" title="Reset view">⟲</button>
         <button className="ix-tool" onClick={() => dolly(0.8)} aria-label="Zoom in" title="Zoom in">＋</button>
         <button className="ix-tool" onClick={() => dolly(1.25)} aria-label="Zoom out" title="Zoom out">－</button>
@@ -326,7 +339,7 @@ export default function InternalsExplorer({ onBack }) {
 
       {/* left rail */}
       {!intro && (
-        <aside className="ix-rail" key={`${level}:${modelId}:${sceneId}`}>
+        <aside className="ix-rail" key={`${level}:${modelId}:${sceneId}`} aria-label="Explore the parts of this view">
           <div className="ix-rail-head">
             <p className="ix-rail-kicker">{railHead.kicker}</p>
             <h2 className="ix-rail-title">{railHead.title}</h2>
@@ -337,6 +350,7 @@ export default function InternalsExplorer({ onBack }) {
               <li key={it.id}>
                 <button
                   className={`ix-rail-item${hovered === it.id ? ' is-hot' : ''}${selected === it.id && level === 'scene' ? ' is-sel' : ''}`}
+                  aria-current={selected === it.id && level === 'scene' ? 'true' : undefined}
                   onMouseEnter={() => setHovered(it.id)}
                   onMouseLeave={() => setHovered(h => (h === it.id ? null : h))}
                   onFocus={() => setHovered(it.id)}
@@ -374,12 +388,12 @@ export default function InternalsExplorer({ onBack }) {
       {/* detail panel */}
       <AnimatePresence>
         {item && (
-          <motion.aside className="ix-panel" key={item.id} initial={{ x: '108%' }} animate={{ x: 0 }} exit={{ x: '108%' }} transition={{ type: 'spring', stiffness: 260, damping: 30 }}>
+          <motion.aside className="ix-panel" role="dialog" aria-modal="false" aria-labelledby="ix-panel-title" key={item.id} initial={{ x: '108%' }} animate={{ x: 0 }} exit={{ x: '108%' }} transition={{ type: 'spring', stiffness: 260, damping: 30 }}>
             <div className="ix-panel-head">
               <span className="ix-badge">{scene.title}</span>
               <button className="ix-close" onClick={() => setSelected(null)} aria-label="Close">✕</button>
             </div>
-            <h2 className="ix-panel-title">{item.title}</h2>
+            <h2 className="ix-panel-title" id="ix-panel-title">{item.title}</h2>
             <p className="ix-panel-tag">
               <Rich text={item.blurb} />
             </p>

@@ -4,7 +4,7 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
-import { Arrow, Block, C, Chip, FaceText, Region, Wire, noRaycast } from '../primitives.jsx';
+import { Arrow, Block, C, Chip, FaceText, Region, Wire, noRaycast, paintCard } from '../primitives.jsx';
 
 export const pose = { pos: [0, 1.5, 22], tgt: [0.6, 0.8, 0], span: 25, height: 10.5 };
 
@@ -52,7 +52,7 @@ export default function ContextScene() {
       if (!mat) return;
       const [x, y] = N[n];
       const d = Math.hypot(x - N.Provider[0], y - N.Provider[1]);
-      mat.emissiveIntensity = u < 1.6 && r >= d ? 1.5 : 0.7;
+      paintCard(mat, GOLD, u < 1.6 && r >= d ? 0.42 : 0.2);
     };
     reach('Header', header.current);
     reach('Button', button.current);
@@ -72,12 +72,12 @@ export default function ContextScene() {
         <Chip key={n} position={P(n)} color={C.react} text={`<${n}>`} intensity={0.45} />
       ))}
 
-      <Region id="provider" position={P('Provider')} size={[7.0, 0.9, 0.6]} center={[1.6, 0, 0]} color={GOLD} label="Provider" sub="broadcasts a value">
+      <Region id="provider" position={P('Provider')} size={[7.8, 0.9, 0.6]} center={[1.8, 0, 0]} color={GOLD} label="Provider" sub="broadcasts a value">
         {hot => (
           <>
-            <Chip size={[3.4, 0.7, 0.45]} color={GOLD} text="<ThemeContext.Provider>" textSize={0.2} hot={hot} intensity={0.8} />
-            <Chip position={[3.6, 0, 0]} size={[2.4, 0.6, 0.35]} color={GOLD} hot={hot} intensity={0.35}>
-              <Text ref={valueText} position={[0, 0, 0.19]} fontSize={0.2} color="#fff3c4" anchorX="center" anchorY="middle" raycast={noRaycast}>
+            <Chip size={[3.9, 0.7, 0.45]} color={GOLD} text="<ThemeContext.Provider>" textSize={0.28} hot={hot} />
+            <Chip position={[3.75, 0, 0]} size={[2.9, 0.62, 0.35]} color={GOLD} hot={hot}>
+              <Text ref={valueText} position={[0, 0, 0.19]} fontSize={0.29} color="#fff3c4" anchorX="center" anchorY="middle" raycast={noRaycast}>
                 value = "dark"
               </Text>
             </Chip>
@@ -91,8 +91,8 @@ export default function ContextScene() {
         <meshBasicMaterial color={GOLD} transparent opacity={0} />
       </mesh>
 
-      <Region id="propagation" position={P('Layout')} size={[2.6, 0.8, 0.6]} color={C.grey} label="memo skipped — consumers still update" labelY={0.4}>
-        {hot => <Chip size={[2.4, 0.62, 0.4]} color={C.grey} text="<Layout> memo" dim={!hot} hot={hot} intensity={0.5} />}
+      <Region id="propagation" position={P('Layout')} size={[3.1, 0.8, 0.6]} color={C.grey} label="memo skipped — consumers still update" labelY={0.4}>
+        {hot => <Chip size={[2.9, 0.62, 0.4]} color={C.grey} text="<Layout> memo" textSize={0.3} dim={!hot} hot={hot} />}
       </Region>
 
       <Region id="consumer" position={P('Header')} size={[2.4, 0.8, 0.6]} color={GOLD} label="useContext" labelY={-0.95}>
@@ -107,19 +107,19 @@ export default function ContextScene() {
         {hot => (
           <>
             {['<App theme>', '<Page theme>', '<Panel theme>', '<Button theme>'].map((t, i) => (
-              <Chip key={t} position={[0, 2.3 - i * 1.55, 0]} size={[2.8, 0.6, 0.4]} color={i === 3 ? GOLD : C.red} text={t} textSize={0.2} hot={hot} intensity={0.4} />
+              <Chip key={t} position={[0, 2.3 - i * 1.55, 0]} size={[2.9, 0.62, 0.4]} color={i === 3 ? GOLD : C.red} text={t} textSize={0.29} hot={hot} />
             ))}
             {[0, 1, 2].map(i => (
               <group key={i}>
                 <Arrow from={[0, 1.95 - i * 1.55, 0.25]} to={[0, 1.1 - i * 1.55, 0.25]} color="#ffb3bd" head={0.2} />
-                <FaceText position={[0.75, 1.52 - i * 1.55, 0.25]} size={0.15} color="#ffb3bd" anchorX="left">props.theme</FaceText>
+                <FaceText position={[0.2, 1.52 - i * 1.55, 0.25]} size={0.28} color="#ffc2c9" anchorX="left">props.theme</FaceText>
               </group>
             ))}
           </>
         )}
       </Region>
 
-      <Block id="split" position={[11.3, 3.4, 0]} size={[3.2, 1.05, 0.35]} color={GOLD} intensity={0.4} text={'useMemo(value)\nsplit fast / slow contexts'} textSize={0.19} label="Keep it fast" labelPos={[0, 0.8, 0]} />
+      <Block id="split" position={[11.3, 3.4, 0]} size={[3.6, 1.1, 0.35]} color={GOLD} text={'useMemo the value\nsplit contexts'} textSize={0.3} label="Keep it fast" labelPos={[0, 0.8, 0]} />
     </group>
   );
 }

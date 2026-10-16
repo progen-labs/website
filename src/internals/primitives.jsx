@@ -1,8 +1,18 @@
 // Shared 3D building blocks for the Internals Explorer: clickable hotspots,
-// labelled blocks, flowing particles, arrows and callouts. Every scene is
-// assembled from these so the look (dark glass + emissive accent) stays
-// consistent and every interactive piece behaves the same way.
-import { createContext, useContext, useMemo, useRef } from 'react';
+// labelled cards, flowing particles, arrows and callouts. Every scene is
+// assembled from these, so the look and the accessibility rules live here:
+//
+//  • Anything that carries text is a dark "card": a tinted face (never more
+//    than ~40% of the accent mixed into the surface colour) with a coloured
+//    border. Light text on it measures ≥ 7:1 contrast (WCAG AAA for large
+//    text, AA for body text). Glow lives on borders and decorative shapes,
+//    never behind text.
+//  • Floating labels sit on a dark backing plate and are drawn in front of
+//    nearby geometry, so a gear or a line can never cover them.
+//  • 3D text has a floor (TEXT_MIN world units ≈ 13px on a laptop screen at
+//    the default framing). Zooming the camera enlarges everything uniformly.
+//  • Multi-line text is laid out line by line (no stray glyph boxes).
+import { createContext, useContext, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Billboard, Edges, Line, RoundedBox, Text } from '@react-three/drei';
 import * as THREE from 'three';
@@ -20,11 +30,74 @@ export const C = {
   grey: '#8a93ad',
 };
 
+/** Text colours, chosen for contrast on the dark card faces / plates. */
+export const INK = '#f5f7ff'; // primary (≈ 15:1 on #0a0f1e, ≥ 5.5:1 on the brightest card tint)
+export const INK_DIM = '#c3cbe2'; // secondary (≥ 4.5:1 on every card tint)
+export const TEXT_MIN = 0.28; // world units — the smallest 3D text allowed
+export const SURFACE = '#0a0f1e';
+
 // hovered / selected / pick / clickGuard — provided inside the Canvas
 export const PickContext = createContext(null);
 export const usePick = () => useContext(PickContext);
 
 export const noRaycast = () => null;
+
+/** sRGB hex mix: t = 0 → a, t = 1 → b. */
+export function mix(a, b, t) {
+  const pa = parseInt(a.slice(1), 16);
+  const pb = parseInt(b.slice(1), 16);
+  const ch = s => {
+    const x = (pa >> s) & 255;
+    const y = (pb >> s) & 255;
+    return Math.round(x + (y - x) * t);
+  };
+  return `#${((1 << 24) | (ch(16) << 16) | (ch(8) << 8) | ch(0)).toString(16).slice(1)}`;
+}
+
+/** Card face colour for an accent at a given strength. Keep ≤ 0.42 so light
+ *  text on top stays above 4.5:1 for every accent in the palette. */
+export const cardTint = (accent, level = 0.22) => mix(SURFACE, accent, Math.min(level, 0.42));
+export const CARD = { dim: 0.1, idle: 0.22, hot: 0.36, active: 0.42 };
+
+/** Repaint a card material from an animation (e.g. "this one is re-rendering"). */
+export function paintCard(mat, accent, level) {
+  if (!mat) return;
+  mat.emissive.set(cardTint(accent, level));
+  mat.emissiveIntensity = 1;
+}
+
+/** Unlit-looking card face: black diffuse + tinted emissive = exact colour. */
+export function CardMat({ color, level = CARD.idle, opacity = 1, matRef }) {
+  return (
+    <meshStandardMaterial
+      ref={matRef}
+      color="#000000"
+      emissive={cardTint(color, level)}
+      emissiveIntensity={1}
+      roughness={0.8}
+      metalness={0}
+      transparent={opacity < 1}
+      opacity={opacity}
+    />
+  );
+}
+
+/** A thin rectangular border on the front face of a card. */
+export function Border({ size, color, width = 1.4, z }) {
+  const [w, h, d] = size;
+  const zz = z ?? d / 2 + 0.006;
+  const pts = useMemo(
+    () => [
+      [-w / 2, -h / 2, zz],
+      [w / 2, -h / 2, zz],
+      [w / 2, h / 2, zz],
+      [-w / 2, h / 2, zz],
+      [-w / 2, -h / 2, zz],
+    ],
+    [w, h, zz],
+  );
+  return <Line points={pts} color={color} lineWidth={width} raycast={noRaycast} />;
+}
 
 /** A group that hovers, highlights and picks as one unit. Children may be a
  *  render function `(hot, selected) => …`. */
@@ -67,7 +140,7 @@ export function HitBox({ size, position }) {
   );
 }
 
-/** Dark glass with an emissive accent; brightens when hot. */
+/** Glowing material for DECORATIVE shapes only (never put text on it). */
 export function Glass({ color, hot, intensity = 0.55, opacity = 1, base = '#0b1226' }) {
   return (
     <meshStandardMaterial
@@ -102,105 +175,168 @@ export function Cage({ size, color, position }) {
   );
 }
 
-/** Camera-facing title + optional subtitle. The title sits above `position`. */
-export function Label({ position, title, sub, color = '#ffffff', subColor = '#9fb0d8', size = 0.42, maxWidth = 9 }) {
+/**
+ * Text printed flat on a surface. Enforces TEXT_MIN unless `raw` (for tiny
+ * decorative mock-UI text), and lays out "\n" line by line.
+ */
+export function FaceText({ children, size = 0.32, color = INK, anchorX = 'center', anchorY = 'middle', lineHeight = 1.28, position = [0, 0, 0], raw, textAlign, ...rest }) {
+  const s = raw ? size : Math.max(size, TEXT_MIN);
+  const str = children == null ? '' : String(children);
+  const align = textAlign || (anchorX === 'left' ? 'left' : anchorX === 'right' ? 'right' : 'center');
+  if (!str.includes('\n')) {
+    return (
+      <Text position={position} fontSize={s} color={color} anchorX={anchorX} anchorY={anchorY} textAlign={align} raycast={noRaycast} {...rest}>
+        {str}
+      </Text>
+    );
+  }
+  const lines = str.split('\n');
+  const lh = s * lineHeight;
+  const total = lines.length * lh;
+  const top = anchorY === 'top' ? 0 : anchorY === 'bottom' ? total : total / 2;
+  return (
+    <group position={position}>
+      {lines.map((l, i) => (
+        <Text key={i} position={[0, top - lh * (i + 0.5), 0]} fontSize={s} color={color} anchorX={anchorX} anchorY="middle" textAlign={align} raycast={noRaycast} {...rest}>
+          {l.length ? l : ' '}
+        </Text>
+      ))}
+    </group>
+  );
+}
+
+/**
+ * Camera-facing title + optional subtitle on a dark plate, nudged towards the
+ * camera so nearby geometry never covers it. With place="above" (default) the
+ * whole label sits above `position`; with place="below" it hangs beneath it —
+ * so a label never overlaps the object it describes.
+ */
+export function Label({ position, title, sub, color = '#ffffff', subColor = INK_DIM, size = 0.46, maxWidth = 10, place = 'above' }) {
+  const ts = Math.max(size, 0.44);
+  const ss = Math.max(ts * 0.64, 0.3);
+  const gap = ts * 0.2;
+  const [tb, setTb] = useState(null);
+  const [sb, setSb] = useState(null);
+
+  // vertical layout of the two lines relative to `position`
+  const above = place !== 'below';
+  const subH = sub ? (sb ? sb[3] - sb[1] : ss * 1.2) : 0;
+  const titleH = tb ? tb[3] - tb[1] : ts * 1.2;
+  const titleY = above ? (sub ? subH + gap : 0) : 0;
+  const subY = above ? 0 : -(titleH + gap);
+  const titleAnchor = above ? 'bottom' : 'top';
+  const subAnchor = above ? 'bottom' : 'top';
+
+  let plate = null;
+  if (tb) {
+    let minX = tb[0];
+    let maxX = tb[2];
+    let minY = tb[1] + titleY;
+    let maxY = tb[3] + titleY;
+    if (sub && sb) {
+      minX = Math.min(minX, sb[0]);
+      maxX = Math.max(maxX, sb[2]);
+      minY = Math.min(minY, sb[1] + subY);
+      maxY = Math.max(maxY, sb[3] + subY);
+    }
+    const px = ts * 0.32;
+    const py = ts * 0.16;
+    plate = { w: maxX - minX + 2 * px, h: maxY - minY + 2 * py, x: (minX + maxX) / 2, y: (minY + maxY) / 2 };
+  }
+
   return (
     <Billboard position={position}>
-      <Text fontSize={size} color={color} anchorX="center" anchorY="bottom" outlineWidth={size * 0.05} outlineColor="#05060e" maxWidth={maxWidth} textAlign="center">
-        {title}
-      </Text>
-      {sub ? (
-        <Text position={[0, -size * 0.3, 0]} fontSize={size * 0.58} color={subColor} anchorX="center" anchorY="top" outlineWidth={size * 0.03} outlineColor="#05060e" maxWidth={maxWidth} textAlign="center">
-          {sub}
+      <group position={[0, 0, 0.5]}>
+        {plate && (
+          <mesh position={[plate.x, plate.y, -0.02]} renderOrder={9} raycast={noRaycast}>
+            <planeGeometry args={[plate.w, plate.h]} />
+            <meshBasicMaterial color="#060914" transparent opacity={0.9} depthWrite={false} />
+          </mesh>
+        )}
+        <Text
+          renderOrder={10}
+          position={[0, titleY, 0]}
+          fontSize={ts}
+          color={color}
+          anchorX="center"
+          anchorY={titleAnchor}
+          maxWidth={maxWidth}
+          textAlign="center"
+          onSync={m => setTb(m.textRenderInfo ? [...m.textRenderInfo.blockBounds] : null)}
+        >
+          {title}
         </Text>
-      ) : null}
+        {sub ? (
+          <Text
+            renderOrder={10}
+            position={[0, subY, 0]}
+            fontSize={ss}
+            color={subColor}
+            anchorX="center"
+            anchorY={subAnchor}
+            maxWidth={maxWidth}
+            textAlign="center"
+            onSync={m => setSb(m.textRenderInfo ? [...m.textRenderInfo.blockBounds] : null)}
+          >
+            {sub}
+          </Text>
+        ) : null}
+      </group>
     </Billboard>
   );
 }
 
-/** Text printed flat on a surface (does not face the camera). */
-export function FaceText({ children, size = 0.3, color = '#e8ecff', anchorX = 'center', anchorY = 'middle', ...rest }) {
-  return (
-    <Text fontSize={size} color={color} anchorX={anchorX} anchorY={anchorY} raycast={noRaycast} {...rest}>
-      {children}
-    </Text>
-  );
-}
-
-/** The workhorse: a rounded glass block that is a hotspot, with face text and a label. */
-export function Block({
-  id,
-  position,
-  rotation,
-  size = [2, 1, 0.6],
-  color = C.cyan,
-  label,
-  sub,
-  labelPos,
-  text,
-  textSize = 0.3,
-  textColor = '#eef2ff',
-  radius = 0.12,
-  opacity = 1,
-  intensity = 0.55,
-  disabled,
-  children,
-}) {
-  const r = Math.max(0.01, Math.min(radius, size[0] / 2 - 0.01, size[1] / 2 - 0.01, size[2] / 2 - 0.01));
-  return (
-    <Hotspot id={id} position={position} rotation={rotation} disabled={disabled}>
-      {(hot, sel) => (
-        <>
-          <RoundedBox args={size} radius={r} smoothness={3}>
-            <Glass color={color} hot={hot || sel} opacity={opacity} intensity={intensity} />
-          </RoundedBox>
-          {(hot || sel) && <Outline size={size} color={color} />}
-          {text != null && (
-            <FaceText position={[0, 0, size[2] / 2 + 0.012]} size={textSize} color={textColor} maxWidth={size[0] * 0.92} textAlign="center" lineHeight={1.25}>
-              {text}
-            </FaceText>
-          )}
-          {label && <Label position={labelPos || [0, size[1] / 2 + 0.3, 0]} title={label} sub={sub} color={hot || sel ? '#ffffff' : '#dfe6ff'} subColor={color} />}
-          {typeof children === 'function' ? children(hot, sel) : children}
-        </>
-      )}
-    </Hotspot>
-  );
-}
-
-/** A labelled node that is NOT a hotspot itself — its glow is driven by the
- *  parent (e.g. a Region), so many chips can highlight as one concept. */
-export function Chip({ position, size = [1.9, 0.62, 0.4], color = C.react, text, textSize = 0.22, hot, dim, intensity = 0.6, textColor, matRef, children }) {
+/** A labelled card that is NOT a hotspot itself — its highlight is driven by
+ *  the parent (e.g. a Region), so many chips can highlight as one concept. */
+export function Chip({ position, size = [1.9, 0.62, 0.4], color = C.react, text, textSize = 0.32, hot, dim, textColor, matRef, children }) {
+  const level = hot ? CARD.hot : dim ? CARD.dim : CARD.idle;
   return (
     <group position={position}>
-      <RoundedBox args={size} radius={Math.max(0.01, Math.min(0.12, size[1] / 2 - 0.01, size[2] / 2 - 0.01))} smoothness={3} raycast={noRaycast}>
-        <meshStandardMaterial
-          ref={matRef}
-          color="#0b1226"
-          emissive={color}
-          emissiveIntensity={hot ? Math.min(1.3, Math.max(0.9, intensity * 2.2)) : dim ? intensity * 0.4 : intensity}
-          roughness={0.35}
-          metalness={0.3}
-          transparent={!!dim}
-          opacity={dim ? 0.6 : 1}
-        />
+      <RoundedBox args={size} radius={Math.max(0.01, Math.min(0.1, size[1] / 2 - 0.01, size[2] / 2 - 0.01))} smoothness={3} raycast={noRaycast}>
+        <CardMat color={color} level={level} matRef={matRef} opacity={dim ? 0.75 : 1} />
       </RoundedBox>
+      <Border size={size} color={hot ? color : mix(SURFACE, color, dim ? 0.35 : 0.7)} width={hot ? 2.2 : 1.3} />
       {text != null && (
-        <FaceText
-          position={[0, 0, size[2] / 2 + 0.012]}
-          size={textSize}
-          color={textColor || (dim ? '#9aa3bd' : '#ffffff')}
-          maxWidth={size[0] * 0.92}
-          textAlign="center"
-          lineHeight={1.2}
-          outlineWidth={textSize * 0.07}
-          outlineColor="#05060e"
-        >
+        <FaceText position={[0, 0, size[2] / 2 + 0.012]} size={textSize} color={textColor || (dim ? INK_DIM : INK)} maxWidth={size[0] * 0.92}>
           {text}
         </FaceText>
       )}
       {children}
     </group>
+  );
+}
+
+/** The workhorse hotspot card: face text, border, optional floating label. */
+export function Block({ id, position, rotation, size = [2, 1, 0.6], color = C.cyan, label, sub, labelPos, text, textSize = 0.32, textColor = INK, opacity = 1, disabled, children }) {
+  const r = Math.max(0.01, Math.min(0.12, size[0] / 2 - 0.01, size[1] / 2 - 0.01, size[2] / 2 - 0.01));
+  return (
+    <Hotspot id={id} position={position} rotation={rotation} disabled={disabled}>
+      {(hot, sel) => (
+        <>
+          <RoundedBox args={size} radius={r} smoothness={3}>
+            <CardMat color={color} level={hot || sel ? CARD.hot : CARD.idle} opacity={opacity} />
+          </RoundedBox>
+          <Border size={size} color={hot || sel ? color : mix(SURFACE, color, 0.7)} width={hot || sel ? 2.4 : 1.4} />
+          {(hot || sel) && <Outline size={size} color={color} />}
+          {text != null && (
+            <FaceText position={[0, 0, size[2] / 2 + 0.012]} size={textSize} color={textColor} maxWidth={size[0] * 0.92}>
+              {text}
+            </FaceText>
+          )}
+          {label && (
+            <Label
+              // labelPos values were authored as the title's baseline; a label hung below starts ~0.4 higher
+              position={labelPos ? [labelPos[0], labelPos[1] < 0 ? labelPos[1] + 0.4 : labelPos[1], labelPos[2]] : [0, size[1] / 2 + 0.25, 0]}
+              title={label}
+              sub={sub}
+              subColor={mix(color, '#ffffff', 0.35)}
+              place={labelPos && labelPos[1] < 0 ? 'below' : 'above'}
+            />
+          )}
+          {typeof children === 'function' ? children(hot, sel) : children}
+        </>
+      )}
+    </Hotspot>
   );
 }
 
@@ -214,7 +350,13 @@ export function Region({ id, position, size, color = C.cyan, label, sub, labelY,
           <HitBox size={size} position={center} />
           {(hot || sel) && <Outline size={size} position={center} color={color} pad={0.1} />}
           {label && (
-            <Label position={[center[0], labelY ?? center[1] + size[1] / 2 + 0.25, center[2]]} title={label} sub={sub} subColor={color} size={0.36} color={hot || sel ? '#ffffff' : '#dfe6ff'} />
+            <Label
+              position={[center[0], labelY == null ? center[1] + size[1] / 2 + 0.2 : labelY < center[1] ? labelY + 0.4 : labelY, center[2]]}
+              title={label}
+              sub={sub}
+              subColor={mix(color, '#ffffff', 0.35)}
+              place={labelY != null && labelY < center[1] ? 'below' : 'above'}
+            />
           )}
         </>
       )}
@@ -237,7 +379,7 @@ export function Orb({ id, position, color, r = 0.45, label, sub, labelPos }) {
             <meshBasicMaterial color={color} transparent opacity={0.1} depthWrite={false} />
           </mesh>
           <HitBox size={[r * 3, r * 3, r * 3]} />
-          {label && <Label position={labelPos || [0, r + 0.35, 0]} title={label} sub={sub} subColor={color} size={0.36} />}
+          {label && <Label position={labelPos || [0, r + 0.35, 0]} title={label} sub={sub} subColor={mix(color, '#ffffff', 0.35)} />}
         </>
       )}
     </Hotspot>
@@ -307,7 +449,7 @@ export function Callout({ from, to, title, sub, color }) {
         <sphereGeometry args={[0.1, 14, 14]} />
         <meshBasicMaterial color={color} />
       </mesh>
-      <Label position={to} title={title} sub={sub} subColor={color} size={0.5} />
+      <Label position={to} title={title} sub={sub} subColor={mix(color, '#ffffff', 0.35)} size={0.5} />
     </group>
   );
 }
@@ -336,20 +478,20 @@ export function Bob({ amp = 0.15, speed = 1, phase = 0, children, ...props }) {
   );
 }
 
-/** A cog wheel facing the camera. */
+/** A cog wheel facing the camera (decorative). */
 export function Gear({ r = 0.9, color, teeth = 10 }) {
   return (
     <group>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[r, r, 0.35, 32]} />
-        <Glass color={color} intensity={0.8} />
+        <Glass color={color} intensity={0.7} />
       </mesh>
       {Array.from({ length: teeth }, (_, i) => {
         const a = (i / teeth) * Math.PI * 2;
         return (
           <mesh key={i} position={[Math.cos(a) * (r + 0.14), Math.sin(a) * (r + 0.14), 0]} rotation={[0, 0, a]}>
             <boxGeometry args={[0.32, 0.26, 0.35]} />
-            <Glass color={color} intensity={0.8} />
+            <Glass color={color} intensity={0.7} />
           </mesh>
         );
       })}

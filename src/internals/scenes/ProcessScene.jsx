@@ -1,7 +1,7 @@
 // Tabs → the multi-process architecture: one privileged browser process,
 // sandboxed renderers (one per site), the GPU process and the network service,
 // all talking over Mojo IPC (the travelling particles).
-import { Block, C, Cage, FaceText, Flow, Orb, Wire, noRaycast } from '../primitives.jsx';
+import { Block, C, Cage, CardMat, FaceText, Flow, INK_DIM, Orb, Wire, noRaycast } from '../primitives.jsx';
 
 export const pose = { pos: [0, 4, 24], tgt: [0, 0.3, 0], span: 27, height: 12.5 };
 
@@ -19,15 +19,15 @@ export default function ProcessScene() {
         {RENDERERS.map((r, i) => (
           <group key={r.site} position={[r.tab, 0.55, 0.81]}>
             <mesh raycast={noRaycast}>
-              <boxGeometry args={[2.6, 0.5, 0.06]} />
-              <meshStandardMaterial color="#16203d" emissive={C.blue} emissiveIntensity={0.45} />
+              <boxGeometry args={[2.6, 0.56, 0.06]} />
+              <CardMat color={C.blue} level={0.34} />
             </mesh>
-            <FaceText position={[0, 0, 0.05]} size={0.22}>{`tab ${i + 1}`}</FaceText>
+            <FaceText position={[0, 0, 0.05]} size={0.3}>{`tab ${i + 1}`}</FaceText>
           </group>
         ))}
-        <FaceText position={[-3.3, -0.45, 0.82]} size={0.25} color="#cfe0ff">UI thread</FaceText>
-        <FaceText position={[0, -0.45, 0.82]} size={0.25} color="#cfe0ff">IO thread</FaceText>
-        <FaceText position={[3.3, -0.45, 0.82]} size={0.25} color="#cfe0ff">profile & storage</FaceText>
+        <FaceText position={[-3.3, -0.45, 0.82]} size={0.3} color={INK_DIM}>UI thread</FaceText>
+        <FaceText position={[0, -0.45, 0.82]} size={0.3} color={INK_DIM}>IO thread</FaceText>
+        <FaceText position={[3.3, -0.45, 0.82]} size={0.3} color={INK_DIM}>profile & storage</FaceText>
       </Block>
 
       {/* each tab's content is drawn by a renderer */}
@@ -38,7 +38,7 @@ export default function ProcessScene() {
       {/* renderers, each inside an OS sandbox */}
       {RENDERERS.map(r => (
         <group key={r.site}>
-          <Block id="renderer" position={[r.x, -1.3, 0]} size={[4.4, 2.2, 1.6]} color={C.green} label="Renderer process" sub={`site: ${r.site}`} labelPos={[0, -2.15, 0]}>
+          <Block id="renderer" position={[r.x, -1.3, 0]} size={[4.8, 2.2, 1.6]} color={C.green} label="Renderer process" sub={`site: ${r.site}`} labelPos={[0, -2.15, 0]}>
             <group position={[0, 0.25, 0.82]}>
               {[
                 ['Blink', -1.05, C.amber],
@@ -46,23 +46,23 @@ export default function ProcessScene() {
               ].map(([name, x, col]) => (
                 <group key={name} position={[x, 0, 0]}>
                   <mesh raycast={noRaycast}>
-                    <boxGeometry args={[1.8, 0.62, 0.08]} />
-                    <meshStandardMaterial color="#0d1a14" emissive={col} emissiveIntensity={0.5} />
+                    <boxGeometry args={[1.9, 0.64, 0.08]} />
+                    <CardMat color={col} level={0.36} />
                   </mesh>
-                  <FaceText position={[0, 0, 0.06]} size={0.26}>{name}</FaceText>
+                  <FaceText position={[0, 0, 0.06]} size={0.32}>{name}</FaceText>
                 </group>
               ))}
             </group>
-            <FaceText position={[0, -0.6, 0.82]} size={0.19} color="#bff5dc">main · compositor · raster threads</FaceText>
+            <FaceText position={[0, -0.6, 0.82]} size={0.28} color={INK_DIM}>main · compositor · raster</FaceText>
           </Block>
-          <Cage size={[5.2, 3.0, 2.4]} color={C.red} position={[r.x, -1.3, 0]} />
-          <Block id="sandbox" position={[r.x + 1.9, 0.38, 1.25]} size={[1.6, 0.46, 0.25]} color={C.red} text="SANDBOX" textSize={0.2} />
+          <Cage size={[5.5, 3.0, 2.4]} color={C.red} position={[r.x, -1.3, 0]} />
+          <Block id="sandbox" position={[r.x + 1.85, 0.4, 1.25]} size={[1.8, 0.52, 0.25]} color={C.red} text="SANDBOX" textSize={0.28} />
         </group>
       ))}
 
       {/* gpu + network service */}
-      <Block id="gpu" position={[11, 1.4, 0]} size={[3.4, 2.1, 1.6]} color={C.pink} label="GPU process" sub="Viz · raster · video" text={'draws\nframes'} textSize={0.3} />
-      <Block id="netsvc" position={[-11, 1.4, 0]} size={[3.4, 2.1, 1.6]} color={C.amber} label="Network service" sub="DNS · TLS · HTTP · cache" text={'sockets\nlive here'} textSize={0.3} />
+      <Block id="gpu" position={[11, 1.4, 0]} size={[3.4, 2.1, 1.6]} color={C.pink} label="GPU process" sub="Viz · raster · video" text={'draws\nframes'} textSize={0.34} />
+      <Block id="netsvc" position={[-11, 1.4, 0]} size={[3.4, 2.1, 1.6]} color={C.amber} label="Network service" sub="DNS · TLS · HTTP · cache" text={'sockets\nlive here'} textSize={0.34} />
 
       {/* Mojo IPC — messages travelling between processes */}
       {RENDERERS.map((r, i) => (
@@ -75,7 +75,7 @@ export default function ProcessScene() {
 
       <Orb id="ipc" position={[3.6, 2.15, 1.5]} color={C.violet} r={0.4} label="Mojo IPC" sub="message pipes" />
 
-      <Block id="isolation" position={[0, -5.2, 0]} size={[15, 0.85, 0.35]} color={C.green} intensity={0.35} text="SITE ISOLATION — one renderer per site, cross-site iframes included" textSize={0.3} />
+      <Block id="isolation" position={[0, -5.2, 0]} size={[15, 0.85, 0.35]} color={C.green} text="SITE ISOLATION — one renderer process per site" textSize={0.34} />
     </group>
   );
 }

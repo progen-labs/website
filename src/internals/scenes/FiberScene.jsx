@@ -5,9 +5,9 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { RoundedBox, Text } from '@react-three/drei';
 import * as THREE from 'three';
-import { Arrow, Block, C, FaceText, Glass, HitBox, Hotspot, Label, Outline, Wire, noRaycast } from '../primitives.jsx';
+import { Arrow, Block, Border, C, CARD, CardMat, FaceText, HitBox, Hotspot, INK, INK_DIM, Label, Outline, SURFACE, Wire, mix, noRaycast } from '../primitives.jsx';
 
-export const pose = { pos: [5.5, 3.2, 19], tgt: [1.7, 0.5, -1.5], span: 20.5, height: 10 };
+export const pose = { pos: [5.5, 3.2, 19], tgt: [2.2, 0.6, -1.5], span: 22, height: 10.5 };
 
 const N = {
   App: [0, 3.6],
@@ -45,9 +45,10 @@ function FiberBox({ name, z = 0, hot, dim }) {
   return (
     <group position={[x, y, z]}>
       <RoundedBox args={[HW * 2, HH * 2, 0.5]} radius={0.14} raycast={noRaycast}>
-        <Glass color={dim ? C.grey : C.react} hot={hot} intensity={dim ? 0.25 : 0.6} opacity={dim ? 0.6 : 1} />
+        <CardMat color={dim ? C.grey : C.react} level={hot ? CARD.hot : dim ? CARD.dim : CARD.idle} opacity={dim ? 0.8 : 1} />
       </RoundedBox>
-      <FaceText position={[0, 0, 0.27]} size={0.28} color={dim ? '#9aa3bd' : '#ffffff'}>
+      <Border size={[HW * 2, HH * 2, 0.5]} color={hot ? C.react : mix(SURFACE, dim ? C.grey : C.react, 0.6)} width={hot ? 2.2 : 1.3} />
+      <FaceText position={[0, 0, 0.27]} size={0.32} color={dim ? INK_DIM : INK}>
         {name}
       </FaceText>
     </group>
@@ -87,7 +88,7 @@ function Cursor() {
           </mesh>
           <pointLight intensity={10} distance={4} color="#ffffff" />
           <HitBox size={[0.9, 0.9, 0.9]} />
-          <Text ref={label} position={[0, 0.45, 0]} fontSize={0.24} color="#9db8ff" anchorX="center" anchorY="bottom" outlineWidth={0.012} outlineColor="#05060e" raycast={noRaycast}>
+          <Text ref={label} position={[0, 0.45, 0]} fontSize={0.32} color="#b9cbff" anchorX="center" anchorY="bottom" outlineWidth={0.04} outlineColor="#05060e" raycast={noRaycast}>
             beginWork(App)
           </Text>
         </group>
@@ -115,7 +116,7 @@ export default function FiberScene() {
               <FiberBox key={n} name={n} z={BACK_Z} hot={hot || sel} dim={!(hot || sel)} />
             ))}
             <HitBox size={[11, 8, 0.6]} position={[0, 0.3, BACK_Z]} />
-            <Label position={[-6.4, 6.1, BACK_Z]} title="current" sub="the tree on screen" subColor={C.grey} size={0.4} color={hot || sel ? '#fff' : '#b6bfd8'} />
+            <Label position={[-6.4, 6.0, BACK_Z]} title="current" sub="the tree on screen" subColor="#c3cbe2" color="#ffffff" />
           </>
         )}
       </Hotspot>
@@ -138,7 +139,7 @@ export default function FiberScene() {
           </>
         )}
       </Hotspot>
-      <Label position={[-6.2, 4.6, 0]} title="workInProgress" sub="being built" subColor={C.react} size={0.4} />
+      <Label position={[-6.4, 4.4, 0]} title="workInProgress" sub="being built" subColor="#a9ecff" />
 
       {/* child (blue) */}
       <Arrow from={edge('App', 'Header', 'down')[0]} to={edge('App', 'Header', 'down')[1]} color={C.blue} head={0.24} />
@@ -161,7 +162,7 @@ export default function FiberScene() {
       <Cursor />
 
       {/* legend + concepts */}
-      <Hotspot id="links" position={[9.2, 3.0, 0]}>
+      <Hotspot id="links" position={[9.8, 3.1, 0]}>
         {(hot, sel) => (
           <>
             {[
@@ -171,7 +172,7 @@ export default function FiberScene() {
             ].map(([t, c], i) => (
               <group key={t} position={[0, -i * 0.62, 0]}>
                 <Arrow from={[-1.3, 0, 0]} to={[-0.4, 0, 0]} color={c} head={0.2} dashed={t === 'return'} />
-                <FaceText position={[-0.2, 0, 0]} size={0.28} color={c} anchorX="left">{t}</FaceText>
+                <FaceText position={[-0.2, 0, 0]} size={0.32} color={mix(c, "#ffffff", 0.25)} anchorX="left">{t}</FaceText>
               </group>
             ))}
             <HitBox size={[3.2, 2.0, 0.5]} position={[0, -0.62, 0]} />
@@ -179,10 +180,10 @@ export default function FiberScene() {
           </>
         )}
       </Hotspot>
-      <Block id="workloop" position={[9.2, 0.6, 0]} size={[3.2, 0.62, 0.3]} color={C.amber} text="performUnitOfWork()" textSize={0.22} />
-      <Block id="alternate" position={[9.2, -0.4, 0]} size={[3.2, 0.62, 0.3]} color={C.violet} text="fiber.alternate" textSize={0.22} />
-      <Block id="yield" position={[9.2, -1.4, 0]} size={[3.2, 0.62, 0.3]} color={C.yellow} text="if (shouldYield()) pause" textSize={0.21} />
-      <Block id="flags" position={[9.2, -2.4, 0]} size={[3.2, 0.62, 0.3]} color={C.pink} text="flags: Placement | Update" textSize={0.2} />
+      <Block id="workloop" position={[9.8, 0.55, 0]} size={[4.4, 0.66, 0.3]} color={C.amber} text="performUnitOfWork()" textSize={0.3} />
+      <Block id="alternate" position={[9.8, -0.45, 0]} size={[4.4, 0.66, 0.3]} color={C.violet} text="fiber.alternate" textSize={0.3} />
+      <Block id="yield" position={[9.8, -1.45, 0]} size={[4.4, 0.66, 0.3]} color={C.yellow} text="shouldYield() → pause" textSize={0.3} />
+      <Block id="flags" position={[9.8, -2.45, 0]} size={[4.4, 0.66, 0.3]} color={C.pink} text="flags: Placement, Update" textSize={0.29} />
     </group>
   );
 }

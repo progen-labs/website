@@ -4,32 +4,28 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { RoundedBox } from '@react-three/drei';
-import { Block, C, FaceText, Flow, Glass, HitBox, Hotspot, Label, Wire, noRaycast } from '../primitives.jsx';
-export const pose = { pos: [0, 1.5, 22], tgt: [0, 0.6, 0], span: 21, height: 9.5 };
+import { Block, Border, C, CARD, CardMat, FaceText, Flow, HitBox, Hotspot, INK, INK_DIM, Label, Wire, mix, noRaycast, paintCard, SURFACE } from '../primitives.jsx';
+export const pose = { pos: [0, 1.5, 22], tgt: [0, 0.5, 0], span: 21.5, height: 10 };
 
 const L = -6.5;
 const R = 6.5;
-const POS = { root: [0, 3.0], h1: [-2.6, 1.4], ul: [0, 1.4], side: [2.6, 1.4], li0: [-1.5, -0.4], li1: [0, -0.4], li2: [1.5, -0.4] };
+const POS = { root: [0, 3.0], h1: [-2.55, 1.4], ul: [0, 1.4], side: [2.55, 1.4], li0: [-2.45, -0.4], li1: [0, -0.4], li2: [2.45, -0.4] };
+const NW = 2.3; // node width
 
 function TNode({ at, label, color, hot, pulse, dim }) {
   const mat = useRef();
   useFrame(({ clock }) => {
-    if (mat.current && pulse) mat.current.opacity = 0.45 + 0.5 * (0.5 + 0.5 * Math.sin(clock.getElapsedTime() * 3));
+    // pulse the card tint (never brighter than the contrast-safe maximum)
+    if (pulse && !hot) paintCard(mat.current, color, 0.16 + 0.26 * (0.5 + 0.5 * Math.sin(clock.getElapsedTime() * 3)));
   });
+  const level = hot ? CARD.hot : dim ? CARD.dim : CARD.idle;
   return (
     <group position={[at[0], at[1], 0]}>
-      <RoundedBox args={[1.95, 0.66, 0.45]} radius={0.12} raycast={noRaycast}>
-        <meshStandardMaterial
-          ref={mat}
-          color="#0b1226"
-          emissive={color}
-          emissiveIntensity={hot ? 1.4 : dim ? 0.25 : 0.65}
-          roughness={0.35}
-          transparent={!!pulse || dim}
-          opacity={dim ? 0.55 : 1}
-        />
+      <RoundedBox args={[NW, 0.66, 0.45]} radius={0.12} raycast={noRaycast}>
+        <CardMat color={color} level={level} matRef={mat} />
       </RoundedBox>
-      <FaceText position={[0, 0, 0.24]} size={0.22} color={dim ? '#9aa3bd' : '#ffffff'}>
+      <Border size={[NW, 0.66, 0.45]} color={hot || pulse ? color : mix(SURFACE, color, dim ? 0.4 : 0.7)} width={hot || pulse ? 2.2 : 1.3} />
+      <FaceText position={[0, 0, 0.24]} size={0.29} color={dim ? INK_DIM : INK}>
         {label}
       </FaceText>
     </group>
@@ -55,9 +51,9 @@ function Edges3({ base }) {
 export default function ReconcileScene() {
   return (
     <group>
-      <Block id="vdom" position={[L, 4.6, 0]} size={[4.6, 0.7, 0.3]} color={C.grey} text="Previous render" textSize={0.28} intensity={0.35} />
-      <Block id="vdom" position={[R, 4.6, 0]} size={[4.6, 0.7, 0.3]} color={C.react} text="Next render" textSize={0.28} intensity={0.45} />
-      <Block id="remount" position={[0, 4.6, 0]} size={[6.6, 0.7, 0.3]} color={C.pink} text="key={userId} changed → remount, fresh state" textSize={0.22} intensity={0.45} />
+      <Block id="vdom" position={[L, 4.6, 0]} size={[4.6, 0.72, 0.3]} color={C.grey} text="Previous render" textSize={0.32} />
+      <Block id="vdom" position={[R, 4.6, 0]} size={[4.6, 0.72, 0.3]} color={C.react} text="Next render" textSize={0.32} />
+      <Block id="remount" position={[0, 4.6, 0]} size={[6.4, 0.72, 0.3]} color={C.pink} text="key={userId} changed → remount" textSize={0.3} />
       <Edges3 base={L} />
       <Edges3 base={R} />
 
@@ -66,21 +62,21 @@ export default function ReconcileScene() {
           <>
             <TNode at={at(L, 'root')} label="<div>" color={C.react} hot={hot} />
             <TNode at={at(R, 'root')} label="<div>" color={C.react} hot={hot} />
-            <HitBox size={[2.1, 0.8, 0.6]} position={[...at(L, 'root'), 0]} />
-            <HitBox size={[2.1, 0.8, 0.6]} position={[...at(R, 'root'), 0]} />
+            <HitBox size={[NW + 0.1, 0.8, 0.6]} position={[...at(L, 'root'), 0]} />
+            <HitBox size={[NW + 0.1, 0.8, 0.6]} position={[...at(R, 'root'), 0]} />
           </>
         )}
       </Hotspot>
       <Wire points={[[...at(L, 'root'), 0.3], [...at(R, 'root'), 0.3]]} color={C.green} dashed opacity={0.45} />
-      <FaceText position={[0, 3.25, 0.3]} size={0.2} color="#a7f3d0">same type → keep</FaceText>
+      <FaceText position={[0, 3.32, 0.3]} size={0.3} color="#a7f3d0">same type → keep</FaceText>
 
       <Hotspot id="props">
         {hot => (
           <>
-            <TNode at={at(L, 'h1')} label="<h1> Todos (2)" color={C.react} hot={hot} />
-            <TNode at={at(R, 'h1')} label="<h1> Todos (3)" color={C.yellow} hot={hot} pulse />
-            <HitBox size={[2.1, 0.8, 0.6]} position={[...at(L, 'h1'), 0]} />
-            <HitBox size={[2.1, 0.8, 0.6]} position={[...at(R, 'h1'), 0]} />
+            <TNode at={at(L, 'h1')} label="h1: Todos (2)" color={C.react} hot={hot} />
+            <TNode at={at(R, 'h1')} label="h1: Todos (3)" color={C.yellow} hot={hot} pulse />
+            <HitBox size={[NW + 0.1, 0.8, 0.6]} position={[...at(L, 'h1'), 0]} />
+            <HitBox size={[NW + 0.1, 0.8, 0.6]} position={[...at(R, 'h1'), 0]} />
           </>
         )}
       </Hotspot>
@@ -89,9 +85,9 @@ export default function ReconcileScene() {
         {hot => (
           <>
             <TNode at={at(L, 'side')} label="<Sidebar>" color={C.react} hot={hot} />
-            <TNode at={at(R, 'side')} label="memo · skipped" color={C.grey} hot={hot} dim />
-            <HitBox size={[2.1, 0.8, 0.6]} position={[...at(L, 'side'), 0]} />
-            <HitBox size={[2.1, 0.8, 0.6]} position={[...at(R, 'side'), 0]} />
+            <TNode at={at(R, 'side')} label="memo: skipped" color={C.grey} hot={hot} dim />
+            <HitBox size={[NW + 0.1, 0.8, 0.6]} position={[...at(L, 'side'), 0]} />
+            <HitBox size={[NW + 0.1, 0.8, 0.6]} position={[...at(R, 'side'), 0]} />
           </>
         )}
       </Hotspot>
@@ -107,17 +103,17 @@ export default function ReconcileScene() {
             <TNode at={at(R, 'li0')} label="li key=c" color={C.cyan} hot={hot} />
             <TNode at={at(R, 'li1')} label="li key=a" color={C.react} hot={hot} />
             <TNode at={at(R, 'li2')} label="li key=d" color={C.green} hot={hot} pulse />
-            <HitBox size={[5.2, 2.8, 0.6]} position={[L, 0.5, 0]} />
-            <HitBox size={[5.2, 2.8, 0.6]} position={[R, 0.5, 0]} />
+            <HitBox size={[6.9, 2.8, 0.6]} position={[L, 0.5, 0]} />
+            <HitBox size={[6.9, 2.8, 0.6]} position={[R, 0.5, 0]} />
           </>
         )}
       </Hotspot>
       {/* key matches across renders */}
       <Flow points={[[...at(L, 'li0'), 0.3], [0, -1.6, 2.6], [...at(R, 'li1'), 0.3]]} color={C.green} count={3} speed={0.18} />
       <Flow points={[[...at(L, 'li2'), 0.3], [0, -1.1, 1.8], [...at(R, 'li0'), 0.3]]} color={C.cyan} count={3} speed={0.18} offset={0.4} />
-      <FaceText position={[L, -1.3, 0.3]} size={0.2} color="#ffb3bd">b removed</FaceText>
-      <FaceText position={[R + 1.5, -1.3, 0.3]} size={0.2} color="#a7f3d0">d inserted</FaceText>
-      <FaceText position={[R - 1.5, -1.3, 0.3]} size={0.2} color="#bdefff">c moved</FaceText>
+      <FaceText position={[L, -1.25, 0.3]} size={0.3} color="#ffc2c9">b removed</FaceText>
+      <FaceText position={[R + 2.45, -1.25, 0.3]} size={0.3} color="#a7f3d0">d inserted</FaceText>
+      <FaceText position={[R - 2.45, -1.25, 0.3]} size={0.3} color="#bdefff">c moved</FaceText>
 
       <Hotspot id="patch" position={[0, -3.4, 0]}>
         {hot => (
@@ -129,14 +125,15 @@ export default function ReconcileScene() {
               ['INSERT  li d', C.green],
             ].map(([t, c], i) => (
               <group key={t} position={[-6.6 + i * 4.4, 0, 0]}>
-                <RoundedBox args={[3.8, 0.75, 0.35]} radius={0.12} raycast={noRaycast}>
-                  <Glass color={c} hot={hot} intensity={0.5} />
+                <RoundedBox args={[3.9, 0.78, 0.35]} radius={0.12} raycast={noRaycast}>
+                  <CardMat color={c} level={hot ? CARD.hot : 0.26} />
                 </RoundedBox>
-                <FaceText position={[0, 0, 0.19]} size={0.26}>{t}</FaceText>
+                <Border size={[3.9, 0.78, 0.35]} color={c} width={hot ? 2.4 : 1.4} />
+                <FaceText position={[0, 0, 0.19]} size={0.31}>{t}</FaceText>
               </group>
             ))}
             <HitBox size={[17.4, 0.9, 0.5]} />
-            <Label position={[0, 0.6, 0]} title="Commit list" sub="only these four operations touch the DOM" subColor={C.react} color={hot ? '#fff' : '#dfe6ff'} size={0.38} />
+            <Label position={[0, 0.6, 0]} title="Commit list" sub="only these four operations touch the DOM" subColor="#a9ecff" color="#ffffff" />
           </>
         )}
       </Hotspot>

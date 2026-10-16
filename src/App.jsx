@@ -1,113 +1,81 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Canvas } from '@react-three/fiber';
 import { AnimatePresence, motion } from 'framer-motion';
-import * as THREE from 'three';
-import World, { SPECTRA_POS, FUNZONE_POS } from './game/World.jsx';
-import { useKeyboard } from './game/useKeyboard.js';
-import Joystick from './game/Joystick.jsx';
-import Hud from './components/Hud.jsx';
-import GateCompass from './components/GateCompass.jsx';
-import WorldSky from './components/WorldSky.jsx';
+import Landing, { PROJECTS } from './landing/Landing.jsx';
 import SpectraWorld from './components/SpectraWorld.jsx';
 import InternalsExplorer from './internals/InternalsExplorer.jsx';
 
+const DESTINATIONS = ['spectra', 'core'];
+const fromHash = () => {
+  const h = typeof window !== 'undefined' ? window.location.hash.slice(1) : '';
+  return DESTINATIONS.includes(h) ? h : null;
+};
+const reducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
 export default function App() {
-  const keys = useKeyboard();
-  const move = useRef({ x: 0, z: 0 });
-  const posRef = useRef(new THREE.Vector3(0, 0, 0));
-  const [phase, setPhase] = useState('explore'); // explore | entering | spectra | funzone
-  const [nearGate, setNearGate] = useState(null); // null | 'spectra' | 'funzone'
-  const [enteringGate, setEnteringGate] = useState('spectra');
-  const [touch] = useState(
-    () =>
-      typeof window !== 'undefined' &&
-      (window.matchMedia?.('(pointer: coarse)').matches || 'ontouchstart' in window),
-  );
-  const phaseRef = useRef(phase);
-  const nearRef = useRef(nearGate);
-  phaseRef.current = phase;
-  nearRef.current = nearGate;
+  // home → entering (camera flies to the project) → spectra | core
+  const [phase, setPhase] = useState(() => fromHash() || 'home');
+  const [target, setTarget] = useState(null);
+  const timer = useRef(null);
 
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    const t = setTimeout(() => setMounted(true), 150);
-    return () => clearTimeout(t);
+  const open = useCallback(id => {
+    setPhase(id);
+    if (window.location.hash !== `#${id}`) window.history.pushState(null, '', `#${id}`);
   }, []);
 
-  const tryEnter = useCallback(() => {
-    const g = nearRef.current;
-    if (phaseRef.current === 'explore' && g) {
-      setEnteringGate(g);
+  const enter = useCallback(
+    id => {
+      if (phase !== 'home' || !DESTINATIONS.includes(id)) return;
+      setTarget(id);
       setPhase('entering');
-      setTimeout(() => setPhase(g), 2600);
-    }
-  }, []);
-
-  useEffect(() => {
-    const onKey = e => {
-      if (e.key === 'Enter') tryEnter();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [tryEnter]);
+      clearTimeout(timer.current);
+      timer.current = setTimeout(() => open(id), reducedMotion() ? 150 : 1500);
+    },
+    [phase, open],
+  );
 
   const back = useCallback(() => {
-    const p = enteringGate === 'funzone' ? FUNZONE_POS : SPECTRA_POS;
-    posRef.current.set(p[0], 0, p[2] + 13);
-    setNearGate(null);
-    setPhase('explore');
-  }, [enteringGate]);
+    setPhase('home');
+    setTarget(null);
+    if (window.location.hash) window.history.pushState(null, '', window.location.pathname + window.location.search);
+  }, []);
 
-  const exploring = phase === 'explore' || phase === 'entering';
+  // keep the back/forward buttons and shared links (#spectra, #core) working
+  useEffect(() => {
+    const onPop = () => {
+      const h = fromHash();
+      setPhase(h || 'home');
+      setTarget(null);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => {
+      window.removeEventListener('popstate', onPop);
+      clearTimeout(timer.current);
+    };
+  }, []);
+
+  const flashColor = PROJECTS.find(p => p.id === target)?.color || '#8fdcff';
 
   return (
-    <div className="game">
-      <WorldSky />
-      <div className="game-canvas">
-        {mounted && (
-          <Canvas camera={{ position: [0, 8, 13], fov: 55 }} dpr={[1, 1.8]} gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}>
-            <World
-              keys={keys}
-              move={move}
-              posRef={posRef}
-              phase={phase}
-              enteringGate={enteringGate}
-              nearGate={nearGate}
-              setNearGate={setNearGate}
-            />
-          </Canvas>
-        )}
-      </div>
-
-      {exploring && (
-        <Hud
-          phase={phase}
-          nearGate={nearGate}
-          touch={touch}
-          onAction={tryEnter}
-        />
-      )}
-
-      {phase === 'explore' && <GateCompass posRef={posRef} />}
-
-      {touch && phase === 'explore' && <Joystick moveRef={move} />}
+    <>
+      {(phase === 'home' || phase === 'entering') && <Landing onEnter={enter} entering={phase === 'entering' ? target : null} />}
 
       <AnimatePresence>
         {phase === 'entering' && (
           <motion.div
-            className="gate-flash"
-            style={{ '--flash': enteringGate === 'funzone' ? '#ffb86b' : '#39e0ff' }}
+            className="ld-flash"
+            style={{ '--flash': flashColor }}
             initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0, 0.1, 1] }}
-            transition={{ duration: 2.6, times: [0, 0.45, 0.7, 1], ease: 'easeIn' }}
+            animate={{ opacity: [0, 0, 1] }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5, times: [0, 0.55, 1], ease: 'easeIn' }}
           />
         )}
       </AnimatePresence>
 
       <AnimatePresence>
-        {phase === 'spectra' && <SpectraWorld key="sw" onBack={back} />}
-        {phase === 'funzone' && <InternalsExplorer key="fz" onBack={back} />}
+        {phase === 'spectra' && <SpectraWorld key="spectra" onBack={back} />}
+        {phase === 'core' && <InternalsExplorer key="core" onBack={back} />}
       </AnimatePresence>
-    </div>
+    </>
   );
 }

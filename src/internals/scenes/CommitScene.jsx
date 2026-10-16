@@ -5,7 +5,7 @@ import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { RoundedBox, Text } from '@react-three/drei';
 import * as THREE from 'three';
-import { Block, C, Cage, FaceText, Glass, HitBox, Hotspot, Label, Outline, Wire, noRaycast } from '../primitives.jsx';
+import { Block, Border, C, CARD, Cage, CardMat, FaceText, Glass, HitBox, Hotspot, INK, Label, Outline, Wire, noRaycast } from '../primitives.jsx';
 
 export const pose = { pos: [0, 1.4, 21], tgt: [0, -0.3, 0], span: 22, height: 9.6 };
 
@@ -35,10 +35,10 @@ function Segment({ s }) {
         <>
           {slices.map(([a, b]) => (
             <RoundedBox key={a} args={[b - a, 0.8, 0.6]} radius={0.12} position={[(a + b) / 2, TRACK_Y, 0]} raycast={noRaycast}>
-              <Glass color={s.color} hot={hot || sel} intensity={0.55} />
+              <CardMat color={s.color} level={hot || sel ? CARD.hot : 0.26} />
             </RoundedBox>
           ))}
-          <FaceText position={[cx, TRACK_Y, 0.32]} size={w < 2 ? 0.17 : 0.22} maxWidth={w - 0.1} textAlign="center">
+          <FaceText position={[cx, TRACK_Y, 0.32]} size={w < 2 ? 0.28 : 0.3}>
             {s.label}
           </FaceText>
           <HitBox size={[w, 0.9, 0.7]} position={[cx, TRACK_Y, 0]} />
@@ -104,7 +104,7 @@ function Stage() {
           <boxGeometry args={[0.06, 2.2, 0.06]} />
           <meshBasicMaterial color="#ffffff" />
         </mesh>
-        <Text ref={headLabel} position={[0, TRACK_Y - 0.95, 0]} fontSize={0.26} color="#ffffff" anchorX="center" anchorY="top" outlineWidth={0.012} outlineColor="#05060e" raycast={noRaycast}>
+        <Text ref={headLabel} position={[0, TRACK_Y - 0.95, 0]} fontSize={0.32} color="#ffffff" anchorX="center" anchorY="top" outlineWidth={0.04} outlineColor="#05060e" raycast={noRaycast}>
           render
         </Text>
       </group>
@@ -115,12 +115,13 @@ function Stage() {
           <>
             <group ref={fn}>
               <RoundedBox args={[4.4, 1.3, 0.3]} radius={0.12} raycast={noRaycast}>
-                <Glass color={C.blue} hot={hot || sel} intensity={0.45} />
+                <CardMat color={C.blue} level={hot || sel ? CARD.hot : CARD.idle} />
               </RoundedBox>
-              <FaceText position={[0, 0, 0.17]} size={0.3}>{'App(props) → <JSX />'}</FaceText>
+              <Border size={[4.4, 1.3, 0.3]} color={C.blue} width={hot || sel ? 2.4 : 1.4} />
+              <FaceText position={[0, 0, 0.17]} size={0.34}>{'App(props) → <JSX />'}</FaceText>
             </group>
             <HitBox size={[4.6, 1.5, 0.5]} />
-            <Label position={[0, 0.95, 0]} title="Calls your components" sub="pure · may run twice" subColor={C.blue} size={0.36} color={hot || sel ? '#fff' : '#dfe6ff'} />
+            <Label position={[0, 0.85, 0]} title="Calls your components" sub="pure · may run twice" subColor="#b9cbff" />
           </>
         )}
       </Hotspot>
@@ -140,7 +141,7 @@ function Stage() {
               </mesh>
             </group>
             <HitBox size={[1.4, 1.2, 0.8]} />
-            <Label position={[0, 0.7, 0]} title="snapshot" subColor={C.violet} size={0.3} color={hot || sel ? '#fff' : '#dfe6ff'} />
+            <Label position={[0, 0.55, 0]} title="snapshot" />
           </>
         )}
       </Hotspot>
@@ -164,7 +165,7 @@ function Stage() {
               </group>
             ))}
             <HitBox size={[3, 2.8, 0.6]} position={[0, -0.3, 0]} />
-            <Label position={[0, 0.85, 0]} title="DOM changes" subColor={C.pink} size={0.3} color={hot || sel ? '#fff' : '#dfe6ff'} />
+            <Label position={[0, 0.8, 0]} title="DOM changes" />
           </>
         )}
       </Hotspot>
@@ -179,9 +180,9 @@ function Stage() {
                 <Glass color={C.amber} hot={hot || sel} intensity={1} />
               </mesh>
             </group>
-            <FaceText position={[0, -0.45, 0]} size={0.2} color="#ffd29a">getBoundingClientRect()</FaceText>
+            <FaceText position={[0, -0.5, 0]} size={0.3} color="#ffe0b8">measure DOM</FaceText>
             <HitBox size={[2.4, 1.2, 0.6]} />
-            <Label position={[0, 0.5, 0]} title="measure" size={0.3} color={hot || sel ? '#fff' : '#dfe6ff'} />
+            <Label position={[0, 0.45, 0]} title="layout fx" />
           </>
         )}
       </Hotspot>
@@ -196,7 +197,7 @@ function Stage() {
               <meshBasicMaterial color={C.green} transparent opacity={0.06} />
             </mesh>
             <HitBox size={[2.2, 1.6, 0.4]} />
-            <Label position={[0, 0.95, 0]} title="frame" size={0.3} color={hot || sel ? '#fff' : '#dfe6ff'} />
+            <Label position={[0, 0.85, 0]} title="frame" />
           </>
         )}
       </Hotspot>
@@ -206,16 +207,16 @@ function Stage() {
         {(hot, sel) => (
           <>
             {['subscribe', 'log', 'fetch'].map((t, i) => (
-              <group key={t} ref={el => (bubbles.current[i] = el)} position={[-1 + i, -0.7, 0]} scale={0.001}>
+              <group key={t} ref={el => (bubbles.current[i] = el)} position={[-1.35 + i * 1.35, -0.7, 0]} scale={0.001}>
                 <mesh raycast={noRaycast}>
                   <sphereGeometry args={[0.38, 20, 20]} />
                   <Glass color={C.cyan} hot={hot || sel} intensity={1} />
                 </mesh>
-                <FaceText position={[0, -0.6, 0]} size={0.18} color="#bdefff">{t}</FaceText>
+                <FaceText position={[0, -0.65, 0]} size={0.28} color={INK}>{t}</FaceText>
               </group>
             ))}
             <HitBox size={[3.4, 2.6, 0.8]} position={[0, 0, 0]} />
-            <Label position={[0, 1.25, 0]} title="effects run" size={0.3} color={hot || sel ? '#fff' : '#dfe6ff'} />
+            <Label position={[0, 1.25, 0]} title="effects run" />
           </>
         )}
       </Hotspot>
@@ -231,9 +232,9 @@ export default function CommitScene() {
       ))}
       {/* commit bracket */}
       <Wire points={[[-3.1, -1.85, 0], [-3.1, -1.65, 0], [3.9, -1.65, 0], [3.9, -1.85, 0]]} color={C.pink} opacity={0.6} />
-      <FaceText position={[0.4, -1.4, 0]} size={0.22} color="#ffc2ef">commit — synchronous, uninterruptible</FaceText>
-      <FaceText position={[-6.85, -1.55, 0]} size={0.22} color="#b9cbff">yields between slices</FaceText>
-      <Block id="strict" position={[-6.9, -4.5, 0]} size={[7.2, 0.75, 0.3]} color={C.yellow} text="StrictMode (dev): render ×2 · effects mount → unmount → mount" textSize={0.2} intensity={0.4} />
+      <FaceText position={[0.4, -1.4, 0]} size={0.3} color="#ffc8f0">commit — synchronous, uninterruptible</FaceText>
+      <FaceText position={[-6.85, -1.5, 0]} size={0.3} color="#c8d6ff">yields between slices</FaceText>
+      <Block id="strict" position={[-6.9, -4.55, 0]} size={[8.0, 0.78, 0.3]} color={C.yellow} text="Strict Mode (dev): render ×2, effects re-run" textSize={0.3} />
       <Stage />
     </group>
   );

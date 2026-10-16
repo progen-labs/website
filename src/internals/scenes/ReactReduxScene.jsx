@@ -6,17 +6,17 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
-import { C, Cage, Chip, FaceText, Region, Spin, Wire, noRaycast } from '../primitives.jsx';
+import { C, CARD, Cage, Chip, FaceText, Region, Spin, Wire, noRaycast, paintCard } from '../primitives.jsx';
 
 export const pose = { pos: [0, 1.6, 22], tgt: [-0.8, 0.8, 0], span: 24, height: 10.5 };
 
 const GOLD = '#ffd166';
 const STORE = [6.2, 1.2, 0];
 const SUBS = [
-  { id: 'Header', at: [-9.6, 0.9], label: '<Header>', sel: 'state.user', changes: false },
-  { id: 'TodoList', at: [-6.5, 0.9], label: '<TodoList>', sel: 'state.todos', changes: true },
-  { id: 'Footer', at: [-3.4, 0.9], label: '<Footer>', sel: 'todos.length', changes: true },
-  { id: 'TodoItem', at: [-5.0, -0.7], label: '<TodoItem id=1>', sel: 'todos[1]', changes: false },
+  { id: 'Header', at: [-9.6, 0.9], label: '<Header>', sel: 's => s.user', changes: false },
+  { id: 'TodoList', at: [-6.5, 0.9], label: '<TodoList>', sel: 's => s.todos', changes: true },
+  { id: 'Footer', at: [-3.4, 0.9], label: '<Footer>', sel: 's => s.todos.length', changes: true },
+  { id: 'TodoItem', at: [-5.0, -0.7], label: '<TodoItem>', sel: 's => s.todos[1]', changes: false },
 ];
 const PERIOD = 6.5;
 
@@ -61,8 +61,7 @@ export default function ReactReduxScene() {
     SUBS.forEach((s, i) => {
       const m = mats.current[i];
       if (m) {
-        m.emissive.set(judged ? (s.changes ? C.green : C.grey) : C.react);
-        m.emissiveIntensity = judged ? (s.changes ? 1.25 : 0.3) : 0.6;
+        paintCard(m, judged ? (s.changes ? C.green : C.grey) : C.react, judged ? (s.changes ? CARD.active : CARD.dim) : CARD.idle);
       }
       const t = tags.current[i];
       if (t) t.visible = judged;
@@ -83,20 +82,20 @@ export default function ReactReduxScene() {
         <Wire key={`${x}${y}`} points={[[-6.5, 2.09, 0], [x, y + 0.31, 0]]} color="#5d6a92" opacity={0.6} />
       ))}
       <Wire points={[[-6.5, 0.59, 0], [-5.0, -0.39, 0]]} color="#5d6a92" opacity={0.6} />
-      <Chip position={[-6.5, 2.4, 0]} text="<App>" color={C.react} intensity={0.45} />
+      <Chip position={[-6.5, 2.4, 0]} text="<App>" color={C.react} />
 
-      <Region id="rr-provider" position={[-6.5, 3.7, 0]} size={[3.2, 0.8, 0.6]} color={GOLD} label="context holds the store" labelY={0.55}>
-        {hot => <Chip size={[3.0, 0.62, 0.4]} color={GOLD} text="<Provider store={store}>" textSize={0.2} hot={hot} intensity={0.8} />}
+      <Region id="rr-provider" position={[-6.5, 3.7, 0]} size={[4.4, 0.8, 0.6]} color={GOLD} label="context holds the store" labelY={0.55}>
+        {hot => <Chip size={[4.4, 0.64, 0.4]} color={GOLD} text="<Provider store={store}>" textSize={0.28} hot={hot} />}
       </Region>
       <Wire points={[[-4.9, 3.7, 0], [STORE[0] - 0.4, STORE[1] + 1.4, 0]]} color={GOLD} dashed opacity={0.6} />
 
       {SUBS.map((s, i) => (
         <Region key={s.id} id="useselector" position={[...s.at, 0]} size={[2.6, 0.8, 0.6]} color={C.violet}>
           {hot => (
-            <Chip size={[2.4, 0.62, 0.4]} color={C.react} text={s.label} textSize={0.2} hot={hot} matRef={el => (mats.current[i] = el)}>
-              <FaceText position={[0, -0.48, 0.2]} size={0.15} color="#d9ccff">{`useSelector(${s.sel})`}</FaceText>
+            <Chip size={[2.4, 0.62, 0.4]} color={C.react} text={s.label} textSize={0.29} hot={hot} matRef={el => (mats.current[i] = el)}>
+              <FaceText position={[0, -0.52, 0.2]} size={0.28} color="#e3dcff">{s.sel}</FaceText>
               <group ref={el => (tags.current[i] = el)} visible={false}>
-                <FaceText position={[0, 0.52, 0.2]} size={0.17} color={s.changes ? '#a7f3d0' : '#b6bfd8'}>{s.changes ? 'changed → re-render' : 'equal → skip'}</FaceText>
+                <FaceText position={[0, 0.56, 0.2]} size={0.28} color={s.changes ? '#a7f3d0' : '#c3cbe2'}>{s.changes ? 're-renders' : 'skipped'}</FaceText>
               </group>
             </Chip>
           )}
@@ -105,8 +104,8 @@ export default function ReactReduxScene() {
 
       <Region id="usedispatch" position={[-8.0, -0.7, 0]} size={[2.6, 0.8, 0.6]} color={C.pink}>
         {hot => (
-          <Chip size={[2.4, 0.62, 0.4]} color={C.pink} text="<AddButton>" textSize={0.2} hot={hot}>
-            <FaceText position={[0, -0.48, 0.2]} size={0.15} color="#ffc2ef">useDispatch()</FaceText>
+          <Chip size={[2.4, 0.62, 0.4]} color={C.pink} text="<AddButton>" textSize={0.29} hot={hot}>
+            <FaceText position={[0, -0.52, 0.2]} size={0.28} color="#ffc8f0">useDispatch()</FaceText>
           </Chip>
         )}
       </Region>
@@ -137,19 +136,19 @@ export default function ReactReduxScene() {
               <icosahedronGeometry args={[0.95, 1]} />
               <meshStandardMaterial ref={core} color="#170d33" emissive={C.violet} emissiveIntensity={1.1} flatShading />
             </mesh>
-            <FaceText position={[0, -1.6, 0.3]} size={0.18} color="#e3dcff">{'todos: [4] · user · filter'}</FaceText>
+            <FaceText position={[0, -1.65, 0.3]} size={0.28} color="#e3dcff">{'todos · user · filter'}</FaceText>
           </>
         )}
       </Region>
 
-      <Region id="equality" position={[1.6, 3.6, 0]} size={[4.2, 0.9, 0.6]} color={C.green}>
-        {hot => <Chip size={[4.0, 0.72, 0.4]} color={C.green} text="selector(next) === selector(prev) ?" textSize={0.2} hot={hot} intensity={0.45} />}
+      <Region id="equality" position={[1.6, 3.6, 0]} size={[4.6, 0.9, 0.6]} color={C.green}>
+        {hot => <Chip size={[4.4, 0.72, 0.4]} color={C.green} text="selected next === prev ?" textSize={0.29} hot={hot} />}
       </Region>
       <Region id="tearing" position={[-0.4, -3.4, 0]} size={[9.4, 0.9, 0.6]} color={C.cyan}>
-        {hot => <Chip size={[9.2, 0.72, 0.4]} color={C.cyan} text="useSyncExternalStore → one consistent snapshot per render (no tearing)" textSize={0.21} hot={hot} intensity={0.4} />}
+        {hot => <Chip size={[9.2, 0.72, 0.4]} color={C.cyan} text="useSyncExternalStore → no tearing" textSize={0.3} hot={hot} />}
       </Region>
 
-      <Text ref={status} position={[1.0, -2.25, 0.3]} fontSize={0.28} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.012} outlineColor="#05060e" raycast={noRaycast}>
+      <Text ref={status} position={[1.0, -2.25, 0.3]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#05060e" raycast={noRaycast}>
         dispatch(todoAdded("Ship it"))
       </Text>
     </group>

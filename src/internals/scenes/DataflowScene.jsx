@@ -4,9 +4,9 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
-import { C, Chip, Region, noRaycast } from '../primitives.jsx';
+import { C, CARD, Chip, Region, noRaycast, paintCard } from '../primitives.jsx';
 
-export const pose = { pos: [0, 1.2, 22], tgt: [0, 0.2, 0], span: 17.5, height: 15.5 };
+export const pose = { pos: [0, 1.2, 22], tgt: [0, 0.2, 0], span: 18.5, height: 15.5 };
 
 const R = 6.2;
 const CY = 0.2;
@@ -15,9 +15,9 @@ const STATIONS = [
   { id: 'action', text: 'action\n{ type, payload }', color: C.pink },
   { id: 'df-dispatch', text: 'store.dispatch()', color: C.violet },
   { id: 'df-middleware', text: 'middleware\nthunk · listener', color: C.amber },
-  { id: 'df-reducer', text: 'rootReducer\n(state, action) → state', color: C.yellow },
+  { id: 'df-reducer', text: 'rootReducer\n(state, action)', color: C.yellow },
   { id: 'df-store', text: 'store\nnew state saved', color: C.violet },
-  { id: 'df-subscribe', text: 'subscribers\nnotified → re-render', color: C.green },
+  { id: 'df-subscribe', text: 'subscribers\n→ UI re-renders', color: C.green },
 ];
 const angleOf = i => Math.PI + (i / STATIONS.length) * Math.PI * 2;
 const posOf = (a, r = R) => [r * Math.cos(a), CY + r * Math.sin(a), 0];
@@ -46,7 +46,7 @@ export default function DataflowScene() {
     }
     const near = Math.round(phi / ((Math.PI * 2) / STATIONS.length)) % STATIONS.length;
     mats.current.forEach((m, i) => {
-      if (m) m.emissiveIntensity = i === near ? 1.25 : 0.45;
+      paintCard(m, STATIONS[i].color, i === near ? CARD.active : 0.18);
     });
     if (near !== last.current && label.current) {
       last.current = near;
@@ -74,8 +74,8 @@ export default function DataflowScene() {
       })}
 
       {STATIONS.map((s, i) => (
-        <Region key={s.id} id={s.id} position={posOf(angleOf(i))} size={[3.1, 1.15, 0.7]} color={s.color}>
-          {hot => <Chip size={[2.95, 1.0, 0.5]} color={s.color} text={s.text} textSize={0.22} hot={hot} matRef={el => (mats.current[i] = el)} />}
+        <Region key={s.id} id={s.id} position={posOf(angleOf(i))} size={[3.8, 1.25, 0.7]} color={s.color}>
+          {hot => <Chip size={[3.6, 1.1, 0.5]} color={s.color} text={s.text} textSize={0.29} hot={hot} matRef={el => (mats.current[i] = el)} />}
         </Region>
       ))}
 
@@ -92,11 +92,11 @@ export default function DataflowScene() {
       <Region id="principles" position={[0, CY + 0.2, 0]} size={[5.6, 3.4, 0.6]} color={C.violet} label="Three principles" labelY={2.0}>
         {hot =>
           ['single source of truth', 'state is read-only', 'changes via pure functions'].map((t, i) => (
-            <Chip key={t} position={[0, 1.0 - i * 1.0, 0]} size={[5.2, 0.72, 0.4]} color={C.violet} text={t} textSize={0.26} hot={hot} intensity={0.45} />
+            <Chip key={t} position={[0, 1.0 - i * 1.0, 0]} size={[5.6, 0.74, 0.4]} color={C.violet} text={t} textSize={0.3} hot={hot} />
           ))
         }
       </Region>
-      <Text ref={label} position={[0, CY - 2.55, 0.3]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.012} outlineColor="#05060e" raycast={noRaycast}>
+      <Text ref={label} position={[0, CY - 2.55, 0.3]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#05060e" raycast={noRaycast}>
         user event
       </Text>
     </group>

@@ -4,7 +4,7 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { RoundedBox } from '@react-three/drei';
-import { Arrow, Bob, C, FaceText, Flow, Gear, Glass, HitBox, Hotspot, Label, Outline, Padlock, Spin, Wire, noRaycast } from '../primitives.jsx';
+import { Arrow, Bob, Border, C, CARD, CardMat, FaceText, Flow, Gear, Glass, HitBox, Hotspot, INK, INK_DIM, Label, Outline, Padlock, Spin, Wire, noRaycast } from '../primitives.jsx';
 
 export const pose = { pos: [0, 3, 23], tgt: [0, -0.8, 0], span: 25.5, height: 11 };
 
@@ -22,16 +22,17 @@ function Omnibox() {
       {(hot, sel) => (
         <>
           <RoundedBox args={[4.6, 0.9, 0.4]} radius={0.2} smoothness={3}>
-            <Glass color={C.amber} hot={hot || sel} intensity={0.45} />
+            <CardMat color={C.amber} level={hot || sel ? CARD.hot : CARD.idle} />
           </RoundedBox>
-          <FaceText position={[-2.0, 0, 0.22]} size={0.28} anchorX="left">progenlabs.dev|</FaceText>
-          {['progenlabs.dev/internals', 'progen labs github', 'Search “progen labs”'].map((s, i) => (
-            <group key={s} position={[0.1, -0.85 - i * 0.55, 0]}>
+          <Border size={[4.6, 0.9, 0.4]} color={C.amber} />
+          <FaceText position={[-2.0, 0, 0.22]} size={0.32} anchorX="left">progenlabs.dev|</FaceText>
+          {['progenlabs.dev/internals', 'progen labs github', 'Search "progen labs"'].map((s, i) => (
+            <group key={s} position={[0.1, -0.88 - i * 0.6, 0]}>
               <mesh raycast={noRaycast}>
-                <boxGeometry args={[4.4, 0.46, 0.12]} />
-                <meshStandardMaterial color="#141b30" emissive={C.amber} emissiveIntensity={i === 0 ? 0.35 : 0.1} />
+                <boxGeometry args={[4.4, 0.52, 0.12]} />
+                <CardMat color={C.amber} level={i === 0 ? 0.3 : 0.12} />
               </mesh>
-              <FaceText position={[-2.0, 0, 0.08]} size={0.2} color={i === 0 ? '#fff' : '#b9c3dc'} anchorX="left">{s}</FaceText>
+              <FaceText position={[-2.0, 0, 0.08]} size={0.28} color={i === 0 ? INK : INK_DIM} anchorX="left">{s}</FaceText>
             </group>
           ))}
           <HitBox size={[4.8, 3.0, 0.6]} position={[0, -0.95, 0]} />
@@ -59,7 +60,7 @@ function Dns() {
             <Glass color={C.cyan} hot={hot || sel} intensity={0.6} />
           </mesh>
           <HitBox size={[2.5, 2.5, 2.5]} />
-          <FaceText position={[0, -1.55, 0.5]} size={0.24} color="#bdefff">progenlabs.dev → 104.21.x.x</FaceText>
+          <FaceText position={[0, -1.6, 0.5]} size={0.3} color={INK}>name → 104.21.x.x</FaceText>
           <Label position={[0, 1.4, 0]} title="DNS lookup" sub="name → IP" subColor={C.cyan} color={hot || sel ? '#fff' : '#dfe6ff'} />
         </>
       )}
@@ -85,13 +86,13 @@ function Handshake() {
                 <boxGeometry args={[0.32, 3.6, 0.32]} />
                 <Glass color={i ? C.green : C.blue} hot={hot || sel} intensity={0.7} />
               </mesh>
-              <FaceText position={[0, -2.1, 0.2]} size={0.22} color="#b9c3dc">{i ? 'server' : 'client'}</FaceText>
+              <FaceText position={[0, -2.15, 0.2]} size={0.3} color={INK_DIM}>{i ? 'server' : 'client'}</FaceText>
             </group>
           ))}
           {steps.map(s => (
             <group key={s.t}>
               <Arrow from={[s.l2r ? -1.42 : 1.42, s.y, 0]} to={[s.l2r ? 1.42 : -1.42, s.y - 0.22, 0]} color={s.c} head={0.22} width={1.8} />
-              <FaceText position={[0, s.y + 0.06, 0.05]} size={0.16} color="#e8ecff">{s.t}</FaceText>
+              <FaceText position={[0, s.y + 0.2, 0.05]} size={0.28} color={INK}>{s.t}</FaceText>
             </group>
           ))}
           <group position={[0, 2.0, 0]}>
@@ -112,25 +113,27 @@ function Http() {
       {(hot, sel) => (
         <>
           <Bob amp={0.12} speed={1.3}>
-            <group position={[-0.25, 0.35, 0.2]}>
-              <RoundedBox args={[3.0, 1.0, 0.12]} radius={0.05}>
-                <Glass color={C.amber} hot={hot || sel} intensity={0.5} />
+            <group position={[-0.35, 0.4, 0.2]}>
+              <RoundedBox args={[4.0, 1.1, 0.12]} radius={0.05}>
+                <CardMat color={C.amber} level={hot || sel ? CARD.hot : CARD.idle} />
               </RoundedBox>
-              <FaceText position={[-1.35, 0.18, 0.08]} size={0.2} anchorX="left">GET /internals  HTTP/2</FaceText>
-              <FaceText position={[-1.35, -0.18, 0.08]} size={0.15} color="#d6dcf0" anchorX="left">accept: text/html · cookie: …</FaceText>
+              <Border size={[4.0, 1.1, 0.12]} color={C.amber} />
+              <FaceText position={[-1.8, 0.2, 0.08]} size={0.3} anchorX="left">GET /internals  HTTP/2</FaceText>
+              <FaceText position={[-1.8, -0.22, 0.08]} size={0.28} color={INK_DIM} anchorX="left">accept: text/html</FaceText>
             </group>
           </Bob>
           <Bob amp={0.12} speed={1.3} phase={1.6}>
-            <group position={[0.35, -0.85, -0.2]}>
-              <RoundedBox args={[3.0, 1.0, 0.12]} radius={0.05}>
-                <Glass color={C.green} hot={hot || sel} intensity={0.5} />
+            <group position={[0.35, -0.95, -0.2]}>
+              <RoundedBox args={[4.0, 1.1, 0.12]} radius={0.05}>
+                <CardMat color={C.green} level={hot || sel ? CARD.hot : CARD.idle} />
               </RoundedBox>
-              <FaceText position={[-1.35, 0.18, 0.08]} size={0.2} anchorX="left">200 OK · text/html</FaceText>
-              <FaceText position={[-1.35, -0.18, 0.08]} size={0.15} color="#d6dcf0" anchorX="left">cache-control: max-age=600</FaceText>
+              <Border size={[4.0, 1.1, 0.12]} color={C.green} />
+              <FaceText position={[-1.8, 0.2, 0.08]} size={0.3} anchorX="left">200 OK · text/html</FaceText>
+              <FaceText position={[-1.8, -0.22, 0.08]} size={0.28} color={INK_DIM} anchorX="left">max-age=600</FaceText>
             </group>
           </Bob>
-          <HitBox size={[3.6, 2.8, 1]} position={[0, -0.2, 0]} />
-          <Label position={[0, 1.15, 0]} title="HTTP request & response" sub="h2 / h3 streams" subColor={C.amber} color={hot || sel ? '#fff' : '#dfe6ff'} />
+          <HitBox size={[4.6, 3.0, 1]} position={[0, -0.2, 0]} />
+          <Label position={[0, 1.25, 0]} title="HTTP request & response" sub="h2 / h3 streams" subColor={C.amber} color={hot || sel ? '#fff' : '#dfe6ff'} />
         </>
       )}
     </Hotspot>
@@ -185,7 +188,7 @@ function Cache() {
                 <cylinderGeometry args={[0.6, 0.6, 1.3, 28]} />
                 <Glass color={C.yellow} hot={hot || sel} intensity={0.5} />
               </mesh>
-              <FaceText position={[0, -0.95, 0.4]} size={0.2} color="#f6e7b4">{n}</FaceText>
+              <FaceText position={[0, -0.98, 0.4]} size={0.28} color={INK}>{n}</FaceText>
             </group>
           ))}
           <HitBox size={[3.4, 2.2, 1.4]} />
@@ -230,7 +233,7 @@ export default function NetworkScene() {
       <Wire points={[[-10.3, -1.9, 0.6], [-9.8, -3.2, 0.8]]} color={C.yellow} dashed opacity={0.6} />
       <Wire points={[[-8.4, -1.6, 0.6], [-5.2, -3.3, 1.0]]} color={C.pink} dashed opacity={0.6} />
       <Wire points={[[-3.6, -3.4, 1.0], [-2.3, -2.0, 0.8]]} color={C.pink} dashed opacity={0.6} />
-      <FaceText position={[0, -6.0, 0]} size={0.26} color="#8f9bbb">amber = request · green = response · dashed = short-circuits</FaceText>
+      <FaceText position={[0, -6.0, 0]} size={0.3} color={INK_DIM}>amber = request · green = response · dashed = short-circuits</FaceText>
     </group>
   );
 }

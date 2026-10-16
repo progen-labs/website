@@ -4,7 +4,7 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Edges } from '@react-three/drei';
-import { C, Cage, FaceText, Flow, Glass, HitBox, Hotspot, Label, Outline, Wire, noRaycast } from '../primitives.jsx';
+import { C, CARD, Cage, CardMat, FaceText, Flow, Glass, HitBox, Hotspot, INK, INK_DIM, Label, Outline, Wire, noRaycast } from '../primitives.jsx';
 
 export const pose = { pos: [1, 3, 23], tgt: [0, 0.9, 0], span: 25.5, height: 12.5 };
 
@@ -64,7 +64,7 @@ function LayerStack() {
                   <Edges color={C.cyan} />
                 </mesh>
                 {l.draw()}
-                <FaceText position={[-3.75, -2.25 + 0.02, 0.03]} size={0.2} color={i === 0 ? '#45506b' : '#bdefff'} anchorX="left" anchorY="bottom">
+                <FaceText position={[-3.7, -2.22, 0.03]} size={0.3} color={i === 0 ? '#1f2740' : INK} anchorX="left" anchorY="bottom">
                   {l.name}
                 </FaceText>
               </group>
@@ -90,7 +90,7 @@ function Station({ id, x, n, title, color, children }) {
           </mesh>
           <HitBox size={[2.9, 3, 1.6]} />
           {(hot || sel) && <Outline size={[2.8, 2.7, 1.2]} color={color} position={[0, 0, 0]} />}
-          <Label position={[0, 1.45, 0]} title={`${n} · ${title}`} color={hot || sel ? '#fff' : '#dfe6ff'} size={0.38} />
+          <Label position={[0, 1.45, 0]} title={`${n} · ${title}`} color={hot || sel ? '#fff' : INK} size={0.44} />
         </>
       )}
     </Hotspot>
@@ -138,7 +138,7 @@ export default function RenderScene() {
         {() => (
           <>
             <FaceText position={[0, 0.2, 0.2]} size={1.05} color={C.violet}>{'{ }'}</FaceText>
-            <FaceText position={[0, -0.75, 0.2]} size={0.2} color="#d9ccff">h1 · .card · #hero</FaceText>
+            <FaceText position={[0, -0.8, 0.2]} size={0.3} color={INK}>selectors</FaceText>
           </>
         )}
       </Station>
@@ -150,7 +150,7 @@ export default function RenderScene() {
             <Cage size={[0.95, 1.25, 0.3]} color={C.green} position={[-0.52, 0, 0.05]} />
             <Cage size={[0.95, 0.55, 0.3]} color={C.green} position={[0.52, 0.32, 0.05]} />
             <Cage size={[0.95, 0.55, 0.3]} color={C.green} position={[0.52, -0.32, 0.05]} />
-            <FaceText position={[0, -1.0, 0.2]} size={0.17} color="#c6f6df">x · y · width · height</FaceText>
+            <FaceText position={[0, -1.05, 0.2]} size={0.3} color={INK}>x, y, w, h</FaceText>
           </>
         )}
       </Station>
@@ -158,12 +158,12 @@ export default function RenderScene() {
       <Station id="paint" x={2.2} n={4} title="Paint" color={C.yellow}>
         {hot =>
           ['drawRect', 'drawText', 'drawImage'].map((t, i) => (
-            <group key={t} position={[0, 0.5 - i * 0.5, 0]}>
+            <group key={t} position={[0, 0.55 - i * 0.55, 0]}>
               <mesh raycast={noRaycast}>
-                <boxGeometry args={[2.3, 0.38, 0.1]} />
-                <Glass color={C.yellow} hot={hot} intensity={0.4} />
+                <boxGeometry args={[2.4, 0.46, 0.1]} />
+                <CardMat color={C.yellow} level={hot ? CARD.hot : CARD.idle} />
               </mesh>
-              <FaceText position={[0, 0, 0.07]} size={0.2} color="#fff6d6">{t}</FaceText>
+              <FaceText position={[0, 0, 0.07]} size={0.3} color={INK}>{t}</FaceText>
             </group>
           ))
         }
@@ -186,9 +186,9 @@ export default function RenderScene() {
           <>
             <mesh position={[0, -0.45, 0]} raycast={noRaycast}>
               <boxGeometry args={[1.7, 0.9, 0.3]} />
-              <Glass color={C.pink} hot={hot} intensity={0.6} />
+              <CardMat color={C.pink} level={hot ? CARD.hot : CARD.idle} />
             </mesh>
-            <FaceText position={[0, -0.45, 0.17]} size={0.22}>GPU</FaceText>
+            <FaceText position={[0, -0.45, 0.17]} size={0.34}>GPU</FaceText>
             {Array.from({ length: 6 }, (_, i) => (
               <mesh key={i} position={[-0.5 + (i % 3) * 0.5, 0.4 + Math.floor(i / 3) * 0.48, 0]} raycast={noRaycast}>
                 <planeGeometry args={[0.42, 0.42]} />

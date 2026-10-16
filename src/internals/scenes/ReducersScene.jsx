@@ -43,7 +43,7 @@ export default function ReducersScene() {
     <group>
       {/* rootReducer → slice reducers */}
       <Flow points={[[-11.2, 4.4, 0.4], [-8.6, 4.1, 0.6], [-6.8, 3.2, 0.4]]} color={C.pink} count={2} speed={0.45} size={0.12} />
-      <FaceText position={[-10.4, 4.85, 0.3]} size={0.2} color="#ffc2ef">action</FaceText>
+      <FaceText position={[-10.4, 4.9, 0.3]} size={0.3} color="#ffc8f0">action</FaceText>
       <Region id="root" position={[-6.0, 3.0, 0]} size={[2.2, 2.2, 1]} color={C.amber} label="rootReducer" sub="combineReducers({ todos, user, filter })" labelY={1.3}>
         {() => (
           <Spin speed={0.8} axis="z">
@@ -61,20 +61,20 @@ export default function ReducersScene() {
               <Spin speed={i % 2 ? -1.1 : 1.1} axis="z">
                 <Gear r={0.48} color={C.yellow} teeth={9} />
               </Spin>
-              <FaceText position={[0, -0.85, 0.3]} size={0.2} color="#fff0bf">{n}</FaceText>
+              <FaceText position={[0, -0.88, 0.3]} size={0.28} color="#fff0bf">{n}</FaceText>
             </group>
           ))
         }
       </Region>
 
       <Region id="pure" position={[-6.0, -1.5, 0]} size={[9.6, 0.85, 0.6]} color={C.green}>
-        {hot => <Chip size={[9.4, 0.7, 0.4]} color={C.green} text="(state, action) → newState  ·  no side effects  ·  no async  ·  no mutation" textSize={0.21} hot={hot} intensity={0.4} />}
+        {hot => <Chip size={[9.4, 0.7, 0.4]} color={C.green} text="pure: (state, action) → newState · no side effects" textSize={0.3} hot={hot} />}
       </Region>
       <Region id="immer" position={[-8.5, -3.55, 0]} size={[4.9, 1.5, 0.6]} color={C.cyan} label="Immer" labelY={0.95}>
-        {hot => <Chip size={[4.7, 1.3, 0.4]} color={C.cyan} text={'todo.done = !todo.done   // draft\n→ new immutable state'} textSize={0.2} hot={hot} intensity={0.4} />}
+        {hot => <Chip size={[4.7, 1.3, 0.4]} color={C.cyan} text={'todo.done = true  // draft\n→ new immutable state'} textSize={0.29} hot={hot} />}
       </Region>
       <Region id="createslice" position={[-3.3, -3.55, 0]} size={[4.9, 1.5, 0.6]} color={C.violet} label="createSlice" labelY={0.95}>
-        {hot => <Chip size={[4.7, 1.3, 0.4]} color={C.violet} text={'createSlice({ name, reducers })\n→ slice.reducer + slice.actions'} textSize={0.2} hot={hot} intensity={0.4} />}
+        {hot => <Chip size={[4.7, 1.3, 0.4]} color={C.violet} text={'createSlice(options)\n→ reducer + actions'} textSize={0.3} hot={hot} />}
       </Region>
 
       {/* structural sharing */}
@@ -84,16 +84,16 @@ export default function ReducersScene() {
             {SHARE_EDGES.map(([a, b, isNew]) => (
               <Wire key={a + b} points={[[...S[a], -0.1], [...S[b], -0.1]]} color={isNew ? '#46e2a0' : '#6b7489'} opacity={isNew ? 0.8 : 0.5} />
             ))}
-            <Chip position={[...S.prev, 0]} size={[2.2, 0.62, 0.4]} color={C.grey} text="prev state" hot={hot} dim />
-            <Chip position={[...S.next, 0]} size={[2.2, 0.62, 0.4]} color={C.green} text="next state" hot={hot} />
-            <Chip position={[...S.todosOld, 0]} size={[1.9, 0.6, 0.4]} color={C.grey} text="todos" hot={hot} dim />
-            <Chip position={[...S.todosNew, 0]} size={[1.9, 0.6, 0.4]} color={C.green} text="todos (new)" hot={hot} />
-            <Chip position={[...S.t2Old, 0]} size={[1.9, 0.6, 0.4]} color={C.grey} text="todo 2" hot={hot} dim />
-            <Chip position={[...S.t2New, 0]} size={[1.9, 0.6, 0.4]} color={C.green} text="todo 2 (new)" textSize={0.19} hot={hot} />
+            <Chip position={[...S.prev, 0]} size={[2.2, 0.62, 0.4]} color={C.grey} text="prev state" textSize={0.29} hot={hot} dim />
+            <Chip position={[...S.next, 0]} size={[2.2, 0.62, 0.4]} color={C.green} text="next state" textSize={0.29} hot={hot} />
+            <Chip position={[...S.todosOld, 0]} size={[2.2, 0.6, 0.4]} color={C.grey} text="todos" textSize={0.29} hot={hot} dim />
+            <Chip position={[...S.todosNew, 0]} size={[2.2, 0.6, 0.4]} color={C.green} text="todos (new)" textSize={0.29} hot={hot} />
+            <Chip position={[...S.t2Old, 0]} size={[2.2, 0.6, 0.4]} color={C.grey} text="todo 2" textSize={0.29} hot={hot} dim />
+            <Chip position={[...S.t2New, 0]} size={[2.2, 0.6, 0.4]} color={C.green} text="todo 2 (new)" textSize={0.28} hot={hot} />
             {['user', 'filter', 't0', 't1'].map(k => (
-              <Chip key={k} position={[...S[k], 0]} size={[1.9, 0.6, 0.4]} color={C.violet} text={{ user: 'user', filter: 'filter', t0: 'todo 0', t1: 'todo 1' }[k]} hot={hot} intensity={0.45} />
+              <Chip key={k} position={[...S[k], 0]} size={[2.2, 0.6, 0.4]} color={C.violet} text={{ user: 'user', filter: 'filter', t0: 'todo 0', t1: 'todo 1' }[k]} textSize={0.29} hot={hot} />
             ))}
-            <FaceText position={[5.8, -2.75, 0.3]} size={0.18} color="#d9ccff">violet = shared by both trees</FaceText>
+            <FaceText position={[5.8, -2.8, 0.3]} size={0.28} color="#e3dcff">violet = shared by both trees</FaceText>
           </group>
         )}
       </Region>

@@ -5,7 +5,7 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { C, Cage, Chip, FaceText, Flow, Glass, Label, Region, noRaycast } from '../primitives.jsx';
+import { C, Cage, CardMat, Chip, FaceText, Flow, Glass, INK, Label, Region, noRaycast, paintCard } from '../primitives.jsx';
 
 export const pose = { pos: [0, 1.4, 23], tgt: [-0.2, 0.6, 0], span: 25, height: 11 };
 
@@ -24,10 +24,10 @@ function Payload() {
   return [0, 1, 2].map(i => (
     <group key={i} ref={el => (refs.current[i] = el)}>
       <mesh raycast={noRaycast}>
-        <boxGeometry args={[1.9, 0.42, 0.12]} />
-        <meshStandardMaterial color="#0b1226" emissive={C.amber} emissiveIntensity={0.9} />
+        <boxGeometry args={[3.3, 0.5, 0.12]} />
+        <CardMat color={C.amber} level={0.34} />
       </mesh>
-      <FaceText position={[0, 0, 0.07]} size={0.14} color="#fff2d6">{['J0:["$","article",…]', 'M1:{"id":"./Like.js"}', 'J2:["$","@1",{…}]'][i]}</FaceText>
+      <FaceText position={[0, 0, 0.07]} size={0.28} color={INK}>{['J0:["$","article"]', 'M1:{"id":"Like.js"}', 'J2:["$","@1"]'][i]}</FaceText>
     </group>
   ));
 }
@@ -37,7 +37,7 @@ export default function RscScene() {
   useFrame(({ clock }) => {
     const u = clock.getElapsedTime() % 5;
     hydrate.current.forEach((m, i) => {
-      if (m) m.emissiveIntensity = u > 1.5 + i * 0.8 ? 1.2 : 0.25;
+      paintCard(m, C.blue, u > 1.5 + i * 0.8 ? 0.42 : 0.12);
     });
   });
 
@@ -52,9 +52,9 @@ export default function RscScene() {
       <Region id="server-tree" position={[SX + 0.6, 1.0, 0]} size={[5.6, 4.0, 0.6]} color={C.green} label="Server Components" labelY={-2.35}>
         {hot => (
           <>
-            <Chip position={[0, 1.4, 0]} size={[3.2, 0.62, 0.4]} color={C.green} text="async function Page()" textSize={0.19} hot={hot} />
-            <Chip position={[-1.5, 0, 0]} size={[2.4, 0.62, 0.4]} color={C.green} text="<Post> await db" textSize={0.19} hot={hot} />
-            <Chip position={[1.5, 0, 0]} size={[2.4, 0.62, 0.4]} color={C.green} text="<Sidebar>" hot={hot} />
+            <Chip position={[0, 1.4, 0]} size={[3.9, 0.62, 0.4]} color={C.green} text="async function Page()" textSize={0.29} hot={hot} />
+            <Chip position={[-1.5, 0, 0]} size={[2.65, 0.62, 0.4]} color={C.green} text="<Post> await db" textSize={0.28} hot={hot} />
+            <Chip position={[1.5, 0, 0]} size={[2.65, 0.62, 0.4]} color={C.green} text="<Sidebar>" hot={hot} />
             <Chip position={[0, -1.4, 0]} size={[2.6, 0.62, 0.4]} color={C.green} text="<Comments>" hot={hot} />
           </>
         )}
@@ -97,7 +97,7 @@ export default function RscScene() {
 
       <Flow points={[[CX + 1.5, -1.2, 0.5], [2.0, -3.3, 0.9], [SX + 0.6, -1.0, 0.5]]} color={C.pink} count={3} speed={0.25} size={0.09} opacity={0.45} />
       <Region id="actions" position={[1.0, -3.6, 0]} size={[5.4, 0.9, 0.6]} color={C.pink}>
-        {hot => <Chip size={[5.2, 0.72, 0.4]} color={C.pink} text={'"use server"  →  submitComment(form)'} textSize={0.22} hot={hot} intensity={0.45} />}
+        {hot => <Chip size={[5.2, 0.72, 0.4]} color={C.pink} text={'"use server" → submit(form)'} textSize={0.3} hot={hot} />}
       </Region>
     </group>
   );

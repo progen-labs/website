@@ -1,7 +1,7 @@
 // Nucleus → components & JSX: source → compiler → element objects → a tree
 // of components, with props flowing down the edges.
 import { RoundedBox } from '@react-three/drei';
-import { Block, C, FaceText, Flow, Gear, Glass, HitBox, Hotspot, Label, Outline, Spin, noRaycast } from '../primitives.jsx';
+import { Block, Border, C, CARD, CardMat, FaceText, Flow, Gear, HitBox, Hotspot, INK, Label, Outline, Spin, noRaycast } from '../primitives.jsx';
 
 export const pose = { pos: [0, 2, 22], tgt: [0, 0.2, 0], span: 27.5, height: 10.5 };
 
@@ -15,11 +15,10 @@ const JSX_SRC = `function App() {
 }`;
 
 const ELEMENT_SRC = `{
-  $$typeof: Symbol(react.element),
   type: Layout,
   key: null,
   props: {
-    children: [ {…}, {…} ]
+    children: [ … ]
   }
 }`;
 
@@ -47,9 +46,10 @@ function CodeCard({ id, position, src, title, sub, color, size }) {
       {(hot, sel) => (
         <>
           <RoundedBox args={size} radius={0.14} smoothness={3} raycast={noRaycast}>
-            <Glass color={color} hot={hot || sel} intensity={0.22} base="#0d1222" />
+            <CardMat color={color} level={hot || sel ? 0.2 : 0.1} />
           </RoundedBox>
-          <FaceText position={[-size[0] / 2 + 0.3, size[1] / 2 - 0.3, size[2] / 2 + 0.02]} size={0.25} color="#d8e4ff" anchorX="left" anchorY="top" lineHeight={1.35}>
+          <Border size={size} color={color} width={hot || sel ? 2.4 : 1.3} />
+          <FaceText position={[-size[0] / 2 + 0.25, size[1] / 2 - 0.25, size[2] / 2 + 0.02]} size={0.28} color={INK} anchorX="left" anchorY="top">
             {src}
           </FaceText>
           <HitBox size={size} />
@@ -84,10 +84,11 @@ export default function ComponentsScene() {
             {[2, 1, 0].map(i => (
               <group key={i} position={[i * 0.28, -i * 0.28, -i * 0.35]}>
                 <RoundedBox args={[4.4, 3.0, 0.12]} radius={0.1} raycast={noRaycast}>
-                  <Glass color={C.violet} hot={(hot || sel) && i === 0} intensity={i === 0 ? 0.3 : 0.12} base="#0e0d22" />
+                  <CardMat color={C.violet} level={i === 0 ? (hot || sel ? 0.22 : 0.12) : 0.06} />
                 </RoundedBox>
+                {i === 0 && <Border size={[4.4, 3.0, 0.12]} color={C.violet} width={hot || sel ? 2.4 : 1.3} />}
                 {i === 0 && (
-                  <FaceText position={[-2.0, 1.3, 0.08]} size={0.22} color="#e3dcff" anchorX="left" anchorY="top" lineHeight={1.35}>
+                  <FaceText position={[-2.0, 1.25, 0.08]} size={0.3} color={INK} anchorX="left" anchorY="top">
                     {ELEMENT_SRC}
                   </FaceText>
                 )}
@@ -109,10 +110,11 @@ export default function ComponentsScene() {
           <>
             {Object.entries(TREE).map(([name, [x, y]]) => (
               <group key={name} position={[x, y, 0]}>
-                <RoundedBox args={[1.75, 0.62, 0.45]} radius={0.12} raycast={noRaycast}>
-                  <Glass color={C.react} hot={hot || sel} intensity={name.startsWith('Item') ? 0.4 : 0.65} />
+                <RoundedBox args={[1.8, 0.62, 0.45]} radius={0.12} raycast={noRaycast}>
+                  <CardMat color={C.react} level={hot || sel ? CARD.hot : CARD.idle} />
                 </RoundedBox>
-                <FaceText position={[0, 0, 0.24]} size={0.24}>{`<${name}>`}</FaceText>
+                <Border size={[1.8, 0.62, 0.45]} color={C.react} />
+                <FaceText position={[0, 0, 0.24]} size={0.29}>{`<${name}>`}</FaceText>
               </group>
             ))}
             <HitBox size={[6.2, 5.4, 1]} position={[0.6, 1.0, 0]} />
@@ -138,10 +140,10 @@ export default function ComponentsScene() {
         />
       ))}
 
-      <Block id="props" position={[11.6, 2.6, 0.6]} size={[2.6, 0.75, 0.3]} color={C.green} text="props down, events up" textSize={0.24} label="Data flow" labelPos={[0, 0.55, 0]} />
+      <Block id="props" position={[11.4, 2.6, 0.6]} size={[3.7, 0.75, 0.3]} color={C.green} text="props down, events up" textSize={0.3} label="Data flow" labelPos={[0, 0.55, 0]} />
 
-      <Block id="purity" position={[-6.8, -3.4, 0]} size={[6.2, 1.1, 0.4]} color={C.pink} text={'UI = f(props, state)\nno side effects while rendering'} textSize={0.24} label="Pure components" labelPos={[0, 0.85, 0]} />
-      <Block id="composition" position={[0.6, -3.4, 0]} size={[6.6, 1.1, 0.4]} color={C.amber} text={'<Card>\n  <Avatar />  {children}\n</Card>'} textSize={0.22} label="Composition" labelPos={[0, 0.85, 0]} />
+      <Block id="purity" position={[-6.8, -3.4, 0]} size={[6.4, 1.2, 0.4]} color={C.pink} text={'UI = f(props, state)\nno side effects while rendering'} textSize={0.3} label="Pure components" labelPos={[0, 0.9, 0]} />
+      <Block id="composition" position={[0.6, -3.4, 0]} size={[6.6, 1.4, 0.4]} color={C.amber} text={'<Card>\n  <Avatar />  {children}\n</Card>'} textSize={0.29} label="Composition" labelPos={[0, 1.0, 0]} />
     </group>
   );
 }

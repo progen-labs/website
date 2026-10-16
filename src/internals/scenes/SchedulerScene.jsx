@@ -5,7 +5,7 @@ import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { RoundedBox } from '@react-three/drei';
 import * as THREE from 'three';
-import { Block, C, FaceText, Flow, Glass, HitBox, Hotspot, Label, Orb, Outline, noRaycast } from '../primitives.jsx';
+import { Block, Border, C, CARD, CardMat, FaceText, Flow, Glass, HitBox, Hotspot, INK, Label, Orb, Outline, noRaycast } from '../primitives.jsx';
 
 export const pose = { pos: [-1.2, 1.4, 23], tgt: [-1.2, 1.4, 0], span: 24.5, height: 9 };
 
@@ -42,7 +42,7 @@ function Lanes() {
                   <boxGeometry args={[X1 - X0, 0.62, 0.16]} />
                   <Glass color={l.color} hot={hot || sel} intensity={0.18} />
                 </mesh>
-                <FaceText position={[X0 - 0.25, y, 0.1]} size={0.26} color={l.color} anchorX="right">
+                <FaceText position={[X0 - 0.25, y, 0.1]} size={0.3} color={l.color} anchorX="right">
                   {l.name}
                 </FaceText>
                 {[0, 1, 2].map(k => (
@@ -89,13 +89,13 @@ function FrameBar() {
               .map(p => (
                 <group key={p.cx} position={[p.cx, 0, 0]}>
                   <RoundedBox args={[p.w - 0.04, 0.7, 0.45]} radius={0.1} raycast={noRaycast}>
-                    <Glass color={C.violet} hot={hot || sel} intensity={0.6} />
+                    <CardMat color={C.violet} level={hot || sel ? CARD.hot : 0.3} />
                   </RoundedBox>
-                  <FaceText position={[0, 0, 0.24]} size={0.2}>~5 ms</FaceText>
+                  <FaceText position={[0, 0, 0.24]} size={0.3}>~5 ms</FaceText>
                 </group>
               ))}
             <HitBox size={[X1 - X0, 0.8, 0.5]} position={[(X0 + X1) / 2, 0, 0]} />
-            <Label position={[(X0 + X1) / 2, 0.75, 0]} title="Time slicing" sub="two 16.7 ms frames" subColor={C.violet} size={0.38} color={hot || sel ? '#fff' : '#dfe6ff'} />
+            <Label position={[(X0 + X1) / 2, 0.75, 0]} title="Time slicing" sub="two 16.7 ms frames" subColor="#e3dcff" />
           </>
         )}
       </Hotspot>
@@ -107,15 +107,15 @@ function FrameBar() {
               .map(p => (
                 <group key={p.cx} position={[p.cx, 0, 0]}>
                   <RoundedBox args={[p.w - 0.04, 0.7, 0.45]} radius={0.1} raycast={noRaycast}>
-                    <Glass color={C.green} hot={hot || sel} intensity={0.55} />
+                    <CardMat color={C.green} level={hot || sel ? CARD.hot : 0.3} />
                   </RoundedBox>
-                  <FaceText position={[0, 0, 0.24]} size={0.19}>input · paint</FaceText>
+                  <FaceText position={[0, 0, 0.24]} size={0.28}>input · paint</FaceText>
                 </group>
               ))}
             {pieces
               .filter(p => p.kind === 'gap')
               .map(p => (
-                <FaceText key={p.cx} position={[p.cx, -0.55, 0.1]} size={0.14} color="#a7f3d0">yield</FaceText>
+                <FaceText key={p.cx} position={[p.cx, -0.62, 0.1]} size={0.28} color="#a7f3d0">yield</FaceText>
               ))}
           </>
         )}
@@ -147,7 +147,7 @@ function Batching() {
                 <boxGeometry args={[0.55, 0.55, 0.55]} />
                 <Glass color={C.react} hot={hot || sel} intensity={1} />
               </mesh>
-              <FaceText position={[0, 0.48, 0]} size={0.16} color="#bdefff">{`${n}()`}</FaceText>
+              <FaceText position={[0, 0.55, 0]} size={0.28} color={INK}>{`${n}()`}</FaceText>
             </group>
           ))}
           <group ref={merged} position={[0, -0.5, 0]} scale={0.001}>
@@ -155,10 +155,10 @@ function Batching() {
               <boxGeometry args={[0.95, 0.95, 0.95]} />
               <Glass color={C.green} hot={hot || sel} intensity={1.2} />
             </mesh>
-            <FaceText position={[0, -0.75, 0]} size={0.2} color="#a7f3d0">1 render</FaceText>
+            <FaceText position={[0, -0.8, 0]} size={0.3} color="#a7f3d0">1 render</FaceText>
           </group>
           <HitBox size={[3.2, 2.8, 1]} position={[0, 0, 0]} />
-          <Label position={[0, 1.35, 0]} title="Automatic batching" subColor={C.react} size={0.34} color={hot || sel ? '#fff' : '#dfe6ff'} />
+          <Label position={[0, 1.6, 0]} title="Automatic batching" />
         </>
       )}
     </Hotspot>
@@ -184,9 +184,9 @@ function Expiry() {
               <meshBasicMaterial color={C.yellow} />
             </mesh>
           </group>
-          <FaceText position={[0, -1.2, 0]} size={0.18} color="#ffe7a3">lane expires → forced sync</FaceText>
+          <FaceText position={[0, -1.2, 0]} size={0.3} color="#ffe7a3">expires → sync</FaceText>
           <HitBox size={[2.4, 2.6, 0.8]} position={[0, -0.2, 0]} />
-          <Label position={[0, 1.05, 0]} title="Starvation guard" subColor={C.yellow} size={0.34} color={hot || sel ? '#fff' : '#dfe6ff'} />
+          <Label position={[0, 1.0, 0]} title="Starvation guard" />
         </>
       )}
     </Hotspot>
@@ -197,7 +197,7 @@ export default function SchedulerScene() {
   return (
     <group>
       <Lanes />
-      <Block id="preempt" position={[7.3, 0.4, 0]} size={[2.3, 5.0, 1.2]} color={C.react} text={'Scheduler\n\nhighest\nlane first\n\nurgent work\ninterrupts'} textSize={0.24} label="Work loop" labelPos={[0, 2.8, 0]} />
+      <Block id="preempt" position={[7.3, 0.4, 0]} size={[2.6, 5.0, 1.2]} color={C.react} text={'Scheduler\n\nhighest\nlane first\n\nurgent work\ninterrupts'} textSize={0.3} label="Work loop" labelPos={[0, 2.8, 0]} />
       <FrameBar />
       <Orb id="yield" position={[8.0, 4.55, 0.4]} color={C.green} r={0.35} label="MessageChannel" sub="post → new task" labelPos={[0, 0.65, 0]} />
       <Flow points={[[5.7, 4.75, 0.4], [6.9, 5.2, 0.6], [7.65, 4.75, 0.4]]} color={C.green} count={2} speed={0.6} size={0.08} />

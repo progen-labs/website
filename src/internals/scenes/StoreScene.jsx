@@ -4,7 +4,7 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Edges } from '@react-three/drei';
-import { C, Chip, FaceText, Region, Wire, noRaycast } from '../primitives.jsx';
+import { C, Chip, FaceText, INK, Region, Wire, noRaycast } from '../primitives.jsx';
 
 export const pose = { pos: [0, 1.4, 22], tgt: [-0.3, 0.6, 0], span: 23, height: 10.5 };
 
@@ -15,8 +15,8 @@ const T = {
   filter: [-2.4, 2.0],
   ids: [-9.6, 0.4],
   entities: [-7.2, 0.4],
-  e1: [-8.6, -1.1],
-  e2: [-6.0, -1.1],
+  e1: [-8.85, -1.1],
+  e2: [-6.15, -1.1],
   userLeaf: [-5.0, 0.4],
   filterLeaf: [-2.4, 0.4],
 };
@@ -52,27 +52,27 @@ export default function StoreScene() {
       ))}
 
       <Region id="tree" position={P('root')} size={[2.4, 0.8, 0.6]} color={C.violet} label="state (root)" labelY={0.55}>
-        {hot => <Chip size={[2.2, 0.62, 0.4]} color={C.violet} text="{ }" textSize={0.3} hot={hot} intensity={0.8} />}
+        {hot => <Chip size={[2.2, 0.62, 0.4]} color={C.violet} text="{ }" textSize={0.32} hot={hot} />}
       </Region>
       <Region id="slices" position={[-5.4, 2.0, 0]} size={[8.2, 0.85, 0.6]} color={C.violet}>
         {hot =>
           ['todos', 'user', 'filter'].map(k => (
-            <Chip key={k} position={[T[k][0] + 5.4, 0, 0]} size={[2.1, 0.62, 0.4]} color={C.violet} text={k} hot={hot} intensity={0.55} />
+            <Chip key={k} position={[T[k][0] + 5.4, 0, 0]} size={[2.1, 0.62, 0.4]} color={C.violet} text={k} hot={hot} />
           ))
         }
       </Region>
-      <Region id="normalized" position={[-7.9, -0.35, 0]} size={[5.0, 2.6, 0.6]} color={C.cyan} label="normalized: { ids, entities }" labelY={-1.75}>
+      <Region id="normalized" position={[-7.9, -0.35, 0]} size={[5.9, 2.6, 0.6]} center={[0.2, 0, 0]} color={C.cyan} label="normalized: { ids, entities }" labelY={-1.75}>
         {hot => (
           <>
-            <Chip position={[-1.7, 0.75, 0]} size={[2.1, 0.62, 0.4]} color={C.cyan} text="ids: [1, 2]" textSize={0.2} hot={hot} />
+            <Chip position={[-1.7, 0.75, 0]} size={[2.1, 0.62, 0.4]} color={C.cyan} text="ids: [1, 2]" textSize={0.29} hot={hot} />
             <Chip position={[0.7, 0.75, 0]} size={[2.1, 0.62, 0.4]} color={C.cyan} text="entities" hot={hot} />
-            <Chip position={[-0.7, -0.75, 0]} size={[2.3, 0.62, 0.4]} color={C.cyan} text={'1: { text, done }'} textSize={0.18} hot={hot} intensity={0.4} />
-            <Chip position={[1.9, -0.75, 0]} size={[2.3, 0.62, 0.4]} color={C.cyan} text={'2: { text, done }'} textSize={0.18} hot={hot} intensity={0.4} />
+            <Chip position={[-0.95, -0.75, 0]} size={[2.6, 0.62, 0.4]} color={C.cyan} text={'1: {text, done}'} textSize={0.28} hot={hot} />
+            <Chip position={[1.75, -0.75, 0]} size={[2.6, 0.62, 0.4]} color={C.cyan} text={'2: {text, done}'} textSize={0.28} hot={hot} />
           </>
         )}
       </Region>
-      <Chip position={P('userLeaf')} size={[2.1, 0.62, 0.4]} color={C.violet} text="{ id, name }" textSize={0.2} intensity={0.35} />
-      <Chip position={P('filterLeaf')} size={[2.1, 0.62, 0.4]} color={C.violet} text={"'all'"} textSize={0.2} intensity={0.35} />
+      <Chip position={P('userLeaf')} size={[2.1, 0.62, 0.4]} color={C.violet} text="{ id, name }" textSize={0.28} />
+      <Chip position={P('filterLeaf')} size={[2.1, 0.62, 0.4]} color={C.violet} text={"'all'"} textSize={0.3} />
 
       {/* immutable snapshots */}
       <Region id="snapshots" position={[5.2, 1.9, 0]} size={[5.6, 3.8, 3.0]} color={C.violet} label="Immutable snapshots" sub="one per dispatch" labelY={2.5}>
@@ -85,7 +85,7 @@ export default function StoreScene() {
                   <meshBasicMaterial ref={el => (snaps.current[i] = el)} color={C.violet} transparent opacity={0.1} side={2} depthWrite={false} />
                   <Edges color="#b9a6ff" />
                 </mesh>
-                <FaceText position={[-1.5, 0.85, 0.02]} size={0.17} color="#e3dcff" anchorX="left">{`v${i} · ${a}`}</FaceText>
+                <FaceText position={[-1.5, 0.75, 0.02]} size={0.28} color="#eee9ff" anchorX="left">{`v${i} · ${a}`}</FaceText>
               </group>
             ))}
           </group>
@@ -94,27 +94,27 @@ export default function StoreScene() {
 
       <Region id="devtools" position={[5.2, -2.1, 0]} size={[5.6, 2.0, 0.6]} color={C.amber} label="Redux DevTools" labelY={1.25}>
         {hot => (
-          <Chip size={[5.4, 1.8, 0.3]} color="#3a3f55" hot={hot} intensity={0.5}>
-            {SNAPS.slice(1).map((a, i) => (
-              <FaceText key={i} position={[-2.5, 0.6 - i * 0.32, 0.17]} size={0.17} color={i === 3 ? '#ffd29a' : '#c9d2ea'} anchorX="left">{`› ${a}`}</FaceText>
+          <Chip size={[5.4, 1.8, 0.3]} color={C.amber} hot={hot}>
+            {SNAPS.slice(2).map((a, i) => (
+              <FaceText key={i} position={[-2.5, 0.45 - i * 0.42, 0.17]} size={0.28} color={i === 2 ? '#ffe0b8' : INK} anchorX="left">{`› ${a}`}</FaceText>
             ))}
-            <mesh position={[1.4, -0.55, 0.17]} raycast={noRaycast}>
-              <planeGeometry args={[2.2, 0.08]} />
-              <meshBasicMaterial color="#8a93ad" />
+            <FaceText position={[1.45, 0.4, 0.17]} size={0.28} color="#ffe0b8">time travel</FaceText>
+            <mesh position={[1.45, -0.15, 0.17]} raycast={noRaycast}>
+              <planeGeometry args={[2.0, 0.08]} />
+              <meshBasicMaterial color="#c3cbe2" />
             </mesh>
-            <mesh position={[1.9, -0.55, 0.18]} raycast={noRaycast}>
-              <circleGeometry args={[0.13, 16]} />
+            <mesh position={[1.95, -0.15, 0.18]} raycast={noRaycast}>
+              <circleGeometry args={[0.14, 16]} />
               <meshBasicMaterial color={C.amber} />
             </mesh>
-            <FaceText position={[1.4, -0.25, 0.17]} size={0.15} color="#ffd29a">time travel</FaceText>
           </Chip>
         )}
       </Region>
 
-      <Region id="api" position={[-5.4, -3.15, 0]} size={[9.4, 0.85, 0.6]} color={C.green} label="store API" labelY={0.6}>
+      <Region id="api" position={[-5.4, -3.15, 0]} size={[10.4, 0.85, 0.6]} color={C.green} label="store API" labelY={0.6}>
         {hot =>
           ['getState()', 'dispatch(action)', 'subscribe(listener)'].map((t, i) => (
-            <Chip key={t} position={[-3.0 + i * 3.0, 0, 0]} size={[2.8, 0.66, 0.4]} color={C.green} text={t} textSize={0.21} hot={hot} intensity={0.5} />
+            <Chip key={t} position={[-3.35 + i * 3.35, 0, 0]} size={[3.2, 0.66, 0.4]} color={C.green} text={t} textSize={0.28} hot={hot} />
           ))
         }
       </Region>

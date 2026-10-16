@@ -6,9 +6,9 @@ import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { RoundedBox, Text } from '@react-three/drei';
 import * as THREE from 'three';
-import { C, Cage, FaceText, Glass, HitBox, Hotspot, Label, Outline, noRaycast } from '../primitives.jsx';
+import { Border, C, CARD, Cage, CardMat, FaceText, Glass, HitBox, Hotspot, INK, Label, Outline, noRaycast, paintCard } from '../primitives.jsx';
 
-export const pose = { pos: [0.8, 1.4, 22.5], tgt: [0.8, 0, 0], span: 24, height: 9.5 };
+export const pose = { pos: [0.5, 1.4, 22.5], tgt: [0.45, 0, 0], span: 24.8, height: 10 };
 
 const WORDS = ['r', 're', 'rea', 'reac', 'react', 'react', 'react'];
 const typedAt = t => Math.floor(t / 0.7) % WORDS.length;
@@ -45,31 +45,33 @@ function Transition() {
         <>
           <group position={[0, 2.1, 0]}>
             <RoundedBox args={[4.2, 0.75, 0.3]} radius={0.12} raycast={noRaycast}>
-              <Glass color={C.green} hot={hot || sel} intensity={0.45} />
+              <CardMat color={C.green} level={hot || sel ? CARD.hot : CARD.idle} />
             </RoundedBox>
+            <Border size={[4.2, 0.75, 0.3]} color={C.green} />
             <Text ref={input} position={[-1.85, 0, 0.17]} fontSize={0.32} color="#ffffff" anchorX="left" anchorY="middle" raycast={noRaycast}>
               r|
             </Text>
-            <FaceText position={[2.3, 0, 0.17]} size={0.17} color="#a7f3d0" anchorX="left">urgent</FaceText>
+            <FaceText position={[2.3, 0, 0.17]} size={0.3} color="#a7f3d0" anchorX="left">urgent</FaceText>
           </group>
           <group position={[0, -0.5, 0]}>
             <RoundedBox args={[4.2, 3.4, 0.15]} radius={0.12} raycast={noRaycast}>
-              <Glass color={C.violet} hot={hot || sel} intensity={0.2} />
+              <CardMat color={C.violet} level={hot || sel ? 0.2 : 0.1} />
             </RoundedBox>
+            <Border size={[4.2, 3.4, 0.15]} color={C.violet} />
             {Array.from({ length: 7 }, (_, i) => (
               <mesh key={i} ref={el => (bars.current[i] = el)} position={[-0.2 - (i % 3) * 0.25, 1.2 - i * 0.38, 0.1]} raycast={noRaycast}>
                 <boxGeometry args={[3.2 - (i % 3) * 0.5, 0.24, 0.06]} />
                 <meshStandardMaterial color="#1a1530" emissive={C.violet} emissiveIntensity={0.9} transparent opacity={0.3} />
               </mesh>
             ))}
-            <Text ref={status} position={[0, -1.55, 0.12]} fontSize={0.2} color="#d9ccff" anchorX="center" anchorY="middle" raycast={noRaycast}>
+            <Text ref={status} position={[0, -1.45, 0.12]} fontSize={0.3} color="#e3dcff" anchorX="center" anchorY="middle" raycast={noRaycast}>
               rendering in background…
             </Text>
-            <FaceText position={[2.3, 1.3, 0.1]} size={0.17} color="#d9ccff" anchorX="left">transition</FaceText>
+            <FaceText position={[2.3, 1.3, 0.1]} size={0.3} color="#e3dcff" anchorX="left">transition</FaceText>
           </group>
           <HitBox size={[4.6, 5.4, 0.6]} position={[0, 0.2, 0]} />
           {(hot || sel) && <Outline size={[4.6, 5.2, 0.4]} position={[0, 0.25, 0]} color={C.violet} />}
-          <Label position={[0, 2.8, 0]} title="startTransition" sub="input stays snappy" subColor={C.green} size={0.38} color={hot || sel ? '#fff' : '#dfe6ff'} />
+          <Label position={[0, 2.8, 0]} title="startTransition" sub="input stays snappy" subColor="#a7f3d0" />
         </>
       )}
     </Hotspot>
@@ -98,20 +100,21 @@ function Deferred() {
       {(hot, sel) => (
         <>
           {[
-            [-1.15, now, C.green, 'query = "r"'],
-            [1.15, lag, C.violet, 'deferred = "r"'],
+            [-1.6, now, C.green, 'query = "r"'],
+            [1.6, lag, C.violet, 'deferred = "r"'],
           ].map(([x, ref, c, init]) => (
             <group key={x} position={[x, 0, 0]}>
-              <RoundedBox args={[2.2, 0.7, 0.25]} radius={0.12} raycast={noRaycast}>
-                <Glass color={c} hot={hot || sel} intensity={0.5} />
+              <RoundedBox args={[3.0, 0.72, 0.25]} radius={0.12} raycast={noRaycast}>
+                <CardMat color={c} level={hot || sel ? CARD.hot : CARD.idle} />
               </RoundedBox>
-              <Text ref={ref} position={[0, 0, 0.14]} fontSize={0.18} color="#ffffff" anchorX="center" anchorY="middle" raycast={noRaycast}>
+              <Border size={[3.0, 0.72, 0.25]} color={c} />
+              <Text ref={ref} position={[0, 0, 0.14]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" raycast={noRaycast}>
                 {init}
               </Text>
             </group>
           ))}
-          <HitBox size={[4.8, 0.9, 0.5]} />
-          <Label position={[0, 0.6, 0]} title="useDeferredValue" sub="lags one step behind" subColor={C.violet} size={0.34} color={hot || sel ? '#fff' : '#dfe6ff'} />
+          <HitBox size={[6.4, 0.9, 0.5]} />
+          <Label position={[0, 0.6, 0]} title="useDeferredValue" sub="lags one step behind" subColor="#e3dcff" />
         </>
       )}
     </Hotspot>
@@ -163,14 +166,15 @@ function SuspenseBoundary() {
             {[1.1, 0, -1.1].map((y, i) => (
               <group key={y} ref={el => (cards.current[i] = el)} position={[0, y, 0]} scale={0.001}>
                 <RoundedBox args={[3.8, 0.85, 0.3]} radius={0.12} raycast={noRaycast}>
-                  <Glass color={C.react} hot={hot || sel} intensity={0.6} />
+                  <CardMat color={C.react} level={hot || sel ? CARD.hot : CARD.idle} />
                 </RoundedBox>
-                <FaceText position={[0, 0, 0.17]} size={0.22}>{['<Profile />', '<Posts />', '<Friends />'][i]}</FaceText>
+                <Border size={[3.8, 0.85, 0.3]} color={C.react} />
+                <FaceText position={[0, 0, 0.17]} size={0.32}>{['<Profile />', '<Posts />', '<Friends />'][i]}</FaceText>
               </group>
             ))}
-            <FaceText position={[0, -2.45, 0]} size={0.2} color="#d9ccff">fallback → content</FaceText>
+            <FaceText position={[0, -2.5, 0]} size={0.3} color="#e3dcff">fallback → content</FaceText>
             <HitBox size={[5.0, 4.2, 2.0]} />
-            <Label position={[0, 2.15, 0]} title="<Suspense fallback>" subColor={C.violet} size={0.38} color={hot || sel ? '#fff' : '#dfe6ff'} />
+            <Label position={[0, 2.15, 0]} title="<Suspense fallback>" />
           </>
         )}
       </Hotspot>
@@ -181,7 +185,7 @@ function SuspenseBoundary() {
               <icosahedronGeometry args={[0.42, 2]} />
               <meshStandardMaterial ref={orb} color={C.amber} emissive={C.amber} emissiveIntensity={1.4} />
             </mesh>
-            <Text ref={orbText} position={[0.65, 0, 0]} fontSize={0.24} color="#ffffff" anchorX="left" anchorY="middle" outlineWidth={0.012} outlineColor="#05060e" raycast={noRaycast}>
+            <Text ref={orbText} position={[0.65, 0, 0]} fontSize={0.3} color="#ffffff" anchorX="left" anchorY="middle" outlineWidth={0.04} outlineColor="#05060e" raycast={noRaycast}>
               Promise · pending
             </Text>
             <HitBox size={[1.2, 1.2, 1.2]} />
@@ -213,8 +217,7 @@ function Streaming() {
       const m = mats.current[i];
       if (m) {
         const hydrated = u > HYDRATE_AT[i];
-        m.emissive.set(hydrated ? C.cyan : '#7d87a6');
-        m.emissiveIntensity = hydrated ? 1.1 : 0.35;
+        paintCard(m, hydrated ? C.cyan : C.grey, hydrated ? 0.4 : 0.2);
       }
     });
   });
@@ -229,7 +232,7 @@ function Streaming() {
               </RoundedBox>
             ))}
             <HitBox size={[2.2, 2.6, 1.6]} />
-            <Label position={[0, 1.5, 0]} title="Streaming SSR" sub="shell first, then boundaries" subColor={C.amber} size={0.34} color={hot || sel ? '#fff' : '#dfe6ff'} />
+            <Label position={[0, 1.5, 0]} title="Streaming SSR" sub="shell first, then boundaries" subColor="#ffe0b8" />
           </>
         )}
       </Hotspot>
@@ -237,9 +240,9 @@ function Streaming() {
         <group key={y} ref={el => (chunks.current[i] = el)} scale={0.001}>
           <mesh raycast={noRaycast}>
             <boxGeometry args={[2.6, 0.72, 0.16]} />
-            <meshStandardMaterial ref={el => (mats.current[i] = el)} color="#0b1226" emissive="#7d87a6" emissiveIntensity={0.35} />
+            <CardMat color={C.grey} level={0.2} matRef={el => (mats.current[i] = el)} />
           </mesh>
-          <FaceText position={[0, 0, 0.1]} size={0.18}>{['<html> shell', '<Nav />', '<Comments />', '<Footer />'][i]}</FaceText>
+          <FaceText position={[0, 0, 0.1]} size={0.29}>{['<html> shell', '<Nav />', '<Comments />', '<Footer />'][i]}</FaceText>
         </group>
       ))}
       <Hotspot id="hydration" position={[PAGE_X, 0.4, 0]}>
@@ -247,8 +250,8 @@ function Streaming() {
           <>
             <Cage size={[3.1, 4.4, 0.4]} color={hot || sel ? '#ffffff' : C.cyan} />
             <HitBox size={[3.1, 4.4, 0.6]} position={[0, 0, 0.1]} />
-            <FaceText position={[0, -2.55, 0]} size={0.18} color="#bdefff">grey = HTML · cyan = hydrated</FaceText>
-            <Label position={[0, 2.4, 0]} title="Selective hydration" sub="interactive piece by piece" subColor={C.cyan} size={0.34} color={hot || sel ? '#fff' : '#dfe6ff'} />
+            <FaceText position={[0, -2.6, 0]} size={0.29} color={INK}>grey = HTML · cyan = hydrated</FaceText>
+            <Label position={[0, 2.4, 0]} title="Selective hydration" sub="interactive piece by piece" subColor="#a9ecff" />
           </>
         )}
       </Hotspot>

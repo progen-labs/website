@@ -4,7 +4,7 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { Arrow, Block, C, FaceText, Flow, Glass, HitBox, Hotspot, Label, Outline, Wire, noRaycast } from '../primitives.jsx';
+import { Arrow, Block, Border, C, CARD, CardMat, FaceText, Flow, Glass, HitBox, Hotspot, INK, INK_DIM, Label, Outline, Wire, noRaycast } from '../primitives.jsx';
 
 export const pose = { pos: [0, 1.5, 22], tgt: [0, 0, 0], span: 24, height: 11.5 };
 
@@ -21,17 +21,18 @@ function V8Pipeline() {
           {stages.map(([n, s, c], i) => (
             <group key={n} position={[-3.3 + i * 3.3, 0, 0]}>
               <mesh raycast={noRaycast}>
-                <boxGeometry args={[2.6, 1.05, 0.8]} />
-                <Glass color={c} hot={hot || sel} intensity={0.55} />
+                <boxGeometry args={[2.7, 1.15, 0.8]} />
+                <CardMat color={c} level={hot || sel ? CARD.hot : CARD.idle} />
               </mesh>
-              <FaceText position={[0, 0.17, 0.42]} size={0.3}>{n}</FaceText>
-              <FaceText position={[0, -0.24, 0.42]} size={0.17} color="#cdd6ee">{s}</FaceText>
+              <Border size={[2.7, 1.15, 0.8]} color={c} />
+              <FaceText position={[0, 0.2, 0.42]} size={0.34}>{n}</FaceText>
+              <FaceText position={[0, -0.25, 0.42]} size={0.28} color={INK_DIM}>{s}</FaceText>
             </group>
           ))}
           <Arrow from={[-1.95, 0, 0.3]} to={[-1.35, 0, 0.3]} color="#cfe0ff" head={0.22} />
           <Arrow from={[1.35, 0, 0.3]} to={[1.95, 0, 0.3]} color="#cfe0ff" head={0.22} />
           <Arrow from={[3.0, -0.75, 0.3]} to={[0.4, -0.75, 0.3]} color={C.red} dashed head={0.2} />
-          <FaceText position={[1.7, -1.0, 0.3]} size={0.17} color={C.red}>deopt</FaceText>
+          <FaceText position={[1.7, -1.1, 0.3]} size={0.3} color={C.red}>deopt</FaceText>
           <HitBox size={[10, 2.4, 1.2]} position={[0, -0.2, 0]} />
           {(hot || sel) && <Outline size={[9.6, 2.0, 1.0]} position={[0, -0.2, 0]} color={C.green} />}
           <Label position={[0, 0.85, 0]} title="V8 engine" sub="parse → interpret → optimize" subColor={C.green} color={hot || sel ? '#fff' : '#dfe6ff'} />
@@ -73,8 +74,8 @@ function Heap() {
             <planeGeometry args={[0.04, 1.8]} />
             <meshBasicMaterial color="#5b6584" />
           </mesh>
-          <FaceText position={[-1.2, -1.15, 0]} size={0.2} color="#bdefff">young gen</FaceText>
-          <FaceText position={[1.3, -1.15, 0]} size={0.2} color="#d9ccff">old gen</FaceText>
+          <FaceText position={[-1.2, -1.2, 0]} size={0.3} color={INK}>young gen</FaceText>
+          <FaceText position={[1.3, -1.2, 0]} size={0.3} color={INK}>old gen</FaceText>
           <HitBox size={[5, 2.8, 1.6]} />
           {(hot || sel) && <Outline size={[4.8, 2.4, 1.2]} color={C.violet} />}
           <Label position={[0, 1.25, 0]} title="Heap & GC" sub="allocate · scavenge · compact" subColor={C.violet} color={hot || sel ? '#fff' : '#dfe6ff'} />
@@ -104,10 +105,11 @@ function CallStack() {
           {FRAMES.map((f, i) => (
             <group key={f} ref={el => (refs.current[i] = el)} position={[0, -0.9 + i * 0.68, 0]}>
               <mesh raycast={noRaycast}>
-                <boxGeometry args={[3.0, 0.58, 0.9]} />
-                <Glass color={C.blue} hot={hot || sel} intensity={0.45 + i * 0.12} />
+                <boxGeometry args={[3.0, 0.6, 0.9]} />
+                <CardMat color={C.blue} level={(hot || sel ? CARD.hot : 0.16) + i * 0.05} />
               </mesh>
-              <FaceText position={[0, 0, 0.46]} size={0.26}>{f}</FaceText>
+              <Border size={[3.0, 0.6, 0.9]} color={C.blue} />
+              <FaceText position={[0, 0, 0.46]} size={0.32}>{f}</FaceText>
             </group>
           ))}
           <mesh position={[0, -1.32, 0]} raycast={noRaycast}>
@@ -193,10 +195,10 @@ export default function RuntimeScene() {
         {['setTimeout(cb, 0)', 'fetch("/api")', 'click listener'].map((t, i) => (
           <group key={t} position={[0, 0.65 - i * 0.62, 0.52]}>
             <mesh raycast={noRaycast}>
-              <boxGeometry args={[3.6, 0.46, 0.06]} />
-              <meshStandardMaterial color="#1a1530" emissive={C.violet} emissiveIntensity={0.4} />
+              <boxGeometry args={[3.8, 0.52, 0.06]} />
+              <CardMat color={C.violet} level={0.32} />
             </mesh>
-            <FaceText position={[0, 0, 0.05]} size={0.22}>{t}</FaceText>
+            <FaceText position={[0, 0, 0.05]} size={0.3}>{t}</FaceText>
           </group>
         ))}
       </Block>

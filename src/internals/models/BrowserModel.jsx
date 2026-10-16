@@ -3,7 +3,7 @@
 // V8 engine chip underneath. In the hub the whole window is one hotspot; when
 // focused, each part becomes its own hotspot with a callout.
 import { RoundedBox } from '@react-three/drei';
-import { Bob, C, Callout, FaceText, Flow, Glass, HitBox, Hotspot, Label, Outline, Padlock, noRaycast } from '../primitives.jsx';
+import { Bob, Border, C, Callout, CardMat, FaceText, Flow, HitBox, Hotspot, Label, Outline, Padlock, noRaycast } from '../primitives.jsx';
 
 const FRAME = '#1b1c20';
 const TOOLBAR = '#35363a';
@@ -197,27 +197,27 @@ function DevTools() {
       <Flat p={[6.1, -0.97, 0.012]} s={[6.0, 9.26]} c="#202124" />
       <Flat p={[3.12, -0.97, 0.02]} s={[0.04, 9.26]} c="#3c4043" />
       <Flat p={[6.1, 3.38, 0.02]} s={[6.0, 0.55]} c="#292a2d" />
-      <FaceText position={[3.35, 3.38, 0.04]} size={0.2} color="#8ab4f8" anchorX="left">
+      <FaceText position={[3.35, 3.38, 0.04]} size={0.28} color="#8ab4f8" anchorX="left">
         Elements
       </FaceText>
-      <FaceText position={[4.6, 3.38, 0.04]} size={0.2} color="#9aa0a6" anchorX="left">
-        Console   Sources   Network
+      <FaceText position={[4.85, 3.38, 0.04]} size={0.28} color="#bdc1c6" anchorX="left">
+        Console  Sources
       </FaceText>
-      <Flat p={[3.87, 3.13, 0.03]} s={[1.05, 0.04]} c="#8ab4f8" />
+      <Flat p={[4.0, 3.13, 0.03]} s={[1.3, 0.04]} c="#8ab4f8" />
       {/* DOM tree */}
       <Flat p={[6.1, 2.75 - 4 * 0.34, 0.02]} s={[5.96, 0.32]} c="#264268" />
       {DOM_LINES.map((l, i) => (
-        <FaceText key={i} position={[3.4, 2.75 - i * 0.34, 0.04]} size={0.19} color={i === 4 ? '#ffffff' : '#8ab4f8'} anchorX="left">
+        <FaceText key={i} position={[3.4, 2.75 - i * 0.34, 0.04]} size={0.2} raw color={i === 4 ? '#ffffff' : '#a8c7fa'} anchorX="left">
           {l}
         </FaceText>
       ))}
       {/* styles pane */}
       <Flat p={[6.1, -0.35, 0.02]} s={[6.0, 0.03]} c="#3c4043" />
-      <FaceText position={[3.35, -0.62, 0.04]} size={0.18} color={TEXT} anchorX="left">
+      <FaceText position={[3.35, -0.62, 0.04]} size={0.28} color={TEXT} anchorX="left">
         Styles    Computed    Layout
       </FaceText>
       {['#hero {', '  padding: 48px;', '  background: #2f5bff;', '}'].map((l, i) => (
-        <FaceText key={l} position={[3.4, -1.05 - i * 0.3, 0.04]} size={0.18} color={i === 0 || i === 3 ? TEXT : '#81c995'} anchorX="left">
+        <FaceText key={l} position={[3.4, -1.05 - i * 0.36, 0.04]} size={0.28} color={i === 0 || i === 3 ? TEXT : '#81c995'} anchorX="left">
           {l}
         </FaceText>
       ))}
@@ -226,10 +226,10 @@ function DevTools() {
       <Flat p={[6.6, -3.6, 0.036]} s={[2.9, 1.65]} c="#fddd9b" />
       <Flat p={[6.6, -3.6, 0.042]} s={[2.3, 1.15]} c="#c3d08b" />
       <Flat p={[6.6, -3.6, 0.048]} s={[1.4, 0.6]} c="#8cb6c0" />
-      <FaceText position={[4.95, -2.65, 0.06]} size={0.13} color="#5a3b16" anchorX="left">
+      <FaceText position={[4.95, -2.65, 0.06]} size={0.16} raw color="#3d2706" anchorX="left">
         margin
       </FaceText>
-      <FaceText position={[6.6, -3.6, 0.06]} size={0.13} color="#10303a">
+      <FaceText position={[6.6, -3.6, 0.06]} size={0.16} raw color="#0a2129">
         1180 × 320
       </FaceText>
     </group>
@@ -240,8 +240,11 @@ function V8Chip() {
   return (
     <group>
       <RoundedBox args={[4.6, 1.3, 0.5]} radius={0.12} smoothness={3} position={[-3, -7.75, 0.15]}>
-        <Glass color={C.green} intensity={0.5} />
+        <CardMat color={C.green} level={0.26} />
       </RoundedBox>
+      <group position={[-3, -7.75, 0.15]}>
+        <Border size={[4.6, 1.3, 0.5]} color={C.green} />
+      </group>
       {Array.from({ length: 8 }, (_, i) => (
         <group key={i}>
           <mesh position={[-4.75 + i * 0.5, -6.98, 0.15]} raycast={noRaycast}>
@@ -254,7 +257,7 @@ function V8Chip() {
           </mesh>
         </group>
       ))}
-      <FaceText position={[-3, -7.75, 0.42]} size={0.36} color="#eafff2">
+      <FaceText position={[-3, -7.75, 0.42]} size={0.38} color="#f5f7ff">
         V8 · JS engine
       </FaceText>
       <Flow points={[[-3, -6.9, 0.3], [-2.6, -6.25, 0.7], [-3, -5.62, 0.3]]} color={C.green} count={3} speed={0.45} size={0.09} opacity={0.5} />

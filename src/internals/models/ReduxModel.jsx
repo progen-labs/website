@@ -8,7 +8,7 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { RoundedBox } from '@react-three/drei';
 import * as THREE from 'three';
-import { C, Cage, Callout, FaceText, Flow, Gear, Glass, HitBox, Hotspot, Label, Outline, Spin, noRaycast } from '../primitives.jsx';
+import { Border, C, CARD, Cage, Callout, CardMat, FaceText, Flow, Gear, Glass, HitBox, Hotspot, Label, Outline, Spin, noRaycast } from '../primitives.jsx';
 
 const V = C.violet;
 const RING = 3.6;
@@ -18,7 +18,7 @@ const deg = d => (d * Math.PI) / 180;
 /** Where the bridge meets the Redux model (local coords) — the selector lens. */
 export const LENS = [-4.7, 0, 0.3];
 
-const PACKAGES = ['@reduxjs/toolkit', 'react-redux', 'redux-thunk', 'reselect', 'immer', 'redux-persist'];
+const PACKAGES = ['@reduxjs/\ntoolkit', 'react-\nredux', 'redux-\nthunk', 'reselect', 'immer', 'redux-\npersist'];
 
 const CALLOUTS = {
   'store-core': { from: [0, 1.5, 0.8], to: [0, 5.3, 0.9], title: 'Store', sub: 'single state tree' },
@@ -219,13 +219,14 @@ export default function ReduxModel({ position, mode }) {
             </mesh>
             {PACKAGES.map((p, i) => (
               <group key={p} position={[-5.25 + i * 2.1, 0, 0]}>
-                <RoundedBox args={[1.9, 1.1, 0.9]} radius={0.08} raycast={noRaycast}>
-                  <Glass color={i === 0 ? V : '#8f86c9'} hot={hot || sel} intensity={i === 0 ? 0.55 : 0.3} />
+                <RoundedBox args={[1.95, 1.15, 0.9]} radius={0.08} raycast={noRaycast}>
+                  <CardMat color={V} level={hot || sel ? CARD.hot : i === 0 ? 0.3 : CARD.idle} />
                 </RoundedBox>
-                <FaceText position={[0, 0, 0.47]} size={i === 0 ? 0.16 : 0.18} maxWidth={1.8} textAlign="center">{p}</FaceText>
+                <Border size={[1.95, 1.15, 0.9]} color={hot || sel ? V : '#7d6bc0'} />
+                <FaceText position={[0, 0, 0.47]} size={0.28}>{p}</FaceText>
               </group>
             ))}
-            {focus && <Label position={[0, 0.85, 0]} title="Production packages" sub="the npm dependencies" subColor={V} size={0.36} color={hot || sel ? '#fff' : '#e3dcff'} />}
+            {focus && <Label position={[0, 0.85, 0]} title="Production packages" sub="the npm dependencies" subColor="#e3dcff" />}
           </group>
         )}
       </Part>
@@ -278,7 +279,7 @@ export function ReduxBridge({ from, to, focusModel }) {
           <meshStandardMaterial color="#1a1036" emissive={C.amber} emissiveIntensity={hot || sel ? 2.4 : 1.2} />
         </mesh>
       </Spin>
-      <FaceText position={[0, -0.95, 0.2]} size={0.24} color="#ffd29a">redux-thunk</FaceText>
+      <FaceText position={[0, -1.0, 0.2]} size={0.3} color="#ffe0b8">redux-thunk</FaceText>
       <HitBox size={[1.4, 1.6, 1.2]} position={[0, -0.25, 0]} />
       {(hot || sel) && <Outline size={[1.3, 1.3, 1.1]} color={C.amber} />}
     </group>
