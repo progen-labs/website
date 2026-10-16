@@ -5,7 +5,8 @@
 import { useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { motion as m } from 'framer-motion';
-import { Logo } from '../components/Icons.jsx';
+import Logo3D from '../components/Logo3D.jsx';
+import { ThemeToggle } from '../theme.jsx';
 import LandingScene from './LandingScene.jsx';
 import './landing.css';
 
@@ -71,8 +72,10 @@ function ProjectIcon({ id }) {
   );
 }
 
-export default function Landing({ onEnter, entering }) {
+export default function Landing({ onEnter, entering, theme, onToggleTheme }) {
   const reduced = useReducedMotion();
+  const [brandHot, setBrandHot] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [hovered, setHovered] = useState(null);
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -92,19 +95,27 @@ export default function Landing({ onEnter, entering }) {
   });
 
   return (
-    <div className="ld">
+    <div className="ld" data-theme={theme} onScroll={e => setScrolled(e.currentTarget.scrollTop > 8)}>
       <div className="ld-stage" aria-hidden="true">
         {mounted && (
           <Canvas camera={{ position: [0, 2.3, 17.5], fov: 38 }} dpr={[1, 2]} gl={{ antialias: true, powerPreference: 'high-performance' }}>
-            <LandingScene projects={PROJECTS} hovered={hovered} setHovered={setHovered} onPick={pick} entering={entering} motion={!reduced} />
+            <LandingScene theme={theme} projects={PROJECTS} hovered={hovered} setHovered={setHovered} onPick={pick} entering={entering} motion={!reduced} />
           </Canvas>
         )}
       </div>
       <div className="ld-vignette" aria-hidden="true" />
 
-      <header className="ld-nav">
-        <a className="ld-brand" href="#top" aria-label="Progen Labs home">
-          <Logo size={24} />
+      <header className={`ld-nav${scrolled ? ' is-scrolled' : ''}`}>
+        <a
+          className="ld-brand"
+          href="#top"
+          aria-label="Progen Labs home"
+          onMouseEnter={() => setBrandHot(true)}
+          onMouseLeave={() => setBrandHot(false)}
+          onFocus={() => setBrandHot(true)}
+          onBlur={() => setBrandHot(false)}
+        >
+          <Logo3D theme={theme} active={brandHot} motion={!reduced} />
           <span>Progen Labs</span>
         </a>
         <nav aria-label="Primary">
@@ -113,6 +124,7 @@ export default function Landing({ onEnter, entering }) {
           <a href="https://github.com/progen-labs" target="_blank" rel="noreferrer">
             GitHub
           </a>
+          <ThemeToggle className="ld-theme" theme={theme} onToggle={onToggleTheme} />
         </nav>
       </header>
 
@@ -126,8 +138,8 @@ export default function Landing({ onEnter, entering }) {
           <span>Build it faster.</span>
         </m.h1>
         <m.p className="ld-lead" {...rise(2)}>
-          Progen Labs builds free, open-source developer tools, from a frontend performance profiler to an interactive atlas of how
-          browsers, React and Redux really work.
+          Progen Labs is an open-source lab building free software, tools and learning experiences that help developers understand
+          technology deeply and ship better products, made in the open for everyone.
         </m.p>
         <m.div className="ld-cta" {...rise(3)}>
           <button type="button" className="ld-btn ld-btn-primary" onClick={() => pick('core')}>

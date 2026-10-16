@@ -1,17 +1,83 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { SPECTRA_FEATURES, FRAMEWORKS, MATRIX, USAGE, LINKS } from '../data.js';
+import { ThemeToggle } from '../theme.jsx';
 
 const ease = [0.22, 1, 0.36, 1];
 
+// the runnable lines of a snippet, without its # comments
+const commandsOf = code =>
+  code
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l && !l.startsWith('#'))
+    .join('\n');
+const INSTALL = commandsOf(USAGE[0].code);
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    // older browsers, or the clipboard API blocked outside a secure context
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand('copy');
+      ta.remove();
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+}
+
+function CopyButton({ text, label, className = '' }) {
+  const [state, setState] = useState('idle'); // idle | copied | failed
+  const timer = useRef();
+  useEffect(() => () => clearTimeout(timer.current), []);
+  const copy = async () => {
+    setState((await copyText(text)) ? 'copied' : 'failed');
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => setState('idle'), 2000);
+  };
+  return (
+    <>
+      <button type="button" className={`copy-btn ${state === 'copied' ? 'is-copied' : ''} ${className}`} onClick={copy} aria-label={label} title={label}>
+        {state === 'copied' ? (
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m5 12.5 4.5 4.5L19 7.5" />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="8.5" y="8.5" width="11" height="11" rx="2.2" />
+            <path d="M15.5 8.5V6.2a1.7 1.7 0 0 0-1.7-1.7H6.2a1.7 1.7 0 0 0-1.7 1.7v7.6c0 .94.76 1.7 1.7 1.7h2.3" />
+          </svg>
+        )}
+        <span className="copy-text">{state === 'copied' ? 'Copied' : state === 'failed' ? 'Press Ctrl+C' : 'Copy'}</span>
+      </button>
+      <span className="sr-only" role="status">
+        {state === 'copied' ? 'Copied to clipboard' : state === 'failed' ? 'Copy failed. Select the command and copy it manually.' : ''}
+      </span>
+    </>
+  );
+}
+
 /** The world behind the Spectra gate: everything about Spectra. */
-export default function SpectraWorld({ onBack }) {
+export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) {
   const [tab, setTab] = useState(USAGE[0].id);
   const current = USAGE.find(u => u.id === tab) || USAGE[0];
+  const currentCommands = commandsOf(current.code);
+  const many = currentCommands.includes('\n');
 
   return (
     <motion.div
       className="spectra-world"
+      data-theme={theme}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -21,6 +87,7 @@ export default function SpectraWorld({ onBack }) {
       <button className="sw-back" onClick={onBack}>
         ← Back to Progen Labs
       </button>
+      {onToggleTheme && <ThemeToggle className="sw-theme" theme={theme} onToggle={onToggleTheme} />}
 
       <div className="sw-scroll">
         <div className="sw-inner">
@@ -40,6 +107,11 @@ export default function SpectraWorld({ onBack }) {
               culprits — each with the exact file, function and component costing
               you time.
             </p>
+            <div className="sw-install">
+              <span className="sw-prompt" aria-hidden="true">$</span>
+              <code className="sw-install-cmd">{INSTALL}</code>
+              <CopyButton text={INSTALL} label="Copy the npm install command" />
+            </div>
             <div className="sw-cta">
               <a className="btn btn-primary" href={LINKS.npm} target="_blank" rel="noreferrer">@progen-labs/spectra on npm ↗</a>
               <a className="btn btn-ghost" href={LINKS.spectraRepo} target="_blank" rel="noreferrer">GitHub ↗</a>
@@ -71,13 +143,28 @@ export default function SpectraWorld({ onBack }) {
             <div className="code-shell">
               <div className="code-tabs">
                 {USAGE.map(u => (
-                  <button key={u.id} className={`code-tab ${tab === u.id ? 'active' : ''}`} onClick={() => setTab(u.id)}>
+                  <button key={u.id} className={`code-tab ${tab === u.id ? 'active' : ''}`} aria-pressed={tab === u.id} onClick={() => setTab(u.id)}>
                     {u.label}
                   </button>
                 ))}
               </div>
               <div className="code-panel">
-                <pre className="code-block"><code>{current.code}</code></pre>
+                <CopyButton
+                  key={current.id}
+                  text={currentCommands}
+                  label={`Copy the ${current.label.toLowerCase()} command${many ? 's' : ''}`}
+                  className="copy-btn-float"
+                />
+                <pre className="code-block">
+                  <code>
+                    {current.code.split('\n').map((line, i) => (
+                      <span key={i} className={line.trim().startsWith('#') ? 'code-comment' : 'code-cmd'}>
+                        {line}
+                        {'\n'}
+                      </span>
+                    ))}
+                  </code>
+                </pre>
                 <p className="code-note">{current.note}</p>
               </div>
             </div>

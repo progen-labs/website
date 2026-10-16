@@ -2,6 +2,8 @@
 // streaking through it, floating over a dark reflective floor, lit by studio
 // softboxes. Slim light pillars mark the projects; choosing one flies the
 // camera to it. Restraint over decoration: one hero object, two accents.
+// The light theme swaps glow for ink: normal-blended streaks and beams in
+// deeper colours, a pale studio floor and gunmetal reflections.
 import { useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Environment, Float, Lightformer, MeshReflectorMaterial, Sparkles, Text } from '@react-three/drei';
@@ -35,6 +37,7 @@ const streakVertex = /* glsl */ `
 `;
 const streakFragment = /* glsl */ `
   uniform float uTime;
+  uniform float uLight;
   uniform vec3 uA;
   uniform vec3 uB;
   varying vec2 vUv;
@@ -46,26 +49,36 @@ const streakFragment = /* glsl */ `
     float fres = pow(1.0 - abs(dot(vN, vV)), 2.2);
     vec3 col = mix(uA, uB, 0.5 + 0.5 * sin(vUv.x * 6.2831853));
     float a = band * 0.95 + fres * 0.45;
-    gl_FragColor = vec4(col * (band * 1.7 + fres * 0.7), a);
+    if (uLight > 0.5) gl_FragColor = vec4(col, band * 0.85 + fres * 0.2);
+    else gl_FragColor = vec4(col * (band * 1.7 + fres * 0.7), a);
   }
 `;
 
-function InfinityMark({ motion }) {
-  const { tube, shell, streak } = useMemo(() => {
+function InfinityMark({ motion, light }) {
+  const { tube, shell } = useMemo(() => {
     const curve = new THREE.CatmullRomCurve3(lemniscatePoints(), true, 'centripetal');
     return {
       tube: new THREE.TubeGeometry(curve, 480, 0.3, 40, true),
       shell: new THREE.TubeGeometry(curve, 480, 0.33, 40, true),
-      streak: new THREE.ShaderMaterial({
-        uniforms: { uTime: { value: 0 }, uA: { value: new THREE.Color('#36d6ff') }, uB: { value: new THREE.Color('#9b8cff') } },
+    };
+  }, []);
+  const streak = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        uniforms: {
+          uTime: { value: 0 },
+          uLight: { value: light ? 1 : 0 },
+          uA: { value: new THREE.Color(light ? '#0284c7' : '#36d6ff') },
+          uB: { value: new THREE.Color(light ? '#6d28d9' : '#9b8cff') },
+        },
         vertexShader: streakVertex,
         fragmentShader: streakFragment,
         transparent: true,
         depthWrite: false,
-        blending: THREE.AdditiveBlending,
+        blending: light ? THREE.NormalBlending : THREE.AdditiveBlending,
       }),
-    };
-  }, []);
+    [light],
+  );
   const group = useRef();
 
   useFrame(({ clock }) => {
@@ -78,7 +91,7 @@ function InfinityMark({ motion }) {
     <Float speed={motion ? 1.1 : 0} rotationIntensity={0.15} floatIntensity={motion ? 0.6 : 0}>
       <group ref={group} position={[0, 0.55, 0]}>
         <mesh geometry={tube}>
-          <meshPhysicalMaterial color="#cfd8ff" metalness={1} roughness={0.14} clearcoat={1} clearcoatRoughness={0.08} envMapIntensity={1.6} />
+          <meshPhysicalMaterial color={light ? '#c4cde4' : '#cfd8ff'} metalness={1} roughness={0.14} clearcoat={1} clearcoatRoughness={0.08} envMapIntensity={1.6} />
         </mesh>
         <mesh geometry={shell} material={streak} />
       </group>
@@ -87,7 +100,7 @@ function InfinityMark({ motion }) {
 }
 
 // soft aura behind the mark (radial gradient on an additive plane)
-function Aura({ color, position, scale }) {
+function Aura({ color, position, scale, light }) {
   const tex = useMemo(() => {
     const c = document.createElement('canvas');
     c.width = c.height = 256;
@@ -105,7 +118,14 @@ function Aura({ color, position, scale }) {
   return (
     <mesh position={position} scale={scale}>
       <planeGeometry args={[1, 1]} />
-      <meshBasicMaterial map={tex} color={color} transparent opacity={0.55} blending={THREE.AdditiveBlending} depthWrite={false} />
+      <meshBasicMaterial
+        map={tex}
+        color={color}
+        transparent
+        opacity={light ? 0.5 : 0.55}
+        blending={light ? THREE.NormalBlending : THREE.AdditiveBlending}
+        depthWrite={false}
+      />
     </mesh>
   );
 }
@@ -118,23 +138,28 @@ const beamVertex = /* glsl */ `
 const beamFragment = /* glsl */ `
   uniform vec3 uColor;
   uniform float uPower;
+  uniform float uLight;
   varying float vY;
-  void main() { float a = pow(1.0 - vY, 2.2) * 0.32 * uPower; gl_FragColor = vec4(uColor * a * 2.0, a); }
+  void main() {
+    float a = pow(1.0 - vY, 2.2) * 0.32 * uPower;
+    if (uLight > 0.5) gl_FragColor = vec4(uColor, a * 0.9);
+    else gl_FragColor = vec4(uColor * a * 2.0, a);
+  }
 `;
 
-function Beacon({ project, position, hot, entering, onHover, onPick }) {
+function Beacon({ project, position, hot, entering, onHover, onPick, light }) {
   const beam = useMemo(
     () =>
       new THREE.ShaderMaterial({
-        uniforms: { uColor: { value: new THREE.Color(project.color) }, uPower: { value: 1 } },
+        uniforms: { uColor: { value: new THREE.Color(project.color) }, uPower: { value: 1 }, uLight: { value: light ? 1 : 0 } },
         vertexShader: beamVertex,
         fragmentShader: beamFragment,
         transparent: true,
         depthWrite: false,
-        blending: THREE.AdditiveBlending,
+        blending: light ? THREE.NormalBlending : THREE.AdditiveBlending,
         side: THREE.DoubleSide,
       }),
-    [project.color],
+    [project.color, light],
   );
   const core = useRef();
   const power = project.disabled ? 0.35 : hot || entering ? 2.0 : 1.0;
@@ -170,7 +195,7 @@ function Beacon({ project, position, hot, entering, onHover, onPick }) {
       {/* the pillar */}
       <mesh position={[0, 1.9, 0]}>
         <boxGeometry args={[0.12, 3.8, 0.12]} />
-        <meshStandardMaterial ref={core} color="#05070c" emissive={project.color} emissiveIntensity={1.6} toneMapped={false} />
+        <meshStandardMaterial ref={core} color={light ? '#1b2335' : '#05070c'} emissive={project.color} emissiveIntensity={1.6} toneMapped={false} />
       </mesh>
       {/* light beam */}
       <mesh position={[0, 2.1, 0]} material={beam}>
@@ -188,10 +213,10 @@ function Beacon({ project, position, hot, entering, onHover, onPick }) {
           <meshBasicMaterial transparent opacity={0} depthWrite={false} />
         </mesh>
       )}
-      <Text position={[0, 4.3, 0]} fontSize={0.36} letterSpacing={0.18} color="#f5f7ff" anchorX="center" anchorY="bottom">
+      <Text position={[0, 4.3, 0]} fontSize={0.36} letterSpacing={0.18} color={light ? '#0b1020' : '#f5f7ff'} anchorX="center" anchorY="bottom">
         {project.name.toUpperCase()}
       </Text>
-      <Text position={[0, 4.2, 0]} fontSize={0.26} color={project.disabled ? '#9aa3bd' : '#c3cbe2'} anchorX="center" anchorY="top">
+      <Text position={[0, 4.2, 0]} fontSize={0.26} color={light ? '#3e4a63' : project.disabled ? '#9aa3bd' : '#c3cbe2'} anchorX="center" anchorY="top">
         {project.tag}
       </Text>
     </group>
@@ -228,8 +253,10 @@ function CameraDirector({ entering, beacons, motion }) {
 }
 
 // ---------------------------------------------------------------- scene
-export default function LandingScene({ projects, hovered, setHovered, onPick, entering, motion }) {
+export default function LandingScene({ theme = 'dark', projects, hovered, setHovered, onPick, entering, motion }) {
   const { size } = useThree();
+  const light = theme === 'light';
+  const bg = light ? '#eef2f8' : '#04050a';
   const aspect = size.width / size.height;
   // keep the pillars inside the frame: ~72% of the visible half-width at their depth
   const spread = Math.min(9, 19 * Math.tan(THREE.MathUtils.degToRad(19)) * aspect * 0.72);
@@ -237,22 +264,23 @@ export default function LandingScene({ projects, hovered, setHovered, onPick, en
 
   return (
     <>
-      <color attach="background" args={['#04050a']} />
-      <fog attach="fog" args={['#04050a', 16, 46]} />
-      <ambientLight intensity={0.25} />
+      <color attach="background" args={[bg]} />
+      <fog attach="fog" args={[bg, 16, 46]} />
+      <ambientLight intensity={light ? 0.7 : 0.25} />
       <directionalLight position={[4, 8, 6]} intensity={0.6} color="#dfe8ff" />
 
       {/* studio lighting, rendered once into an environment map (no HDR download) */}
-      <Environment resolution={256} frames={1}>
+      <Environment key={theme} resolution={256} frames={1}>
+        {light && <color attach="background" args={['#273044']} />}
         <Lightformer form="rect" intensity={4} color="#36d6ff" position={[-6, 2.5, 5]} scale={[7, 1.4, 1]} rotation-y={Math.PI / 4} />
         <Lightformer form="rect" intensity={4} color="#8f7cff" position={[6, 1.5, 5]} scale={[7, 1.4, 1]} rotation-y={-Math.PI / 4} />
         <Lightformer form="rect" intensity={2.5} color="#ffffff" position={[0, 7, 2]} scale={[12, 0.8, 1]} rotation-x={Math.PI / 2} />
         <Lightformer form="ring" intensity={1.5} color="#ff6ad5" position={[0, 0.5, -9]} scale={5} />
       </Environment>
 
-      <Aura color="#1f6fff" position={[-2.2, 0.8, -3]} scale={[11, 7, 1]} />
-      <Aura color="#7b4dff" position={[2.4, 0.6, -3.2]} scale={[11, 7, 1]} />
-      <InfinityMark motion={motion} />
+      <Aura light={light} color={light ? '#9fd0ff' : '#1f6fff'} position={[-2.2, 0.8, -3]} scale={[11, 7, 1]} />
+      <Aura light={light} color={light ? '#c9bcff' : '#7b4dff'} position={[2.4, 0.6, -3.2]} scale={[11, 7, 1]} />
+      <InfinityMark motion={motion} light={light} />
 
       {aspect >= 1 && projects.filter(p => !p.disabled).map(p => (
         <Beacon
@@ -263,28 +291,29 @@ export default function LandingScene({ projects, hovered, setHovered, onPick, en
           entering={entering === p.id}
           onHover={setHovered}
           onPick={onPick}
+          light={light}
         />
       ))}
 
-      {/* dark mirror floor */}
+      {/* mirror floor: dark glass, or pale studio floor in the light theme */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, FLOOR_Y, 0]}>
         <planeGeometry args={[120, 120]} />
         <MeshReflectorMaterial
           blur={[400, 120]}
           resolution={1024}
           mixBlur={1}
-          mixStrength={14}
-          roughness={0.85}
+          mixStrength={light ? 2.2 : 14}
+          roughness={light ? 0.95 : 0.85}
           depthScale={1.1}
           minDepthThreshold={0.4}
           maxDepthThreshold={1.4}
-          color="#07080e"
-          metalness={0.6}
-          mirror={0.6}
+          color={light ? '#e3e8f1' : '#07080e'}
+          metalness={light ? 0.15 : 0.6}
+          mirror={light ? 0.35 : 0.6}
         />
       </mesh>
 
-      {motion && <Sparkles count={70} scale={[24, 7, 14]} position={[0, 1.5, -2]} size={1.6} speed={0.18} opacity={0.35} color="#a9d8ff" />}
+      {motion && !light && <Sparkles count={70} scale={[24, 7, 14]} position={[0, 1.5, -2]} size={1.6} speed={0.18} opacity={0.35} color="#a9d8ff" />}
 
       <CameraDirector entering={entering} beacons={beacons} motion={motion} />
     </>

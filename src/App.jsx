@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Landing, { PROJECTS } from './landing/Landing.jsx';
 import SpectraWorld from './components/SpectraWorld.jsx';
 import InternalsExplorer from './internals/InternalsExplorer.jsx';
+import { useTheme } from './theme.jsx';
 
 const DESTINATIONS = ['spectra', 'core'];
 const fromHash = () => {
@@ -15,6 +16,7 @@ export default function App() {
   // home → entering (camera flies to the project) → spectra | core
   const [phase, setPhase] = useState(() => fromHash() || 'home');
   const [target, setTarget] = useState(null);
+  const [theme, toggleTheme] = useTheme(); // landing + Spectra; The Core stays dark
   const timer = useRef(null);
 
   const open = useCallback(id => {
@@ -57,7 +59,9 @@ export default function App() {
 
   return (
     <>
-      {(phase === 'home' || phase === 'entering') && <Landing onEnter={enter} entering={phase === 'entering' ? target : null} />}
+      {(phase === 'home' || phase === 'entering') && (
+        <Landing onEnter={enter} entering={phase === 'entering' ? target : null} theme={theme} onToggleTheme={toggleTheme} />
+      )}
 
       <AnimatePresence>
         {phase === 'entering' && (
@@ -73,7 +77,7 @@ export default function App() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {phase === 'spectra' && <SpectraWorld key="spectra" onBack={back} />}
+        {phase === 'spectra' && <SpectraWorld key="spectra" onBack={back} theme={theme} onToggleTheme={toggleTheme} />}
         {phase === 'core' && <InternalsExplorer key="core" onBack={back} />}
       </AnimatePresence>
     </>
