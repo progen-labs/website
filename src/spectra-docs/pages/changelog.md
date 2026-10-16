@@ -1,4 +1,6 @@
-## 0.2.0 (next release)
+Update an existing install with `npm install --save-dev @progen-labs/spectra@latest`, and check yours with `npx spectra --version`.
+
+## 0.2.0 (17 October 2026)
 
 Faster loops, honest comparisons and machine-readable output. Everything is additive: existing commands and options behave as before.
 
@@ -12,20 +14,20 @@ Faster loops, honest comparisons and machine-readable output. Everything is addi
 - **Fixed**: relative `--scenario` paths now resolve against your directory. Zero times read "0 ms", and a single run's summary line no longer prints "nullms".
 - **Dashboard fixes**: on laptop-sized windows the report tabs wrap instead of hiding **Compare commits** off the edge, and the Long tasks cards keep file names, functions and times inside the card.
 
-## 0.1.3
+## 0.1.3 (11 October 2026)
 
 - **Angular**: per-component change-detection counts and self time from Angular's development-mode profiler.
 
-## 0.1.2
+## 0.1.2 (11 October 2026)
 
 - Fixed every reported dependency vulnerability.
 
-## 0.1.1
+## 0.1.1 (11 October 2026)
 
 - **Vue**: deep component support through Vue's DevTools hook.
 - **Next.js**: profiled through React.
 
-## 0.1.0
+## 0.1.0 (11 October 2026)
 
 - First release on npm as `@progen-labs/spectra`.
 - `spectra performance`: self-boots your dev server, discovers actionable elements and runs the safe [golden-path suite](doc:golden-paths).

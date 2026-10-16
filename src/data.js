@@ -104,7 +104,7 @@ npx spectra performance`,
 npx spectra performance --quick --runs 5 --out before.json
 npx spectra performance --quick --runs 5 --out after.json
 npx spectra compare before.json after.json`,
-    note: 'Each side is reduced to its median, and a change only counts when it is bigger than the run-to-run noise. New in 0.2.0.',
+    note: 'Each side is reduced to its median, and a change only counts when it is bigger than the run-to-run noise.',
   },
   {
     id: 'budgets',
@@ -112,7 +112,7 @@ npx spectra compare before.json after.json`,
     lang: 'bash',
     code: `# spectra.config.json: { "budgets": { "tbtMs": 200, "lcpMs": 2500, "criticalFindings": 0 } }
 npx spectra performance --quick --runs 3 --json > spectra-result.json`,
-    note: 'A run over budget exits with code 2, so CI fails the build. --json prints a versioned result for scripts, editors and agents. New in 0.2.0.',
+    note: 'A run over budget exits with code 2, so CI fails the build. --json prints a versioned result for scripts, editors and agents.',
   },
   {
     id: 'dashboard',

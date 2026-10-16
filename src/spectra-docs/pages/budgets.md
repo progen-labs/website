@@ -1,7 +1,5 @@
 Budgets turn Spectra into a check: set upper limits, and any run that goes over one fails with exit code 2.
 
-> **New in 0.2.0.**
-
 ## spectra.config.json
 
 Create `spectra.config.json` in your project root:

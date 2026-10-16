@@ -28,7 +28,7 @@ The full suite takes a minute or two. While you work on one page, profile just i
 npx spectra performance --quick
 ```
 
-> **New in 0.2.0.** `--quick`, `--runs`, `spectra compare`, `spectra reports`, budgets and `--json` arrive in version 0.2.0. See the [Changelog](doc:changelog).
+> `--quick`, `--runs`, `spectra compare`, `spectra reports`, budgets and `--json` need Spectra 0.2.0 or later. Check yours with `npx spectra --version`; update with `npm install --save-dev @progen-labs/spectra@latest`.
 
 ## Open the dashboard
 

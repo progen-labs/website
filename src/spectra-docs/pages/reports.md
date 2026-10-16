@@ -1,7 +1,5 @@
 Lists the reports saved for this project, newest first.
 
-> **New in 0.2.0.**
-
 ```bash
 npx spectra reports
 ```

@@ -1,7 +1,5 @@
 Performance numbers are noisy. `spectra compare` answers "did my change make it faster?" without being fooled by that noise.
 
-> **New in 0.2.0.**
-
 ## Measure, change, verify
 
 ```bash

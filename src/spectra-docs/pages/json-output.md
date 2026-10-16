@@ -1,7 +1,5 @@
 Every `spectra` command can print a machine-readable result, for scripts, editors, CI and AI agents.
 
-> **New in 0.2.0.**
-
 ```bash
 npx spectra performance --quick --runs 3 --json > result.json
 npx spectra performance --quick --json | jq '.summary.tbtMs'

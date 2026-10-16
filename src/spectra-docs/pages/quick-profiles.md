@@ -1,7 +1,5 @@
 A single-page profile records **one page** instead of the whole golden-path suite. It is the fast loop for working on a specific problem.
 
-> **New in 0.2.0:** `--quick` and `--runs`. `--mode`, `--scenario`, `--duration` and `--throttle` are available in every version.
-
 ## --quick: profile the page load
 
 ```bash
