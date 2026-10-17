@@ -70,9 +70,10 @@ export default function App() {
             className="ld-flash"
             style={{ '--flash': flashColor }}
             initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0, 1] }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.5, times: [0, 0.55, 1], ease: 'easeIn' }}
+            animate={{ opacity: [0, 0, 1], transition: { duration: 1.5, times: [0, 0.55, 1], ease: 'easeIn' } }}
+            // the exit needs its own transition: the three-step `times` above, applied to a
+            // two-value fade, ends the fade at 55% and glows back up for the rest of it
+            exit={{ opacity: 0, transition: { duration: 0.6, ease: 'easeOut' } }}
           />
         )}
       </AnimatePresence>
