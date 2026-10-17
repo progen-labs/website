@@ -1,10 +1,10 @@
-// The landing hero: a chrome infinity mark (the Progen Labs logo) with light
-// streaking through it, floating over a dark reflective floor, lit by studio
-// softboxes. Slim light pillars mark the projects; choosing one flies the
+// The landing hero: the Progen Labs Seed — a spinning ribbon of light bars
+// over a hologram emitter — floating over a dark reflective floor, lit by
+// studio softboxes. Slim light pillars mark the projects; choosing one flies the
 // camera to it. Restraint over decoration: one hero object, two accents.
-// The light theme swaps glow for ink: normal-blended streaks and beams in
+// The light theme swaps glow for ink: normal-blended light bars and beams in
 // deeper colours, a pale studio floor and gunmetal reflections.
-import { useMemo, useRef } from 'react';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Environment, Float, Lightformer, MeshReflectorMaterial, Sparkles, Text } from '@react-three/drei';
 import * as THREE from 'three';
@@ -12,88 +12,160 @@ import * as THREE from 'three';
 const FLOOR_Y = -2.1;
 
 // ---------------------------------------------------------------- the mark
-function lemniscatePoints(a = 3.1, n = 360) {
-  const pts = [];
-  for (let i = 0; i < n; i++) {
-    const t = (i / n) * Math.PI * 2;
-    const d = 1 + Math.sin(t) ** 2;
-    // an over/under crossing in the middle gives the mark real depth
-    pts.push(new THREE.Vector3((a * Math.cos(t)) / d, (a * Math.sin(t) * Math.cos(t)) / d, 0.42 * Math.sin(t)));
-  }
-  return pts;
-}
+// The Progen Labs Seed in 3D: a ribbon of light bars that grows from a point,
+// turns a turn and a quarter about its spine and closes to a point, spinning
+// slowly. Bars facing the viewer burn brightest (cyan on the front face,
+// violet on the back), a scan pulse climbs them and an energy dot runs the
+// spine; an orbit ring and an emitter disc frame it. The geometry is the
+// SVG logo's (scripts/brand.mjs), so the hero and the logo are one mark.
+const SEED = { rungs: 56, height: 3.0, turn: 8, pulse: 4 };
+SEED.width = (SEED.height * 24) / 84; // the logo's proportions
+const seedWidth = s => Math.sin(Math.PI * s) ** 0.8 * (0.82 + 0.3 * s);
+const seedTwist = s => -0.7 * Math.PI + 1.25 * Math.PI * s;
+const BAR = 0.034; // thickness of a light bar
+const EDGE = 0.016;
+const Y_AXIS = new THREE.Vector3(0, 1, 0);
+const X_AXIS = new THREE.Vector3(1, 0, 0);
 
-const streakVertex = /* glsl */ `
-  varying vec2 vUv;
-  varying vec3 vN;
-  varying vec3 vV;
-  void main() {
-    vUv = uv;
-    vec4 mv = modelViewMatrix * vec4(position, 1.0);
-    vN = normalize(normalMatrix * normal);
-    vV = normalize(-mv.xyz);
-    gl_Position = projectionMatrix * mv;
-  }
-`;
-const streakFragment = /* glsl */ `
-  uniform float uTime;
-  uniform float uLight;
-  uniform vec3 uA;
-  uniform vec3 uB;
-  varying vec2 vUv;
-  varying vec3 vN;
-  varying vec3 vV;
-  void main() {
-    float s = fract(vUv.x * 2.0 - uTime * 0.11);
-    float band = smoothstep(0.0, 0.04, s) * (1.0 - smoothstep(0.04, 0.42, s));
-    float fres = pow(1.0 - abs(dot(vN, vV)), 2.2);
-    vec3 col = mix(uA, uB, 0.5 + 0.5 * sin(vUv.x * 6.2831853));
-    float a = band * 0.95 + fres * 0.45;
-    if (uLight > 0.5) gl_FragColor = vec4(col, band * 0.85 + fres * 0.2);
-    else gl_FragColor = vec4(col * (band * 1.7 + fres * 0.7), a);
-  }
-`;
+const SEED_PALETTES = {
+  dark: { front: ['#5ef0ff', '#38bdf8', '#5b8cff', '#7c83ff'], back: ['#d0b4ff', '#a78bfa', '#8b5cf6'], hot: '#effdff', edge: '#cfefff', hud: '#7fd8ff', min: 0.22 },
+  light: { front: ['#0891b2', '#0284c7', '#2563eb', '#4338ca'], back: ['#8b5cf6', '#7c3aed', '#5b21b6'], hot: '#0e7490', edge: '#312e81', hud: '#3b5b8f', min: 0.4 },
+};
 
-function InfinityMark({ motion, light }) {
-  const { tube, shell } = useMemo(() => {
-    const curve = new THREE.CatmullRomCurve3(lemniscatePoints(), true, 'centripetal');
-    return {
-      tube: new THREE.TubeGeometry(curve, 480, 0.3, 40, true),
-      shell: new THREE.TubeGeometry(curve, 480, 0.33, 40, true),
-    };
-  }, []);
-  const streak = useMemo(
-    () =>
-      new THREE.ShaderMaterial({
-        uniforms: {
-          uTime: { value: 0 },
-          uLight: { value: light ? 1 : 0 },
-          uA: { value: new THREE.Color(light ? '#0284c7' : '#36d6ff') },
-          uB: { value: new THREE.Color(light ? '#6d28d9' : '#9b8cff') },
-        },
-        vertexShader: streakVertex,
-        fragmentShader: streakFragment,
+function SeedMark({ motion, light }) {
+  const N = SEED.rungs;
+  const rungs = useRef();
+  const edges = useRef();
+  const dot = useRef();
+  const node = useRef();
+  const pulses = useRef([]);
+  const pal = useMemo(() => {
+    const p = SEED_PALETTES[light ? 'light' : 'dark'];
+    const c = v => new THREE.Color(v);
+    return { front: p.front.map(c), back: p.back.map(c), hot: c(p.hot), edge: c(p.edge), hud: c(p.hud), bg: c(light ? '#eef2f8' : '#000000'), min: p.min };
+  }, [light]);
+  const glow = light ? THREE.NormalBlending : THREE.AdditiveBlending;
+  const mats = useMemo(
+    () => ({
+      bar: new THREE.MeshBasicMaterial({ toneMapped: false, transparent: !light, blending: glow, depthWrite: light }),
+      edge: new THREE.MeshBasicMaterial({ color: pal.edge, toneMapped: false, transparent: true, opacity: light ? 0.75 : 0.32, blending: glow, depthWrite: false }),
+      hud: new THREE.MeshBasicMaterial({ color: pal.hud, toneMapped: false, transparent: true, opacity: light ? 0.55 : 0.6, blending: glow, depthWrite: false }),
+      hot: new THREE.MeshBasicMaterial({ color: pal.hot, toneMapped: false, transparent: true, blending: glow, depthWrite: false }),
+      cone: new THREE.ShaderMaterial({
+        uniforms: { uColor: { value: pal.hud }, uPower: { value: light ? 0.7 : 1.2 }, uLight: { value: light ? 1 : 0 } },
+        vertexShader: beamVertex,
+        fragmentShader: beamFragment,
         transparent: true,
         depthWrite: false,
-        blending: light ? THREE.NormalBlending : THREE.AdditiveBlending,
+        side: THREE.DoubleSide,
+        blending: glow,
       }),
-    [light],
+    }),
+    [light, glow, pal],
   );
-  const group = useRef();
+  const geo = useMemo(
+    () => ({
+      box: new THREE.BoxGeometry(1, 1, 1),
+      spine: new THREE.CylinderGeometry(0.008, 0.008, SEED.height, 8),
+      orbit: new THREE.TorusGeometry(2.05, 0.007, 6, 180),
+      ring: new THREE.TorusGeometry(0.55, 0.012, 6, 96),
+      inner: new THREE.TorusGeometry(0.33, 0.009, 6, 72),
+      cone: new THREE.CylinderGeometry(0.16, 0.55, 1.5, 48, 1, true),
+      sphere: new THREE.SphereGeometry(1, 20, 20),
+    }),
+    [],
+  );
+  const tmp = useMemo(() => ({ m: new THREE.Matrix4(), q: new THREE.Quaternion(), p: new THREE.Vector3(), s: new THREE.Vector3(), c: new THREE.Color(), d: new THREE.Vector3(), ends: new Float32Array((N + 1) * 6) }), [N]);
+
+  const ramp = (stops, t, out) => {
+    const x = Math.max(0, Math.min(1, t)) * (stops.length - 1);
+    const i = Math.min(stops.length - 2, Math.floor(x));
+    return out.copy(stops[i]).lerp(stops[i + 1], x - i);
+  };
+  const yAt = s => SEED.height / 2 - SEED.height * s;
+
+  // place every bar and edge segment for one moment of the turn
+  const draw = (phase, scan) => {
+    const { m, q, p, s: sc, c, d, ends } = tmp;
+    for (let i = 0; i <= N; i++) {
+      const s = i / N, th = seedTwist(s) + phase, half = SEED.width * seedWidth(s), y = yAt(s);
+      q.setFromAxisAngle(Y_AXIS, -th);
+      m.compose(p.set(0, y, 0), q, sc.set(Math.max(2 * half, 1e-3), BAR, BAR));
+      rungs.current.setMatrixAt(i, m);
+      const face = Math.cos(th); // >0: the front face is toward the camera
+      const lit = Math.abs(face);
+      const boost = Math.exp(-(((s - scan) / 0.07) ** 2));
+      ramp(face >= 0 ? pal.front : pal.back, s, c).lerp(pal.hot, Math.min(1, 0.22 * lit ** 10 + 0.8 * boost));
+      const strength = Math.min(1, pal.min + (1 - pal.min) * (0.22 + 0.78 * lit) + 0.55 * boost);
+      if (light) c.lerp(pal.bg, 1 - strength);
+      else c.multiplyScalar(strength * 0.72); // additive: overlapping bars add up, so keep each one dim
+      rungs.current.setColorAt(i, c);
+      const k = i * 6, ex = Math.cos(th) * half, ez = Math.sin(th) * half;
+      ends.set([-ex, y, -ez, ex, y, ez], k);
+    }
+    for (let i = 0; i < N; i++)
+      for (let side = 0; side < 2; side++) {
+        const a = i * 6 + side * 3, b = a + 6;
+        d.set(ends[b] - ends[a], ends[b + 1] - ends[a + 1], ends[b + 2] - ends[a + 2]);
+        const len = d.length();
+        q.setFromUnitVectors(X_AXIS, d.normalize());
+        p.set((ends[a] + ends[b]) / 2, (ends[a + 1] + ends[b + 1]) / 2, (ends[a + 2] + ends[b + 2]) / 2);
+        m.compose(p, q, sc.set(len + EDGE, EDGE, EDGE));
+        edges.current.setMatrixAt(i * 2 + side, m);
+      }
+    rungs.current.instanceMatrix.needsUpdate = true;
+    rungs.current.instanceColor.needsUpdate = true;
+    edges.current.instanceMatrix.needsUpdate = true;
+  };
+
+  useLayoutEffect(() => draw(0.35, -1), [pal]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useFrame(({ clock }) => {
+    if (!motion) return;
     const t = clock.getElapsedTime();
-    streak.uniforms.uTime.value = t;
-    if (group.current && motion) group.current.rotation.y = Math.sin(t * 0.25) * 0.28;
+    const scan = 1.15 - 1.3 * ((t / SEED.pulse) % 1);
+    draw(0.35 + (t / SEED.turn) * Math.PI * 2, scan);
+    const inside = scan >= 0 && scan <= 1;
+    dot.current.visible = inside;
+    if (inside) dot.current.position.y = yAt(scan);
+    const a = (t / 6) * Math.PI * 2;
+    node.current.position.set(Math.cos(a) * 2.05, Math.sin(a) * 2.05, 0);
+    node.current.material.opacity = Math.sin(a) > 0 ? 1 : 0.25; // dim behind the ribbon
+    pulses.current.forEach((r, i) => {
+      if (!r) return;
+      const f = ((t + i * 1.5) / 3) % 1;
+      r.scale.setScalar(0.5 + f * 2.4);
+      r.material.opacity = (1 - f) * (light ? 0.5 : 0.8);
+    });
   });
 
+  const base = -SEED.height / 2 - 0.42;
   return (
-    <Float speed={motion ? 1.1 : 0} rotationIntensity={0.15} floatIntensity={motion ? 0.6 : 0}>
-      <group ref={group} position={[0, 0.55, 0]}>
-        <mesh geometry={tube}>
-          <meshPhysicalMaterial color={light ? '#c4cde4' : '#cfd8ff'} metalness={1} roughness={0.14} clearcoat={1} clearcoatRoughness={0.08} envMapIntensity={1.6} />
-        </mesh>
-        <mesh geometry={shell} material={streak} />
+    <Float speed={motion ? 1.1 : 0} rotationIntensity={0.08} floatIntensity={motion ? 0.45 : 0}>
+      <group position={[0, 0.45, 0]}>
+        <instancedMesh ref={rungs} args={[geo.box, mats.bar, N + 1]} frustumCulled={false} />
+        <instancedMesh ref={edges} args={[geo.box, mats.edge, N * 2]} frustumCulled={false} />
+        <mesh geometry={geo.spine} material={mats.hud} />
+        <mesh ref={dot} geometry={geo.sphere} material={mats.hot} scale={0.05} visible={false} />
+        {/* orbit ring, tilted toward the viewer, with a node riding it */}
+        <group rotation={[Math.PI / 2 - 0.22, 0.1, -0.24]}>
+          <mesh geometry={geo.orbit} material={mats.hud} />
+          <mesh ref={node} geometry={geo.sphere} scale={0.06} position={[2.05, 0, 0]}>
+            <meshBasicMaterial color={pal.hot} toneMapped={false} transparent blending={glow} depthWrite={false} />
+          </mesh>
+        </group>
+        {/* the emitter the seed floats above, and its beam */}
+        <group position={[0, base, 0]}>
+          <mesh geometry={geo.ring} material={mats.hud} rotation-x={Math.PI / 2} />
+          <mesh geometry={geo.inner} material={mats.hud} rotation-x={Math.PI / 2} />
+          <mesh geometry={geo.cone} material={mats.cone} position={[0, 0.75, 0]} />
+          {motion &&
+            [0, 1].map(i => (
+              <mesh key={i} ref={r => (pulses.current[i] = r)} geometry={geo.inner} rotation-x={Math.PI / 2}>
+                <meshBasicMaterial color={pal.hud} toneMapped={false} transparent blending={glow} depthWrite={false} />
+              </mesh>
+            ))}
+        </group>
       </group>
     </Float>
   );
@@ -280,7 +352,7 @@ export default function LandingScene({ theme = 'dark', projects, hovered, setHov
 
       <Aura light={light} color={light ? '#9fd0ff' : '#1f6fff'} position={[-2.2, 0.8, -3]} scale={[11, 7, 1]} />
       <Aura light={light} color={light ? '#c9bcff' : '#7b4dff'} position={[2.4, 0.6, -3.2]} scale={[11, 7, 1]} />
-      <InfinityMark motion={motion} light={light} />
+      <SeedMark motion={motion} light={light} />
 
       {aspect >= 1 && projects.filter(p => !p.disabled).map(p => (
         <Beacon

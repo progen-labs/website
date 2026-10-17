@@ -5,6 +5,7 @@ import { ThemeToggle } from '../theme.jsx';
 import { CopyButton, commandsOf } from './CopyButton.jsx';
 import DemoVideo from './DemoVideo.jsx';
 import FeatureVideo from './FeatureVideo.jsx';
+import ProgenMark from './ProgenMark.jsx';
 import SpectraDocs from '../spectra-docs/SpectraDocs.jsx';
 import { DEFAULT_DOC, docFromHash } from '../spectra-docs/index.js';
 
@@ -251,6 +252,7 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
           </section>
 
           <footer className="sw-foot">
+            <ProgenMark theme={theme} className="sw-foot-mark" />
             <p>Spectra is a <strong>Progen Labs</strong> project — open source, nonprofit, always free.</p>
             <button className="btn btn-ghost" onClick={onBack}>← Back to Progen Labs</button>
           </footer>

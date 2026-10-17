@@ -5,7 +5,7 @@
 import { useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { motion as m } from 'framer-motion';
-import Logo3D from '../components/Logo3D.jsx';
+import ProgenMark from '../components/ProgenMark.jsx';
 import { ThemeToggle } from '../theme.jsx';
 import LandingScene from './LandingScene.jsx';
 import './landing.css';
@@ -74,7 +74,6 @@ function ProjectIcon({ id }) {
 
 export default function Landing({ onEnter, entering, theme, onToggleTheme }) {
   const reduced = useReducedMotion();
-  const [brandHot, setBrandHot] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hovered, setHovered] = useState(null);
   const [mounted, setMounted] = useState(false);
@@ -106,16 +105,8 @@ export default function Landing({ onEnter, entering, theme, onToggleTheme }) {
       <div className="ld-vignette" aria-hidden="true" />
 
       <header className={`ld-nav${scrolled ? ' is-scrolled' : ''}`}>
-        <a
-          className="ld-brand"
-          href="#top"
-          aria-label="Progen Labs home"
-          onMouseEnter={() => setBrandHot(true)}
-          onMouseLeave={() => setBrandHot(false)}
-          onFocus={() => setBrandHot(true)}
-          onBlur={() => setBrandHot(false)}
-        >
-          <Logo3D theme={theme} active={brandHot} motion={!reduced} />
+        <a className="ld-brand" href="#top" aria-label="Progen Labs home">
+          <ProgenMark theme={theme} />
           <span>Progen Labs</span>
         </a>
         <nav aria-label="Primary">

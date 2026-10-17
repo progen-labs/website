@@ -3,11 +3,12 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Official website of Progen Labs — a nonprofit, open-source, always-free developer community.",
+  "description": "Official website of Progen Labs \u2014 a nonprofit, open-source, always-free developer community.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "brand": "node scripts/brand.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.114.0",
