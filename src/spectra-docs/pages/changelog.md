@@ -8,7 +8,7 @@ Update an existing install with `npm install --save-dev @progen-labs/spectra@lat
 
 The first release of the [VS Code extension](doc:vscode), on the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=progen-labs.spectra-performance) as `progen-labs.spectra-performance`: findings in the Problems panel at the exact line, CodeLens above costly components and functions, headline numbers in the status bar, verify against a baseline, golden paths, the dashboard in the editor, results shared with the CLI and AI assistants, and Spectra's MCP server offered to agent mode.
 
-## 0.3.0 (next release)
+## 0.3.0 (17 October 2026)
 
 Spectra works inside your AI assistant.
 
