@@ -3,7 +3,7 @@ Spectra's Claude Code plugin lets Claude profile your app, fix what it finds, an
 > **New in 0.3.0.**
 
 ```video claude-code
-Install the plugin, ask for a faster page, and watch the change get verified. Every number is real Spectra output on its demo app.
+Install the plugin, ask for a faster page, and watch the change get verified. Every number is real output from Spectra's MCP server on its demo app.
 ```
 
 ## Install

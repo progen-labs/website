@@ -3,7 +3,7 @@ The Spectra extension for VS Code puts every finding where you work: at the file
 > **New.** Get it from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=progen-labs.spectra-performance): **Spectra — frontend performance**.
 
 ```video vscode
-Profile a page, see each finding at its line, change one line, and verify it: real VS Code screenshots and results on Spectra's demo app.
+A real recording of VS Code: profile a page, see each finding at its line, change one line, and verify it. Every number comes from that run on Spectra's demo app.
 ```
 
 ## What you get

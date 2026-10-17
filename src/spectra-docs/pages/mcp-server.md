@@ -3,7 +3,7 @@
 > **New in 0.3.0.** Needs Spectra 0.3.0 or later.
 
 ```video mcp-server
-Set-up, the six tools, a profile_page call with progress, and verify_change. Every result shown is real output from the server.
+Setup, the six tools, a profile_page call with live progress, and verify_change. Every result shown is real output from the server.
 ```
 
 ```bash
