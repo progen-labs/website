@@ -1,5 +1,9 @@
 Update an existing install with `npm install --save-dev @progen-labs/spectra@latest`, and check yours with `npx spectra --version`.
 
+## GitHub Action v1 (17 October 2026)
+
+`uses: progen-labs/spectra@v1` profiles each pull request and its base commit on the same runner, compares them, enforces budgets, and reports in the job summary and an optional pull request comment. See [GitHub Action](doc:github-action).
+
 ## VS Code extension 0.1.0 (next release)
 
 The first release of the [VS Code extension](doc:vscode): findings in the Problems panel at the exact line, CodeLens above costly components and functions, headline numbers in the status bar, verify against a baseline, golden paths, the dashboard in the editor, results shared with the CLI and AI assistants, and Spectra's MCP server offered to agent mode.

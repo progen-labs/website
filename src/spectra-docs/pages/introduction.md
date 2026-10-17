@@ -8,7 +8,7 @@ It drives the Chrome you already have through the Chrome DevTools Protocol, reco
 - **Points at code, not symptoms.** Every finding names the function, file and line responsible, mapped back through source maps. See [The Culprits tab](doc:culprits).
 - **Understands your framework.** Per-component render counts and timings for React, Next.js, Vue and Angular, and source-mapped file and function attribution for everything else. See [Frameworks](doc:frameworks).
 - **Proves a fix worked.** Record a few runs before and after a change, and `spectra compare` reports what got better or worse beyond run-to-run noise. See [Compare](doc:compare).
-- **Gates your CI.** Budgets in `spectra.config.json` turn any run into a pass or fail check with exit codes. See [Budgets and CI](doc:budgets).
+- **Gates your CI.** Budgets in `spectra.config.json` turn any run into a pass or fail check, and the GitHub Action compares every pull request with its base commit. See [Budgets and CI](doc:budgets) and [GitHub Action](doc:github-action).
 - **Speaks JSON.** `--json` prints a versioned, schema-described result for scripts, editors and AI agents. See [JSON output](doc:json-output).
 - **Works with your AI assistant.** Claude Code, Cursor, VS Code and other MCP clients can profile a page, fix what it finds and verify each fix. See [Claude Code plugin](doc:claude-code) and [MCP server](doc:mcp-server).
 - **Lives in your editor.** The VS Code extension shows each finding at its line and render counts above components. See [VS Code extension](doc:vscode).

@@ -14,7 +14,8 @@ const INSTALL = commandsOf(USAGE[0].code);
 export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) {
   const [tab, setTab] = useState(USAGE[0].id);
   const current = USAGE.find(u => u.id === tab) || USAGE[0];
-  const currentCommands = commandsOf(current.code);
+  // shell snippets copy without their comments; a YAML snippet copies as written
+  const currentCommands = current.lang === 'bash' ? commandsOf(current.code) : current.code;
   const many = currentCommands.includes('\n');
 
   // Documentation: the page lives in the URL (#spectra/docs/<id>), so a docs
@@ -73,15 +74,11 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease, delay: 0.1 }}
           >
-            <p className="sw-kicker">You have entered</p>
+            <p className="sw-kicker">Frontend performance, measured</p>
             <h1 className="sw-title grad-text">SPECTRA</h1>
             <p className="sw-lead">
-              A CLI and dashboard that profiles a frontend build through the Chrome
-              DevTools Protocol. Run one command and it starts your dev server,
-              auto-discovers the actionable elements on the page, drives a set of
-              golden-path journeys, records each one, and reports a ranked list of
-              culprits — each with the exact file, function and component costing
-              you time. Then it proves your fix worked, and keeps it that way in CI.
+              Spectra finds the exact file, function and component slowing your frontend, and proves each fix
+              with before-and-after measurements. Use it from the terminal, VS Code, your AI assistant or CI.
             </p>
             <div className="sw-install">
               <span className="sw-prompt" aria-hidden="true">$</span>
@@ -125,7 +122,7 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
           </section>
 
           <section className="sw-section">
-            <h2 className="sw-h2">How to use it</h2>
+            <h2 className="sw-h2">Get started</h2>
             <div className="code-shell">
               <div className="code-tabs">
                 {USAGE.map(u => (
@@ -138,7 +135,7 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
                 <CopyButton
                   key={current.id}
                   text={currentCommands}
-                  label={`Copy the ${current.label.toLowerCase()} command${many ? 's' : ''}`}
+                  label={current.lang === 'yaml' ? 'Copy the workflow steps' : `Copy the ${current.label.toLowerCase()} command${many ? 's' : ''}`}
                   className="copy-btn-float"
                 />
                 <pre className="code-block">
@@ -157,7 +154,7 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
           </section>
 
           <section className="sw-section">
-            <h2 className="sw-h2">A run, visualized</h2>
+            <h2 className="sw-h2">What a run reports</h2>
             <div className="matrix-card">
               <div className="matrix-head">
                 <span className="dot r" /><span className="dot y" /><span className="dot g" />
@@ -172,7 +169,7 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
                     <span className={m.critical ? 'finding crit' : 'finding'}>{m.top}</span>
                   </div>
                 ))}
-                <div className="matrix-foot">Automation: 4/4 golden paths passed · reports saved to .spectra/reports</div>
+                <div className="matrix-foot">Spectra's demo app · 3/3 golden paths passed · reports saved to .spectra/reports</div>
               </div>
             </div>
           </section>
@@ -187,7 +184,7 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
                 </div>
               ))}
             </div>
-            <p className="frameworks-note"><strong>Deep</strong> = per-component render counts & timings. <strong>Generic</strong> = source-mapped file/function attribution.</p>
+            <p className="frameworks-note"><strong>Deep</strong>: component render counts and timings. <strong>Generic</strong>: source-mapped files and functions.</p>
           </section>
 
           <section className="sw-section sw-docs" id="spectra-docs" ref={docsRef} aria-labelledby="spectra-docs-heading">
@@ -197,7 +194,7 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
 
           <footer className="sw-foot">
             <p>Spectra is a <strong>Progen Labs</strong> project — open source, nonprofit, always free.</p>
-            <button className="btn btn-ghost" onClick={onBack}>← Return to the world</button>
+            <button className="btn btn-ghost" onClick={onBack}>← Back to Progen Labs</button>
           </footer>
         </div>
       </div>

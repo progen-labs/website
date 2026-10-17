@@ -65,7 +65,7 @@ Budgets: 2 over budget
 
 ## In CI
 
-Any CI system that can run Node and Chrome can run Spectra. The exit code fails the job:
+On GitHub, use the [GitHub Action](doc:github-action): it also compares each pull request with its base commit and reports on the pull request. Any other CI system that can run Node and Chrome can run Spectra directly; the exit code fails the job:
 
 ```bash
 npm ci

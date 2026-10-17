@@ -15,7 +15,7 @@ export const PROJECTS = [
     id: 'spectra',
     name: 'Spectra',
     tag: 'Frontend performance profiler',
-    desc: 'Profile real user flows in React, Next.js, Vue and Angular, and see exactly which component made them slow.',
+    desc: 'Find the exact component, function and line slowing your app, and prove every fix. In the terminal, VS Code, your AI assistant or CI.',
     color: '#36d6ff',
     cta: 'Open Spectra',
   },

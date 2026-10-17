@@ -14,6 +14,7 @@ import jsonOutput from './pages/json-output.md?raw';
 import mcpServer from './pages/mcp-server.md?raw';
 import claudeCode from './pages/claude-code.md?raw';
 import vscodeExt from './pages/vscode.md?raw';
+import githubAction from './pages/github-action.md?raw';
 import goldenPaths from './pages/golden-paths.md?raw';
 import frameworks from './pages/frameworks.md?raw';
 import dashboard from './pages/dashboard.md?raw';
@@ -64,6 +65,7 @@ export const DOC_GROUPS = [
     pages: [
       { id: 'golden-paths', title: 'Golden paths', body: goldenPaths },
       { id: 'frameworks', title: 'Frameworks', body: frameworks },
+      { id: 'github-action', title: 'GitHub Action', body: githubAction },
     ],
   },
   {

@@ -33,48 +33,52 @@ export const VALUES = [
 
 export const SPECTRA_FEATURES = [
   {
-    title: 'One command, zero config',
-    body: 'Run spectra performance in your project. It detects your framework, starts your dev server, profiles it, and shuts it down — automatically.',
+    title: 'One command',
+    body: 'Run spectra performance. It starts your dev server, profiles the app, and shuts the server down again.',
   },
   {
-    title: 'Golden-path automation',
-    body: 'Spectra discovers the actionable elements on your page, synthesizes real user journeys, drives them safely, and scores each one.',
+    title: 'Real user journeys',
+    body: 'Finds the buttons, links and forms on your page and drives safe golden-path journeys through them.',
   },
   {
-    title: 'Per-component attribution',
-    body: 'Chrome DevTools Protocol tracing plus a framework-aware probe pinpoints the exact file, function and component costing you time.',
+    title: 'The exact culprit',
+    body: 'Every finding names the function, file and line responsible, with the evidence and a suggested fix.',
+  },
+  {
+    title: 'Component insight',
+    body: 'Render counts, render time and wasted renders for React, Next.js, Vue and Angular components.',
   },
   {
     title: 'Proof, not guesses',
-    body: 'Record a few runs before and after a change. spectra compare reports what got faster or slower, beyond run-to-run noise.',
+    body: 'spectra compare shows what changed between two sets of runs, and ignores run-to-run noise.',
   },
   {
-    title: 'Budgets for CI',
-    body: 'Set limits in spectra.config.json. A run over budget exits with code 2, so your pipeline catches a regression before your users do.',
+    title: 'Budgets that hold',
+    body: 'Set limits in spectra.config.json. Any run over budget fails with exit code 2.',
+  },
+  {
+    title: 'Pull request checks',
+    body: 'The GitHub Action profiles each pull request against its base commit and posts the verdict.',
+  },
+  {
+    title: 'AI that verifies',
+    body: 'An MCP server and a Claude Code plugin let your assistant fix one finding, then prove it helped.',
+  },
+  {
+    title: 'In your editor',
+    body: 'The VS Code extension shows each finding at its line and render counts above your components.',
+  },
+  {
+    title: 'Visual dashboard',
+    body: 'Culprits, a page map, the call tree, long tasks, commit comparisons and PDF reports.',
   },
   {
     title: 'JSON for any tool',
-    body: '--json prints a versioned, schema-described result: every finding with its file, line, cost and fix, ready for scripts, editors and AI agents.',
-  },
-  {
-    title: 'Works with your AI assistant',
-    body: 'An MCP server and a Claude Code plugin: your assistant profiles the page, fixes one finding at a time, and keeps a change only when Spectra measures an improvement.',
-  },
-  {
-    title: 'Right in your editor',
-    body: 'The VS Code extension puts each finding in the Problems panel at its line, render counts above your components, and verifies every change against a baseline.',
-  },
-  {
-    title: 'A full visual dashboard',
-    body: 'Culprit visualizations, React/Vue/Angular re-renders, long tasks, network and memory — plus PDF export and commit-to-commit compare.',
+    body: 'A versioned, schema-described result for scripts, dashboards and AI agents.',
   },
   {
     title: 'Safe by default',
-    body: 'Auto-exploration never submits destructive actions — delete, pay, logout and mutating form posts are detected and skipped unless allowlisted.',
-  },
-  {
-    title: 'Multi-framework',
-    body: 'Deep component-level metrics for React, Next.js, Vue and Angular. A source-mapped generic profile covers everything else.',
+    body: 'Never clicks delete, pay or log out, and never submits a form that changes data.',
   },
 ];
 
@@ -92,35 +96,43 @@ export const USAGE = [
     id: 'install',
     label: 'Install',
     lang: 'bash',
-    code: `# add Spectra to your project as a dev dependency
+    code: `# add Spectra to your project
 npm install --save-dev @progen-labs/spectra`,
-    note: 'Requires Node 18+ and a local Chrome / Chromium / Edge (Spectra drives your installed browser — it never downloads one).',
+    note: 'Needs Node.js 18 or newer and Chrome, Chromium or Edge. Spectra drives the browser you already have.',
   },
   {
     id: 'profile',
     label: 'Profile',
     lang: 'bash',
-    code: `# from the root of your project — no URL, no config
-npx spectra performance`,
-    note: 'Spectra self-boots your dev server, records a baseline load, runs golden-path journeys, and prints a performance matrix.',
+    code: `# from your project root: starts the dev server and runs the user journeys
+npx spectra performance
+
+# the fast loop: one page, three loads, medians
+npx spectra performance --quick --runs 3`,
+    note: 'Every run is saved in .spectra/reports. Open the reports with npx spectra dashboard.',
   },
   {
     id: 'verify',
     label: 'Verify a fix',
     lang: 'bash',
-    code: `# the median of 5 page loads, before and after your change
+    code: `# five page loads before and after your change, then compare
 npx spectra performance --quick --runs 5 --out before.json
 npx spectra performance --quick --runs 5 --out after.json
 npx spectra compare before.json after.json`,
-    note: 'Each side is reduced to its median, and a change only counts when it is bigger than the run-to-run noise.',
+    note: 'Each side is reduced to its median, and a change counts only when it is bigger than the noise between runs.',
   },
   {
-    id: 'budgets',
-    label: 'Budgets & CI',
-    lang: 'bash',
-    code: `# spectra.config.json: { "budgets": { "tbtMs": 200, "lcpMs": 2500, "criticalFindings": 0 } }
-npx spectra performance --quick --runs 3 --json > spectra-result.json`,
-    note: 'A run over budget exits with code 2, so CI fails the build. --json prints a versioned result for scripts, editors and agents.',
+    id: 'ci',
+    label: 'Pull requests',
+    lang: 'yaml',
+    code: `# .github/workflows/performance.yml (steps)
+- uses: actions/checkout@v4
+- run: npm ci
+- uses: progen-labs/spectra@v1
+  with:
+    compare-to-base: true
+    comment: true`,
+    note: 'Profiles the pull request and its base commit on the same runner, enforces your budgets, and comments the verdict.',
   },
   {
     id: 'ai',
@@ -129,7 +141,7 @@ npx spectra performance --quick --runs 3 --json > spectra-result.json`,
     code: `# in Claude Code
 /plugin marketplace add progen-labs/spectra
 /plugin install spectra@progen-labs`,
-    note: 'Then ask: "make the dashboard page faster". Each change is kept only when Spectra measures an improvement. Cursor, VS Code and other MCP clients run npx -y @progen-labs/spectra mcp. New in 0.3.0.',
+    note: 'Then ask Claude to "make the dashboard page faster". It keeps a change only when Spectra measures an improvement. Other MCP clients run npx -y @progen-labs/spectra mcp. Requires Spectra 0.3.0.',
   },
   {
     id: 'vscode',
@@ -145,35 +157,15 @@ code --install-extension spectra-0.1.0.vsix`,
     id: 'dashboard',
     label: 'Dashboard',
     lang: 'bash',
-    code: `# open the full visual dashboard
-npx spectra dashboard`,
-    note: 'Ranked culprits, component re-renders, long tasks, the golden-path matrix, PDF export and commit compare — no dev toolchain required.',
-  },
-  {
-    id: 'ci',
-    label: 'Options',
-    lang: 'bash',
-    code: `# evaluate an already-running server
-npx spectra performance --url http://localhost:3000/
-
-# cap the golden-path suite, or profile a single page load
-npx spectra performance --paths 8
-npx spectra performance --quick
-
-# list saved reports, to compare or open them
-npx spectra reports`,
-    note: 'Reports land in .spectra/reports in your project — open any of them in the dashboard.',
+    code: `# open the visual dashboard
+npx spectra dashboard --open`,
+    note: 'Culprits, a page map, the call tree, long tasks, commit comparisons and PDF reports. Everything stays on your machine.',
   },
 ];
 
 export const MATRIX = [
-  { path: 'Initial page load', result: 'PASS', top: 'main chunk served uncompressed' },
-  { path: 'Click "Pricing"', result: 'PASS', top: 'Large DOM: 2,139 nodes' },
-  {
-    path: 'Click "Folders"',
-    result: 'PASS',
-    top: 'TreeNode re-rendered 1100× (96% wasted)',
-    critical: true,
-  },
-  { path: 'Fill & submit "Search"', result: 'PASS', top: '—' },
+  { path: 'Initial page load', result: 'PASS', top: 'Row is slow to render: 1,443 ms', critical: true },
+  { path: 'Click "Long task"', result: 'PASS', top: 'src/heavy.js spent 606 ms of JavaScript', critical: true },
+  { path: 'Click "Layout thrash"', result: 'PASS', top: 'Row is slow to render: 336 ms', critical: true },
+  { path: 'Click "Layout shift"', result: 'PASS', top: 'Row is slow to render: 336 ms', critical: true },
 ];
