@@ -4,5 +4,6 @@
 - **Reports hold details of your app**: file paths, function names and URLs, including query strings that may contain ids. Review a report before sharing it.
 - **The page screenshot** (`<id>.page.jpg`) shows whatever was on screen, such as names, numbers or customer data. Treat it like the report. **Delete** in the dashboard removes it with the report.
 - **Spectra's Chrome profile** can hold your app's cookies after you sign in. It lives in your temp directory, separate from your own Chrome profile.
+- **AI assistants stay local.** The [MCP server](doc:mcp-server) only profiles pages on this machine unless you start it with `--allow-remote`, and its results tell the model that page text is data, not instructions.
 - **Safe exploration.** The golden-path suite skips destructive controls (delete, pay, log out and similar) and never submits `POST`, `PUT` or `DELETE` forms. See [Golden paths](doc:golden-paths).
 - **Only author names** are read from git for comparisons, never email addresses.

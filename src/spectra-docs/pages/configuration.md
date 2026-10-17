@@ -10,6 +10,7 @@ Most settings are command-line options. Budgets live in [`spectra.config.json`](
 | `PERF_TARGET_URL` | `http://localhost:3000/` | The page pre-filled in the dashboard |
 | `PERF_TARGET_NAME` | the `name` in your `package.json` | The project name shown in the dashboard and PDFs |
 | `PORT` | `4321` | The dashboard's port, when `--port` is not given |
+| `SPECTRA_MCP_ALLOW_REMOTE` | unset | Set to `1` to let the [MCP server](doc:mcp-server) profile pages that are not on this machine |
 
 ## Data on disk
 

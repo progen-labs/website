@@ -57,6 +57,10 @@ export const SPECTRA_FEATURES = [
     body: '--json prints a versioned, schema-described result: every finding with its file, line, cost and fix, ready for scripts, editors and AI agents.',
   },
   {
+    title: 'Works with your AI assistant',
+    body: 'An MCP server and a Claude Code plugin: your assistant profiles the page, fixes one finding at a time, and keeps a change only when Spectra measures an improvement.',
+  },
+  {
     title: 'A full visual dashboard',
     body: 'Culprit visualizations, React/Vue/Angular re-renders, long tasks, network and memory — plus PDF export and commit-to-commit compare.',
   },
@@ -113,6 +117,15 @@ npx spectra compare before.json after.json`,
     code: `# spectra.config.json: { "budgets": { "tbtMs": 200, "lcpMs": 2500, "criticalFindings": 0 } }
 npx spectra performance --quick --runs 3 --json > spectra-result.json`,
     note: 'A run over budget exits with code 2, so CI fails the build. --json prints a versioned result for scripts, editors and agents.',
+  },
+  {
+    id: 'ai',
+    label: 'AI assistant',
+    lang: 'bash',
+    code: `# in Claude Code
+/plugin marketplace add progen-labs/spectra
+/plugin install spectra@progen-labs`,
+    note: 'Then ask: "make the dashboard page faster". Each change is kept only when Spectra measures an improvement. Cursor, VS Code and other MCP clients run npx -y @progen-labs/spectra mcp. New in 0.3.0.',
   },
   {
     id: 'dashboard',

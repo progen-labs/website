@@ -10,6 +10,7 @@ It drives the Chrome you already have through the Chrome DevTools Protocol, reco
 - **Proves a fix worked.** Record a few runs before and after a change, and `spectra compare` reports what got better or worse beyond run-to-run noise. See [Compare](doc:compare).
 - **Gates your CI.** Budgets in `spectra.config.json` turn any run into a pass or fail check with exit codes. See [Budgets and CI](doc:budgets).
 - **Speaks JSON.** `--json` prints a versioned, schema-described result for scripts, editors and AI agents. See [JSON output](doc:json-output).
+- **Works with your AI assistant.** Claude Code, Cursor, VS Code and other MCP clients can profile a page, fix what it finds and verify each fix. See [Claude Code plugin](doc:claude-code) and [MCP server](doc:mcp-server).
 - **Comes with a dashboard.** A local web app to record live sessions, explore reports, compare commits and export PDFs. See [Dashboard](doc:dashboard).
 
 ```screenshot dashboard-overview

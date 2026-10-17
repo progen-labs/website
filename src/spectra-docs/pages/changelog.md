@@ -1,5 +1,13 @@
 Update an existing install with `npm install --save-dev @progen-labs/spectra@latest`, and check yours with `npx spectra --version`.
 
+## 0.3.0 (next release)
+
+Spectra works inside your AI assistant.
+
+- **`spectra mcp`**: Spectra as an MCP server, with `profile_page`, `verify_change`, `compare_profiles`, `run_golden_paths`, `list_reports` and `get_report`. Local pages only by default; one browser at a time; progress notifications and cancellation. See [MCP server](doc:mcp-server).
+- **Claude Code plugin**: `/plugin marketplace add progen-labs/spectra`, then `/plugin install spectra@progen-labs`. Claude fixes performance problems one at a time and keeps a change only when Spectra measures an improvement; `/spectra:audit` reports without editing. See [Claude Code plugin](doc:claude-code).
+- **Cleaner stops**: stopping or cancelling a run now also closes Chrome and stops the dev server Spectra started.
+
 ## 0.2.0 (17 October 2026)
 
 Faster loops, honest comparisons and machine-readable output. Everything is additive: existing commands and options behave as before.

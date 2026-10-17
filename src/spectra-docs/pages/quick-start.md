@@ -43,3 +43,4 @@ Every report from this project is listed there, with the culprits, the page map,
 - [Measure, change, verify](doc:compare) a fix.
 - Set [budgets](doc:budgets) and run Spectra in CI.
 - Learn to read [the Culprits tab](doc:culprits).
+- Let your AI assistant do the loop: [Claude Code plugin](doc:claude-code).

@@ -26,11 +26,13 @@ server/analysis/           trace, CPU profile, source mapping, report, findings
 server/explore/            dev-server boot, discovery and the golden-path runner
 server/cli.js              single-page profiles (--quick, --mode, --runs)
 server/compare-cli.js      spectra compare
+server/mcp.js              spectra mcp: the MCP server
 shared/compare.js          the comparison engine, shared by the CLI, dashboard and PDF
 shared/result.js           summaries, budgets and the JSON results
 schema/                    JSON Schemas for results and spectra.config.json
 src/                       the dashboard (React and d3)
 fixtures/                  demo apps for React, Vue and Angular
+plugins/spectra/           the Claude Code plugin; .claude-plugin/ holds its marketplace
 ```
 
 ## Add a finding rule
