@@ -665,10 +665,12 @@ strong { color: var(--text); font-weight: 600; }
 .btn-play svg { width: 11px; height: 11px; fill: #fff; margin-left: 1px; }
 .demo-film {
   position: fixed; inset: 0; z-index: 60; overflow-y: auto;
-  display: flex; align-items: center; justify-content: center; padding: 48px 32px;
+  display: flex; padding: 48px 32px;
   background: rgba(4, 6, 14, 0.94); backdrop-filter: blur(14px);
 }
-.demo-film-inner { width: min(1240px, 100%); }
+/* auto margins centre the film when it fits; when the window is shorter, it starts at the top instead of
+   being centred past it, where the head and its close button could not be scrolled back into view */
+.demo-film-inner { width: min(1240px, 100%); margin: auto; }
 .demo-film-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
 .demo-film-title { font-family: var(--font-display); font-size: clamp(1.4rem, 3vw, 2.2rem); letter-spacing: -0.02em; margin: 0; color: #fff; }
 .demo-film-close {
@@ -689,7 +691,7 @@ strong { color: var(--text); font-weight: 600; }
 .demo-chapter.is-active { border-color: rgba(54, 214, 255, 0.7); background: rgba(54, 214, 255, 0.12); color: #fff; }
 .demo-chapter-time { font-family: var(--font-mono); font-size: 0.78rem; color: #36d6ff; }
 @media (max-width: 640px) {
-  .demo-film { padding: 20px 16px; align-items: flex-start; }
+  .demo-film { padding: 20px 16px; }
   .demo-film-video { border-radius: 10px; }
 }
 
