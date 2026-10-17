@@ -33,6 +33,7 @@ schema/                    JSON Schemas for results and spectra.config.json
 src/                       the dashboard (React and d3)
 fixtures/                  demo apps for React, Vue and Angular
 plugins/spectra/           the Claude Code plugin; .claude-plugin/ holds its marketplace
+vscode/                    the VS Code extension
 ```
 
 ## Add a finding rule

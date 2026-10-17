@@ -13,6 +13,7 @@ import budgets from './pages/budgets.md?raw';
 import jsonOutput from './pages/json-output.md?raw';
 import mcpServer from './pages/mcp-server.md?raw';
 import claudeCode from './pages/claude-code.md?raw';
+import vscodeExt from './pages/vscode.md?raw';
 import goldenPaths from './pages/golden-paths.md?raw';
 import frameworks from './pages/frameworks.md?raw';
 import dashboard from './pages/dashboard.md?raw';
@@ -55,6 +56,7 @@ export const DOC_GROUPS = [
     pages: [
       { id: 'claude-code', title: 'Claude Code plugin', body: claudeCode },
       { id: 'mcp-server', title: 'MCP server', body: mcpServer },
+      { id: 'vscode', title: 'VS Code extension', body: vscodeExt },
     ],
   },
   {

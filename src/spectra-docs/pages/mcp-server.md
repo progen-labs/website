@@ -31,7 +31,7 @@ claude mcp add spectra -- npx -y @progen-labs/spectra mcp
 
 **Cursor**, in `.cursor/mcp.json` in your project: the same `mcpServers` block.
 
-**VS Code** (agent mode), in `.vscode/mcp.json`:
+**VS Code** (agent mode): the [Spectra extension](doc:vscode) offers the server automatically on VS Code 1.101 and later. Without the extension, add it in `.vscode/mcp.json`:
 
 ```json
 {

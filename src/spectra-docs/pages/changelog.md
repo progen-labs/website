@@ -1,5 +1,9 @@
 Update an existing install with `npm install --save-dev @progen-labs/spectra@latest`, and check yours with `npx spectra --version`.
 
+## VS Code extension 0.1.0 (next release)
+
+The first release of the [VS Code extension](doc:vscode): findings in the Problems panel at the exact line, CodeLens above costly components and functions, headline numbers in the status bar, verify against a baseline, golden paths, the dashboard in the editor, results shared with the CLI and AI assistants, and Spectra's MCP server offered to agent mode.
+
 ## 0.3.0 (next release)
 
 Spectra works inside your AI assistant.

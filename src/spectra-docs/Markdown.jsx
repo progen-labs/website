@@ -61,6 +61,8 @@ function DocLink({ href, label, onNavigate }) {
       </a>
     );
   }
+  // the site navigates by URL hash, so an in-page #anchor would leave the docs
+  if (href.startsWith('#')) return <span>{body}</span>;
   if (/^https?:\/\//.test(href))
     return (
       <a href={href} target="_blank" rel="noreferrer">

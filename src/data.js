@@ -61,6 +61,10 @@ export const SPECTRA_FEATURES = [
     body: 'An MCP server and a Claude Code plugin: your assistant profiles the page, fixes one finding at a time, and keeps a change only when Spectra measures an improvement.',
   },
   {
+    title: 'Right in your editor',
+    body: 'The VS Code extension puts each finding in the Problems panel at its line, render counts above your components, and verifies every change against a baseline.',
+  },
+  {
     title: 'A full visual dashboard',
     body: 'Culprit visualizations, React/Vue/Angular re-renders, long tasks, network and memory — plus PDF export and commit-to-commit compare.',
   },
@@ -126,6 +130,16 @@ npx spectra performance --quick --runs 3 --json > spectra-result.json`,
 /plugin marketplace add progen-labs/spectra
 /plugin install spectra@progen-labs`,
     note: 'Then ask: "make the dashboard page faster". Each change is kept only when Spectra measures an improvement. Cursor, VS Code and other MCP clients run npx -y @progen-labs/spectra mcp. New in 0.3.0.',
+  },
+  {
+    id: 'vscode',
+    label: 'VS Code',
+    lang: 'bash',
+    code: `# build and install the extension from the Spectra repository
+cd spectra/vscode
+npx @vscode/vsce package --no-dependencies
+code --install-extension spectra-0.1.0.vsix`,
+    note: 'Then run "Spectra: Profile page load" from the Command Palette. Marketplace and Open VSX listings are on the way.',
   },
   {
     id: 'dashboard',
