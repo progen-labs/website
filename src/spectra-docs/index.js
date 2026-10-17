@@ -15,6 +15,10 @@ import mcpServer from './pages/mcp-server.md?raw';
 import claudeCode from './pages/claude-code.md?raw';
 import vscodeExt from './pages/vscode.md?raw';
 import githubAction from './pages/github-action.md?raw';
+import harness from './pages/harness.md?raw';
+import cliFix from './pages/cli-fix.md?raw';
+import harnessSafety from './pages/harness-safety.md?raw';
+import harnessBench from './pages/harness-bench.md?raw';
 import goldenPaths from './pages/golden-paths.md?raw';
 import frameworks from './pages/frameworks.md?raw';
 import dashboard from './pages/dashboard.md?raw';
@@ -58,6 +62,15 @@ export const DOC_GROUPS = [
       { id: 'claude-code', title: 'Claude Code plugin', body: claudeCode },
       { id: 'mcp-server', title: 'MCP server', body: mcpServer },
       { id: 'vscode', title: 'VS Code extension', body: vscodeExt },
+    ],
+  },
+  {
+    title: 'AI fix harness',
+    pages: [
+      { id: 'harness', title: 'How the harness works', body: harness },
+      { id: 'cli-fix', title: 'spectra fix', body: cliFix },
+      { id: 'harness-safety', title: 'Checks and safety', body: harnessSafety },
+      { id: 'harness-bench', title: 'The test bench', body: harnessBench },
     ],
   },
   {

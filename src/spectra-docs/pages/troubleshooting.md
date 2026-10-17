@@ -19,6 +19,10 @@
 | **The raw trace of this recording was not kept** | Only the newest recording's trace stays in memory. Tick **Save raw trace**, or pass `--save-trace`, before recording |
 | The launched Chrome has none of your extensions or logins | Expected: Spectra uses a clean, separate profile so extensions can't distort measurements |
 | The MCP server won't connect in Claude Code (`/mcp` shows it failed) | Needs Spectra 0.3.0 or later: if your project pins an older version, update it with `npm install --save-dev @progen-labs/spectra@latest`. On Windows, start it through `cmd /c npx …`. See [MCP server](doc:mcp-server) |
+| `spectra fix`: **commit or stash your changes first** | The harness works on a copy of your last commit. Commit or stash, then run it again |
+| `spectra fix`: **no checks to run** | Add a `test` script, pass `--check "<cmd>"`, or pass `--no-checks` on purpose. See [Checks and safety](doc:harness-safety) |
+| `spectra fix`: **fails before any change** | One of your checks already fails on your last commit. Fix it, or choose other checks with `--check` |
+| `spectra fix`: **Claude Code cannot work: Not logged in** | Sign in to Claude Code first (run `claude` once), set `SPECTRA_CLAUDE` to its path, or use `--agent "<command>"` |
 | An exit code of `2` | A budget was exceeded, or `compare --fail-on-regression` found a regression. The tables above the exit say which. See [Budgets and CI](doc:budgets) |
 
 If something else goes wrong, the terminal prints the error, and the dashboard shows it in a red bar. Please [open an issue](https://github.com/progen-labs/spectra/issues) with the message.

@@ -9,7 +9,8 @@ Spectra is open source under the MIT licence, and contributions are welcome: bug
 git clone https://github.com/progen-labs/spectra.git
 cd spectra
 npm install
-npm test          # the analysis, result and CLI tests
+npm test          # the analysis, result, CLI, MCP and harness tests
+npm run bench     # the AI fix harness's test bench (needs Chrome)
 npm run demo      # a demo app with deliberate performance bugs, on :5188
 npm run dev       # the dashboard in development, on :5178
 ```
@@ -27,6 +28,8 @@ server/explore/            dev-server boot, discovery and the golden-path runner
 server/cli.js              single-page profiles (--quick, --mode, --runs)
 server/compare-cli.js      spectra compare
 server/mcp.js              spectra mcp: the MCP server
+server/fix/                spectra fix: the AI fix harness (policy, loop, git copy, agents, checks)
+bench/                     the harness's test bench (npm run bench)
 shared/compare.js          the comparison engine, shared by the CLI, dashboard and PDF
 shared/result.js           summaries, budgets and the JSON results
 schema/                    JSON Schemas for results and spectra.config.json

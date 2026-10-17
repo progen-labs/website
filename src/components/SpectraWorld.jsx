@@ -102,7 +102,8 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
             <h1 className="sw-title grad-text">SPECTRA</h1>
             <p className="sw-lead">
               Spectra finds the exact file, function and component slowing your frontend, and proves each fix
-              with before-and-after measurements. Use it from the terminal, VS Code, your AI assistant or CI.
+              with before-and-after measurements. Fix it yourself, or let its AI harness fix it and keep only what
+              measurably helps. Use it from the terminal, VS Code, your AI assistant or CI.
             </p>
             <div className="sw-install">
               <span className="sw-prompt" aria-hidden="true">$</span>
@@ -146,16 +147,33 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
               {SPECTRA_FEATURES.map((f, i) => (
                 <motion.div
                   key={f.title}
-                  className="feature-card"
+                  className={`feature-card${f.featured ? ' is-featured' : ''}`}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: (i % 3) * 0.06 }}
                 >
                   {f.media && <FeatureVideo id={f.media} label={`${f.title}, animated`} />}
-                  <span className="feature-index">{String(i + 1).padStart(2, '0')}</span>
-                  <h3>{f.title}</h3>
-                  <p>{f.body}</p>
+                  <div className="feature-text">
+                    <span className="feature-index">
+                      {String(i + 1).padStart(2, '0')}
+                      {f.badge && <span className="feature-badge">{f.badge}</span>}
+                    </span>
+                    <h3>{f.title}</h3>
+                    <p>{f.body}</p>
+                    {f.featured && (
+                      <a
+                        className="feature-link"
+                        href="#spectra/docs/harness"
+                        onClick={e => {
+                          e.preventDefault();
+                          openDoc('harness');
+                        }}
+                      >
+                        How the harness works →
+                      </a>
+                    )}
+                  </div>
                 </motion.div>
               ))}
             </div>

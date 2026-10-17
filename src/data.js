@@ -92,6 +92,13 @@ export const SPECTRA_FEATURES = [
     media: 'safe',
     body: 'Never clicks delete, pay or log out, and never submits a form that changes data.',
   },
+  {
+    title: 'The AI fix harness',
+    media: 'fix',
+    featured: true,
+    badge: 'New in 0.4.0',
+    body: 'spectra fix hands the costliest findings to a coding agent, one at a time, in a copy of your code. A change is kept only when your checks still pass and Spectra measures it faster, so you review a branch of proven fixes, never a broken page.',
+  },
 ];
 
 export const FRAMEWORKS = [
@@ -154,6 +161,18 @@ npx spectra compare before.json after.json`,
 /plugin marketplace add progen-labs/spectra
 /plugin install spectra@progen-labs`,
     note: 'Then ask Claude to "make the dashboard page faster". It keeps a change only when Spectra measures an improvement. Other MCP clients run npx -y @progen-labs/spectra mcp. Requires Spectra 0.3.0.',
+  },
+  {
+    id: 'fix',
+    label: 'AI fix',
+    lang: 'bash',
+    code: `# let a coding agent fix the costliest findings, proven
+npx spectra fix
+
+# your own checks, more findings, or your own agent
+npx spectra fix --check "npm run e2e" --max-fixes 5
+npx spectra fix --agent "./my-agent.sh"`,
+    note: 'New in 0.4.0. Works in a copy of your last commit. A change is kept only if your checks pass and Spectra measures it faster; the fixes arrive as commits on a spectra/fix-<time> branch.',
   },
   {
     id: 'vscode',

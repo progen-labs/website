@@ -11,6 +11,7 @@ It drives the Chrome you already have through the Chrome DevTools Protocol, reco
 - **Gates your CI.** Budgets in `spectra.config.json` turn any run into a pass or fail check, and the GitHub Action compares every pull request with its base commit. See [Budgets and CI](doc:budgets) and [GitHub Action](doc:github-action).
 - **Speaks JSON.** `--json` prints a versioned, schema-described result for scripts, editors and AI agents. See [JSON output](doc:json-output).
 - **Works with your AI assistant.** Claude Code, Cursor, VS Code and other MCP clients can profile a page, fix what it finds and verify each fix. See [Claude Code plugin](doc:claude-code) and [MCP server](doc:mcp-server).
+- **Fixes it for you, safely.** `spectra fix`, the [AI fix harness](doc:harness), hands the costliest findings to a coding agent and keeps a change only when your checks pass and it measures faster. The fixes arrive as commits on a new branch.
 - **Lives in your editor.** The VS Code extension shows each finding at its line and render counts above components. See [VS Code extension](doc:vscode).
 - **Comes with a dashboard.** A local web app to record live sessions, explore reports, compare commits and export PDFs. See [Dashboard](doc:dashboard).
 

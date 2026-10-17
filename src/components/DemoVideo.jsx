@@ -15,8 +15,9 @@ export const CHAPTERS = [
   { t: 45.9, label: 'VS Code' },
   { t: 60.9, label: 'One free package' },
   { t: 68.4, label: 'The CLI' },
-  { t: 98.4, label: 'Frameworks' },
-  { t: 105.9, label: 'Open source' },
+  { t: 98.4, label: 'AI fix harness' },
+  { t: 105.9, label: 'Frameworks' },
+  { t: 113.4, label: 'Open source' },
 ];
 const clock = t => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
 
@@ -50,7 +51,7 @@ export default function DemoVideo({ onClose }) {
         <div className="demo-film-head">
           <div>
             <p className="sw-kicker">The demo · 2 minutes</p>
-            <h2 className="demo-film-title">Spectra, from your AI assistant to CI</h2>
+            <h2 className="demo-film-title">Spectra, from your AI assistant to its own AI fix harness</h2>
           </div>
           <button ref={close} className="demo-film-close" onClick={onClose} aria-label="Close the demo">
             ✕

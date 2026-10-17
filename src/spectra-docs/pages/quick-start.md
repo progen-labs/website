@@ -44,3 +44,4 @@ Every report from this project is listed there, with the culprits, the page map,
 - Set [budgets](doc:budgets) and run Spectra in CI.
 - Learn to read [the Culprits tab](doc:culprits).
 - Let your AI assistant do the loop: [Claude Code plugin](doc:claude-code).
+- Or hand the findings to the [AI fix harness](doc:harness): `npx spectra fix`.

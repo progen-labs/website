@@ -15,7 +15,7 @@ export const PROJECTS = [
     id: 'spectra',
     name: 'Spectra',
     tag: 'Frontend performance profiler',
-    desc: 'Find the exact component, function and line slowing your app, and prove every fix. In the terminal, VS Code, your AI assistant or CI.',
+    desc: 'Find the exact component, function and line slowing your app, prove every fix, or let its AI harness fix it for you. In the terminal, VS Code, your AI assistant or CI.',
     color: '#36d6ff',
     cta: 'Open Spectra',
   },

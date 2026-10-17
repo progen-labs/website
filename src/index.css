@@ -692,3 +692,21 @@ strong { color: var(--text); font-weight: 600; }
   .demo-film { padding: 20px 16px; align-items: flex-start; }
   .demo-film-video { border-radius: 10px; }
 }
+
+/* the featured card: the AI fix harness, across the whole grid */
+.feature-card.is-featured { grid-column: 1 / -1; display: grid; grid-template-columns: 1.35fr 1fr; gap: 0; padding: 0; }
+.feature-card.is-featured .feature-media { margin: 0; border-bottom: none; border-right: 1px solid var(--border); }
+.feature-card.is-featured .feature-text { padding: 30px 32px; align-self: center; }
+.feature-card.is-featured h3 { font-size: 1.5rem; }
+.feature-card.is-featured p { font-size: 1rem; }
+.feature-badge {
+  margin-left: 10px; padding: 3px 10px; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.04em;
+  color: #04140c; background: linear-gradient(90deg, #46e2a0, #36d6ff);
+}
+.feature-link { display: inline-block; margin-top: 14px; font-weight: 600; color: var(--cyan); text-decoration: none; }
+.feature-link:hover { text-decoration: underline; }
+@media (max-width: 760px) {
+  .feature-card.is-featured { grid-template-columns: 1fr; padding: 26px; }
+  .feature-card.is-featured .feature-media { margin: -26px -26px 18px; border-right: none; border-bottom: 1px solid var(--border); }
+  .feature-card.is-featured .feature-text { padding: 0; }
+}

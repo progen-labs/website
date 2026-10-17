@@ -17,5 +17,6 @@ Most settings are command-line options. Budgets live in [`spectra.config.json`](
 | Location | Contents |
 | --- | --- |
 | `.spectra/reports/` | Reports, page screenshots, optional raw traces and golden-path summaries. Keep it out of git |
+| `.spectra/fix/` | [spectra fix](doc:cli-fix) sessions: each one's report, profiles and (while it runs) its copy of your project, plus `history.json`. Spectra keeps it out of git for you |
 | `spectra.config.json` | Your budgets, if any. Commit it |
 | Temp directory, `spectra-chrome/<project>-<hash>` | Spectra's private Chrome profile, separate from your own, so your extensions can't distort measurements |
