@@ -29,7 +29,7 @@ Then build and install the extension from the Spectra repository:
 git clone https://github.com/progen-labs/spectra.git
 cd spectra/vscode
 npx @vscode/vsce package --no-dependencies
-code --install-extension spectra-0.1.0.vsix
+code --install-extension spectra-performance-0.1.0.vsix
 ```
 
 ## Commands

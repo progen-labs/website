@@ -150,7 +150,7 @@ npx spectra compare before.json after.json`,
     code: `# build and install the extension from the Spectra repository
 cd spectra/vscode
 npx @vscode/vsce package --no-dependencies
-code --install-extension spectra-0.1.0.vsix`,
+code --install-extension spectra-performance-0.1.0.vsix`,
     note: 'Then run "Spectra: Profile page load" from the Command Palette. Marketplace and Open VSX listings are on the way.',
   },
   {
