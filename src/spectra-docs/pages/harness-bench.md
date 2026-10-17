@@ -49,6 +49,27 @@ A real agent instead: Claude Code (signed in) works on the demo app for up to th
 
 `--keep` leaves each case's project in your temp directory to inspect.
 
+## With a real agent
+
+The first run with Claude Code, on 17 October 2026 (Spectra 0.4.0, a $1 cap per finding). Every change passed the behaviour check.
+
+| Finding | What Claude Code changed | Decision |
+| --- | --- | --- |
+| Row is slow to render: 7,200 renders, 1.44 s | Rendered the 120 rows as the memoised `MemoRow` with a stable `onPick` | **Kept**: JavaScript CPU time 1.51 s → 92 ms (−94%); Row renders 7,200 → 120 |
+| `src/heavy.js` spent 1.41 s of JavaScript | Moved the "Long task" button's work into a Web Worker | **Undone**: no measurable gain. The first fix had already cleared this finding, and the button isn't pressed during a page load |
+| App rendered 60× (19 per second) | Moved the 50 ms tick into a small store read with `useSyncExternalStore`, so only the heading and the chart re-render | **Kept**: wasted renders 59 → 0; App renders 60 → 1 |
+
+```
+Session: 2 of 3 fixes kept, 8 findings resolved
+JavaScript CPU time   1.51 s → 82.5 ms (−95%)
+Row renders           7,200 → 120 (−98%)
+Agent cost            $0.44 in total, about 20 s per finding
+```
+
+The harness decided correctly every time, including undoing a plausible-sounding change that measured no faster. The second attempt also showed waste: the harness asked for a fix to a finding that was already gone. Since 0.4.1, a finding that an earlier kept fix cleared is skipped instead.
+
+The third fix left one new warning, "TickHeading rendered 60×". That is expected, because the heading shows the tick. It is a warning, not a critical finding, so the keep rule allows it.
+
 ## Add a case
 
 Cases are in `bench/cases.js`: an id, a description, the change the scripted agent applies (a file, the code to find and its replacement) and the decision expected: `kept`, `checks-failed`, `no-gain`, `out-of-scope`, `slower`, `mixed`, `new-problem` or `unproven`.

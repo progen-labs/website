@@ -1,5 +1,9 @@
 Update an existing install with `npm install --save-dev @progen-labs/spectra@latest`, and check yours with `npx spectra --version`.
 
+## 0.4.1 (not yet on npm)
+
+- **`spectra fix` skips findings that are already fixed.** One fix often clears several findings. After each kept fix, a finding the new measurement no longer shows is listed as skipped ("already resolved by an earlier kept change") instead of being handed to the agent, which saves its time and cost. Found by the first [real-agent bench run](doc:harness-bench), where one of three attempts went to a finding the first fix had cleared.
+
 ## 0.4.0 (17 October 2026)
 
 The [AI fix harness](doc:harness). `spectra fix` hands the costliest findings in your own code to a coding agent (Claude Code by default, or any command), one at a time, in a git worktree of your last commit. A change is kept as a commit on a new branch only when it stays within scope, your checks pass (they can test the running app at `$SPECTRA_FIX_URL`) and Spectra measures it faster beyond run-to-run noise; otherwise it is undone. Each session leaves a Markdown report and a history, so failed findings aren't retried. A [test bench](doc:harness-bench) checks the harness's decisions in CI. See [spectra fix](doc:cli-fix) and [Checks and safety](doc:harness-safety).

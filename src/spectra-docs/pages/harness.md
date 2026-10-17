@@ -48,7 +48,7 @@ your last commit ──▶ a copy on branch spectra/fix-<time>   (your files are
           report: before → after for all kept fixes
 ```
 
-Each fix is measured against the code as it stands after the fixes kept before it, and the report compares the original baseline with the final result. The details are in [Checks and safety](doc:harness-safety).
+Each fix is measured against the code as it stands after the fixes kept before it, and the report compares the original baseline with the final result. One fix often clears several findings (memoising a slow row also quiets the file its render work lives in), so after each kept fix the harness skips any finding the new measurement no longer shows, rather than paying an agent to fix it again. The details are in [Checks and safety](doc:harness-safety).
 
 ## When it helps
 
