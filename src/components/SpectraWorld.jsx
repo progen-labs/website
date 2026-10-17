@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { SPECTRA_FEATURES, FRAMEWORKS, MATRIX, USAGE, LINKS } from '../data.js';
+import { FRAMEWORKS, MATRIX, USAGE, LINKS } from '../data.js';
 import { ThemeToggle } from '../theme.jsx';
 import { CopyButton, commandsOf } from './CopyButton.jsx';
 import DemoVideo from './DemoVideo.jsx';
-import FeatureVideo from './FeatureVideo.jsx';
+import Capabilities from './Capabilities.jsx';
+import WhatsNew, { releases } from './WhatsNew.jsx';
 import ProgenMark from './ProgenMark.jsx';
 import SpectraDocs from '../spectra-docs/SpectraDocs.jsx';
 import { DEFAULT_DOC, docFromHash } from '../spectra-docs/index.js';
@@ -14,6 +15,8 @@ const ease = [0.22, 1, 0.36, 1];
 const INSTALL = commandsOf(USAGE[0].code);
 
 /** The world behind the Spectra gate: everything about Spectra. */
+const LATEST = releases()[0];
+
 export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) {
   const [tab, setTab] = useState(USAGE[0].id);
   const current = USAGE.find(u => u.id === tab) || USAGE[0];
@@ -140,44 +143,27 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
               </a>
               <a className="btn btn-ghost" href={LINKS.spectraRepo} target="_blank" rel="noreferrer">GitHub ↗</a>
             </div>
+            <a
+              className="sw-new"
+              href="#whats-new"
+              onClick={e => {
+                e.preventDefault();
+                document.getElementById('whats-new')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+            >
+              <span className="sw-new-tag">New</span>
+              {LATEST.title}: {LATEST.summary.split(/\.\s/)[0].replace(/\.$/, '').replace(/`/g, '')} →
+            </a>
           </motion.header>
 
-          <section className="sw-section">
+          <section className="sw-section" id="what-it-does">
             <h2 className="sw-h2">What it does</h2>
-            <div className="feature-grid">
-              {SPECTRA_FEATURES.map((f, i) => (
-                <motion.div
-                  key={f.title}
-                  className={`feature-card${f.featured ? ' is-featured' : ''}`}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: (i % 3) * 0.06 }}
-                >
-                  {f.media && <FeatureVideo id={f.media} label={`${f.title}, animated`} />}
-                  <div className="feature-text">
-                    <span className="feature-index">
-                      {String(i + 1).padStart(2, '0')}
-                      {f.badge && <span className="feature-badge">{f.badge}</span>}
-                    </span>
-                    <h3>{f.title}</h3>
-                    <p>{f.body}</p>
-                    {f.featured && (
-                      <a
-                        className="feature-link"
-                        href="#spectra/docs/harness"
-                        onClick={e => {
-                          e.preventDefault();
-                          openDoc('harness');
-                        }}
-                      >
-                        How the harness works →
-                      </a>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+            <Capabilities onDoc={openDoc} />
+          </section>
+
+          <section className="sw-section" id="whats-new">
+            <h2 className="sw-h2">What's new</h2>
+            <WhatsNew onDoc={openDoc} />
           </section>
 
           <section className="sw-section">

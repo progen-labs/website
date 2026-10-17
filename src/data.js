@@ -31,73 +31,50 @@ export const VALUES = [
   },
 ];
 
-export const SPECTRA_FEATURES = [
+// What Spectra does, in four groups. Each capability has a 3D loop (media,
+// from Spectra's video/ project) and the docs page that explains it.
+export const SPECTRA_PILLARS = [
   {
-    title: 'One command',
-    media: 'one-command',
-    body: 'Run spectra performance. It starts your dev server, profiles the app, and shuts the server down again.',
+    id: 'find',
+    title: 'Find',
+    line: 'what makes your app slow',
+    features: [
+      { title: 'One command', media: 'one-command', doc: 'quick-start', body: 'Run spectra performance. It starts your dev server, profiles the app, and shuts the server down again.' },
+      { title: 'Real user journeys', media: 'journeys', doc: 'golden-paths', body: 'Finds the buttons, links and forms on your page and drives safe golden-path journeys through them.' },
+      { title: 'The exact culprit', media: 'culprit', doc: 'culprits', body: 'Every finding names the function, file and line responsible, with the evidence and a suggested fix.' },
+      { title: 'Component insight', media: 'components', doc: 'frameworks', body: 'Render counts, render time and wasted renders for React, Next.js, Vue and Angular components.' },
+    ],
   },
   {
-    title: 'Real user journeys',
-    media: 'journeys',
-    body: 'Finds the buttons, links and forms on your page and drives safe golden-path journeys through them.',
+    id: 'prove',
+    title: 'Prove',
+    line: 'that a change really helped',
+    features: [
+      { title: 'Compare two commits', media: 'compare', doc: 'compare-commits', body: 'In the dashboard, put the runs of two commits side by side and see what improved, file by file. Export it as a PDF summary or a detailed report.' },
+      { title: 'Proof, not guesses', media: 'proof', doc: 'compare', body: 'spectra compare shows what changed between two sets of runs, beyond run-to-run noise.' },
+      { title: 'Budgets that hold', media: 'budgets', doc: 'budgets', body: 'Set limits in spectra.config.json. Any run over budget fails with exit code 2.' },
+      { title: 'Pull request checks', media: 'pull-requests', doc: 'github-action', body: 'The GitHub Action profiles each pull request against its base commit and posts the verdict.' },
+    ],
   },
   {
-    title: 'The exact culprit',
-    media: 'culprit',
-    body: 'Every finding names the function, file and line responsible, with the evidence and a suggested fix.',
+    id: 'fix',
+    title: 'Fix',
+    line: 'with AI that measures',
+    features: [
+      { title: 'The AI fix harness', media: 'fix', doc: 'harness', badge: 'New in 0.4', body: 'spectra fix hands the costliest findings to a coding agent, one at a time, in a copy of your code, and keeps a change only when your checks pass and Spectra measures it faster.' },
+      { title: 'AI that verifies', media: 'ai', doc: 'claude-code', body: 'An MCP server and a Claude Code plugin let your assistant fix one finding, then prove it helped.' },
+      { title: 'In your editor', media: 'editor', doc: 'vscode', body: 'The VS Code extension shows each finding at its line and render counts above your components.' },
+    ],
   },
   {
-    title: 'Component insight',
-    media: 'components',
-    body: 'Render counts, render time and wasted renders for React, Next.js, Vue and Angular components.',
-  },
-  {
-    title: 'Proof, not guesses',
-    media: 'proof',
-    body: 'spectra compare shows what changed between two sets of runs, and ignores run-to-run noise.',
-  },
-  {
-    title: 'Budgets that hold',
-    media: 'budgets',
-    body: 'Set limits in spectra.config.json. Any run over budget fails with exit code 2.',
-  },
-  {
-    title: 'Pull request checks',
-    media: 'pull-requests',
-    body: 'The GitHub Action profiles each pull request against its base commit and posts the verdict.',
-  },
-  {
-    title: 'AI that verifies',
-    media: 'ai',
-    body: 'An MCP server and a Claude Code plugin let your assistant fix one finding, then prove it helped.',
-  },
-  {
-    title: 'In your editor',
-    media: 'editor',
-    body: 'The VS Code extension shows each finding at its line and render counts above your components.',
-  },
-  {
-    title: 'Visual dashboard',
-    media: 'dashboard',
-    body: 'Culprits, a page map, the call tree, long tasks, commit comparisons and PDF reports.',
-  },
-  {
-    title: 'JSON for any tool',
-    media: 'json',
-    body: 'A versioned, schema-described result for scripts, dashboards and AI agents.',
-  },
-  {
-    title: 'Safe by default',
-    media: 'safe',
-    body: 'Never clicks delete, pay or log out, and never submits a form that changes data.',
-  },
-  {
-    title: 'The AI fix harness',
-    media: 'fix',
-    featured: true,
-    badge: 'New in 0.4.0',
-    body: 'spectra fix hands the costliest findings to a coding agent, one at a time, in a copy of your code. A change is kept only when your checks still pass and Spectra measures it faster, so you review a branch of proven fixes, never a broken page.',
+    id: 'fit',
+    title: 'Fit in',
+    line: 'wherever you work',
+    features: [
+      { title: 'Visual dashboard', media: 'dashboard', doc: 'dashboard', body: 'Culprits, a page map, the call tree and long tasks for every run, on your own machine.' },
+      { title: 'JSON for any tool', media: 'json', doc: 'json-output', body: 'A versioned, schema-described result for scripts, dashboards and AI agents.' },
+      { title: 'Safe by default', media: 'safe', doc: 'privacy', body: 'Never clicks delete, pay or log out, and never submits a form that changes data.' },
+    ],
   },
 ];
 

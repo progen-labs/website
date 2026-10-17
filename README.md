@@ -86,4 +86,4 @@ src/
 scripts/brand.mjs         # generates the logo files in public/brand/
 ```
 
-MIT licensed · © Progen Labs
+MIT licensed · © 2026 Sourav Debnath (Progen Labs)

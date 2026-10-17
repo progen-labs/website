@@ -59,6 +59,10 @@ pane: **Each change**, naming exactly which sub-metric moved: here `Row` went fr
 
 Both PDFs are printed by the headless Chrome Spectra already uses, on your machine; nothing is uploaded. The file is named `perf-compare_<before>_<after>_<summary|detailed>.pdf`.
 
+```video compare-commits
+The two PDFs taken apart: the summary's sections (the report, the two commits, the verdict, highlights and key metrics), then the detailed report's Files page, where each improved file says what changed. The demo app before and after the fixes Claude Code made in the fix-harness test bench.
+```
+
 | | **Summary** (about 4 pages) | **Detailed report** (about 10 pages) |
 | --- | --- | --- |
 | Commit cards, verdict, confidence and highlights | ✓ | ✓ |

@@ -1,4 +1,4 @@
-// Spectra's two-minute launch film, full screen, with chapters to jump to.
+// Spectra's launch film (about two and a half minutes), full screen, with chapters to jump to.
 // It lives at #spectra/demo, so it can be shared and closed with the back
 // button or Escape.
 import { useEffect, useRef, useState } from 'react';
@@ -15,9 +15,10 @@ export const CHAPTERS = [
   { t: 45.9, label: 'VS Code' },
   { t: 60.9, label: 'One free package' },
   { t: 68.4, label: 'The CLI' },
-  { t: 98.4, label: 'AI fix harness' },
-  { t: 105.9, label: 'Frameworks' },
-  { t: 113.4, label: 'Open source' },
+  { t: 98.4, label: 'Compare commits' },
+  { t: 120.9, label: 'AI fix harness' },
+  { t: 128.4, label: 'Frameworks' },
+  { t: 135.9, label: 'Open source' },
 ];
 const clock = t => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
 
@@ -50,7 +51,7 @@ export default function DemoVideo({ onClose }) {
       <div className="demo-film-inner">
         <div className="demo-film-head">
           <div>
-            <p className="sw-kicker">The demo · 2 minutes</p>
+            <p className="sw-kicker">The demo · 2½ minutes</p>
             <h2 className="demo-film-title">Spectra, from your AI assistant to its own AI fix harness</h2>
           </div>
           <button ref={close} className="demo-film-close" onClick={onClose} aria-label="Close the demo">
