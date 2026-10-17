@@ -126,6 +126,7 @@
   display: flex; justify-content: space-between; gap: 12px; margin-top: 10px;
   font-size: 0.86rem; color: var(--text-faint);
 }
+.demo-video video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border-radius: 11px; background: #070a14; }
 .shot figcaption a { color: var(--text-dim); text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
 .shot-legend {
   list-style: none; margin: 14px 0 0; padding: 0;

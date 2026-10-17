@@ -6,10 +6,12 @@
 //   ```lang fences (copy button for bash/js/json)    | tables |
 //   > notes                          `code`, **bold**, *italic*, [links](url)
 //   ```screenshot <name>  an annotated screenshot (see Screenshot.jsx)
+//   ```video <name>       a demo video; the body is its caption (see Video.jsx)
 //
 // A link to `doc:<page-id>` opens another page of the docs.
 import { CopyButton, commandsOf } from '../components/CopyButton.jsx';
 import Screenshot, { parseScreenshot } from './Screenshot.jsx';
+import Video, { parseVideo } from './Video.jsx';
 
 const INLINE = String.raw`(\x60[^\x60]+\x60)|(\[[^\]]+\]\([^)\s]+\))|(\*\*[^*]+?\*\*)|(\*[^*\s][^*]*?\*)`;
 const COPYABLE = new Set(['bash', 'sh', 'js', 'json', 'yaml']);
@@ -269,6 +271,7 @@ export default function Markdown({ source, onNavigate }) {
               renderText={text => <Inline text={text} onNavigate={onNavigate} />}
             />
           );
+        if (b.type === 'code' && b.lang === 'video') return <Video key={i} {...parseVideo(b.arg, b.text)} />;
         if (b.type === 'code') return <CodeBlock key={i} lang={b.lang} text={b.text} />;
         if (b.type === 'table') return <Table key={i} rows={b.rows} onNavigate={onNavigate} />;
         if (b.type === 'list') return <List key={i} {...b} onNavigate={onNavigate} />;

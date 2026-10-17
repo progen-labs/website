@@ -2,6 +2,10 @@ The Spectra extension for VS Code puts every finding where you work: at the file
 
 > **New.** Until the extension is listed on the VS Code Marketplace and Open VSX, build it from the Spectra repository, as described under Install below.
 
+```video vscode
+Profile a page, see each finding at its line, change one line, and verify it: real VS Code screenshots and results on Spectra's demo app.
+```
+
 ## What you get
 
 - **Problems at the right line.** Every finding appears in the Problems panel and as a squiggle at the line responsible, with its cost and the suggested fix, such as *Row is slow to render: 1442ms total, 0.2ms per render (7200×)* at `src/Row.jsx:3`.
