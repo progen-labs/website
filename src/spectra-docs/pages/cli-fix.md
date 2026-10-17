@@ -1,6 +1,6 @@
 `spectra fix` runs the [AI fix harness](doc:harness) in your project.
 
-> **New in 0.4.0** (the next release).
+> **New in 0.4.0.** Update with `npm install --save-dev @progen-labs/spectra@latest`.
 
 ```bash
 npx spectra fix

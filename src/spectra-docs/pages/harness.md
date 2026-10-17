@@ -1,6 +1,6 @@
 Spectra's **AI fix harness** turns "find the slow code, fix it, check the fix" into one unattended step. `spectra fix` hands the costliest findings in your own code to a coding agent, one at a time, and keeps a change only when your checks still pass and Spectra measures the page faster, beyond run-to-run noise. Kept changes arrive as commits on a new branch, ready for you to review.
 
-> **New in 0.4.0** (the next release).
+> **New in 0.4.0.** Update with `npm install --save-dev @progen-labs/spectra@latest`.
 
 ```video fix-harness
 A test-bench run on Spectra's demo app: the harness keeps a real fix (JavaScript CPU time 1.57 s → 152 ms) and undoes a "faster" change that broke the page.

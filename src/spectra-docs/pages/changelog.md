@@ -1,6 +1,6 @@
 Update an existing install with `npm install --save-dev @progen-labs/spectra@latest`, and check yours with `npx spectra --version`.
 
-## 0.4.0 (next release)
+## 0.4.0 (17 October 2026)
 
 The [AI fix harness](doc:harness). `spectra fix` hands the costliest findings in your own code to a coding agent (Claude Code by default, or any command), one at a time, in a git worktree of your last commit. A change is kept as a commit on a new branch only when it stays within scope, your checks pass (they can test the running app at `$SPECTRA_FIX_URL`) and Spectra measures it faster beyond run-to-run noise; otherwise it is undone. Each session leaves a Markdown report and a history, so failed findings aren't retried. A [test bench](doc:harness-bench) checks the harness's decisions in CI. See [spectra fix](doc:cli-fix) and [Checks and safety](doc:harness-safety).
 
