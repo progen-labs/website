@@ -1,6 +1,6 @@
 The Spectra extension for VS Code puts every finding where you work: at the file and line responsible, with render counts above your components and before/after verification of every change.
 
-> **New.** Until the extension is listed on the VS Code Marketplace and Open VSX, build it from the Spectra repository, as described under Install below.
+> **New.** Get it from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=progen-labs.spectra-performance): **Spectra — frontend performance**.
 
 ```video vscode
 Profile a page, see each finding at its line, change one line, and verify it: real VS Code screenshots and results on Spectra's demo app.
@@ -23,13 +23,18 @@ You need Node.js 18 or newer and Chrome, Chromium or Edge. Add Spectra to your p
 npm install --save-dev @progen-labs/spectra
 ```
 
-Then build and install the extension from the Spectra repository:
+Then install **Spectra — frontend performance** from the Extensions view (search for *Spectra frontend performance*), from its [Marketplace page](https://marketplace.visualstudio.com/items?itemName=progen-labs.spectra-performance), or from a terminal:
+
+```bash
+code --install-extension progen-labs.spectra-performance
+```
+
+**Cursor, Windsurf and VSCodium** install extensions from Open VSX. Until Spectra is listed there, build the extension from the Spectra repository and install the file with **Extensions: Install from VSIX…**:
 
 ```bash
 git clone https://github.com/progen-labs/spectra.git
 cd spectra/vscode
 npx @vscode/vsce package --no-dependencies
-code --install-extension spectra-performance-0.1.0.vsix
 ```
 
 ## Commands

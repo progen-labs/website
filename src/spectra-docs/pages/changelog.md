@@ -4,9 +4,9 @@ Update an existing install with `npm install --save-dev @progen-labs/spectra@lat
 
 `uses: progen-labs/spectra@v1` profiles each pull request and its base commit on the same runner, compares them, enforces budgets, and reports in the job summary and an optional pull request comment. See [GitHub Action](doc:github-action).
 
-## VS Code extension 0.1.0 (next release)
+## VS Code extension 0.1.0 (17 October 2026)
 
-The first release of the [VS Code extension](doc:vscode): findings in the Problems panel at the exact line, CodeLens above costly components and functions, headline numbers in the status bar, verify against a baseline, golden paths, the dashboard in the editor, results shared with the CLI and AI assistants, and Spectra's MCP server offered to agent mode.
+The first release of the [VS Code extension](doc:vscode), on the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=progen-labs.spectra-performance) as `progen-labs.spectra-performance`: findings in the Problems panel at the exact line, CodeLens above costly components and functions, headline numbers in the status bar, verify against a baseline, golden paths, the dashboard in the editor, results shared with the CLI and AI assistants, and Spectra's MCP server offered to agent mode.
 
 ## 0.3.0 (next release)
 

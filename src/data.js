@@ -147,11 +147,9 @@ npx spectra compare before.json after.json`,
     id: 'vscode',
     label: 'VS Code',
     lang: 'bash',
-    code: `# build and install the extension from the Spectra repository
-cd spectra/vscode
-npx @vscode/vsce package --no-dependencies
-code --install-extension spectra-performance-0.1.0.vsix`,
-    note: 'Then run "Spectra: Profile page load" from the Command Palette. Marketplace and Open VSX listings are on the way.',
+    code: `# install from the VS Code Marketplace
+code --install-extension progen-labs.spectra-performance`,
+    note: 'Or search for "Spectra frontend performance" in the Extensions view. Then run "Spectra: Profile page load" from the Command Palette.',
   },
   {
     id: 'dashboard',
