@@ -121,7 +121,7 @@ export default function Landing({ onEnter, entering, theme, onToggleTheme }) {
 
       <main className="ld-main" id="top">
         <m.p className="ld-kicker" {...rise(0)}>
-          Nonprofit · Open source · Free forever
+          Independent · Open source · Free forever
         </m.p>
         <m.h1 className="ld-title" {...rise(1)}>
           Understand the web.

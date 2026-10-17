@@ -7,7 +7,7 @@
 
 <h1 align="center">Progen Labs: website</h1>
 
-<p align="center"><b>Understand the web. Build it faster.</b><br>Nonprofit · Open source · Free forever</p>
+<p align="center"><b>Understand the web. Build it faster.</b><br>Independent · Open source · Free forever</p>
 
 The official website of **Progen Labs**, an open-source lab building free software, tools and learning
 experiences for developers. It is live at <https://progen-labs.github.io/website/>.

@@ -6,9 +6,9 @@ export const LINKS = {
 
 export const VALUES = [
   {
-    key: 'nonprofit',
-    title: 'Nonprofit',
-    body: 'No investors, no growth targets, no dark patterns. Progen Labs exists to solve real developer problems — not to extract value from the people it serves.',
+    key: 'independent',
+    title: 'Independent',
+    body: 'No investors, no growth targets, no dark patterns. Progen Labs is maintained by one developer to ship useful tools for everyone — not to extract value from the people it serves.',
     glyph: 'heart',
   },
   {
