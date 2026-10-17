@@ -1,6 +1,6 @@
 Update an existing install with `npm install --save-dev @progen-labs/spectra@latest`, and check yours with `npx spectra --version`.
 
-## 0.4.1 (not yet on npm)
+## 0.4.1 (17 October 2026)
 
 - **`spectra fix` skips findings that are already fixed.** One fix often clears several findings. After each kept fix, a finding the new measurement no longer shows is listed as skipped ("already resolved by an earlier kept change") instead of being handed to the agent, which saves its time and cost. Found by the first [real-agent bench run](doc:harness-bench), where one of three attempts went to a finding the first fix had cleared.
 
