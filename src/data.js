@@ -34,50 +34,62 @@ export const VALUES = [
 export const SPECTRA_FEATURES = [
   {
     title: 'One command',
+    media: 'one-command',
     body: 'Run spectra performance. It starts your dev server, profiles the app, and shuts the server down again.',
   },
   {
     title: 'Real user journeys',
+    media: 'journeys',
     body: 'Finds the buttons, links and forms on your page and drives safe golden-path journeys through them.',
   },
   {
     title: 'The exact culprit',
+    media: 'culprit',
     body: 'Every finding names the function, file and line responsible, with the evidence and a suggested fix.',
   },
   {
     title: 'Component insight',
+    media: 'components',
     body: 'Render counts, render time and wasted renders for React, Next.js, Vue and Angular components.',
   },
   {
     title: 'Proof, not guesses',
+    media: 'proof',
     body: 'spectra compare shows what changed between two sets of runs, and ignores run-to-run noise.',
   },
   {
     title: 'Budgets that hold',
+    media: 'budgets',
     body: 'Set limits in spectra.config.json. Any run over budget fails with exit code 2.',
   },
   {
     title: 'Pull request checks',
+    media: 'pull-requests',
     body: 'The GitHub Action profiles each pull request against its base commit and posts the verdict.',
   },
   {
     title: 'AI that verifies',
+    media: 'ai',
     body: 'An MCP server and a Claude Code plugin let your assistant fix one finding, then prove it helped.',
   },
   {
     title: 'In your editor',
+    media: 'editor',
     body: 'The VS Code extension shows each finding at its line and render counts above your components.',
   },
   {
     title: 'Visual dashboard',
+    media: 'dashboard',
     body: 'Culprits, a page map, the call tree, long tasks, commit comparisons and PDF reports.',
   },
   {
     title: 'JSON for any tool',
+    media: 'json',
     body: 'A versioned, schema-described result for scripts, dashboards and AI agents.',
   },
   {
     title: 'Safe by default',
+    media: 'safe',
     body: 'Never clicks delete, pay or log out, and never submits a form that changes data.',
   },
 ];

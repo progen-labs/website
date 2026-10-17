@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { SPECTRA_FEATURES, FRAMEWORKS, MATRIX, USAGE, LINKS } from '../data.js';
 import { ThemeToggle } from '../theme.jsx';
 import { CopyButton, commandsOf } from './CopyButton.jsx';
+import DemoVideo from './DemoVideo.jsx';
+import FeatureVideo from './FeatureVideo.jsx';
 import SpectraDocs from '../spectra-docs/SpectraDocs.jsx';
 import { DEFAULT_DOC, docFromHash } from '../spectra-docs/index.js';
 
@@ -38,9 +40,31 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
     },
     [showDocs],
   );
+  // the demo film lives at #spectra/demo
+  // (opened from this page: closing goes back; opened from a shared link: closing replaces it)
+  const [demo, setDemo] = useState(() => window.location.hash === '#spectra/demo');
+  const pushedDemo = useRef(false);
+  const openDemo = useCallback(() => {
+    if (window.location.hash !== '#spectra/demo') {
+      window.history.pushState(null, '', '#spectra/demo');
+      pushedDemo.current = true;
+    }
+    setDemo(true);
+  }, []);
+  const closeDemo = useCallback(() => {
+    setDemo(false);
+    if (pushedDemo.current) {
+      pushedDemo.current = false;
+      window.history.back();
+    } else window.history.replaceState(null, '', '#spectra');
+  }, []);
+
   useEffect(() => {
     if (docFromHash()) showDocs(false); // arrived through a docs link
     const onPop = () => {
+      const open = window.location.hash === '#spectra/demo';
+      if (!open) pushedDemo.current = false;
+      setDemo(open);
       const id = docFromHash();
       if (id) {
         setDocPage(id);
@@ -88,6 +112,21 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
             <div className="sw-cta">
               <a className="btn btn-primary" href={LINKS.npm} target="_blank" rel="noreferrer">@progen-labs/spectra on npm ↗</a>
               <a
+                className="btn btn-ghost btn-demo"
+                href="#spectra/demo"
+                onClick={e => {
+                  e.preventDefault();
+                  openDemo();
+                }}
+              >
+                <span className="btn-play" aria-hidden="true">
+                  <svg viewBox="0 0 12 12">
+                    <path d="M3 1.8 L10 6 L3 10.2 Z" />
+                  </svg>
+                </span>
+                Watch the demo
+              </a>
+              <a
                 className="btn btn-ghost"
                 href={`#spectra/docs/${docPage}`}
                 onClick={e => {
@@ -113,6 +152,7 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: (i % 3) * 0.06 }}
                 >
+                  {f.media && <FeatureVideo id={f.media} label={`${f.title}, animated`} />}
                   <span className="feature-index">{String(i + 1).padStart(2, '0')}</span>
                   <h3>{f.title}</h3>
                   <p>{f.body}</p>
@@ -198,6 +238,7 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
           </footer>
         </div>
       </div>
+      <AnimatePresence>{demo && <DemoVideo key="demo" onClose={closeDemo} />}</AnimatePresence>
     </motion.div>
   );
 }
