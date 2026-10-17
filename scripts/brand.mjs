@@ -257,7 +257,9 @@ async function renderPngs() {
   const box = (size, bg, inner) => `<div style="width:${size}px;height:${size}px;background:${bg};display:grid;place-items:center">${inner}</div>`;
   const sized = (f, w, h) => svg(f).replace('<svg ', `<svg width="${w}" height="${h}" `);
   const jobs = [
-    ['progen-labs-avatar.png', 800, box(800, ground, sized('progen-seed-emblem.svg', 720, 720))], // GitHub org, LinkedIn page
+    // the avatar is the mark alone: the emblem's rings turn to noise at the 32–48 px avatars are shown at
+    ['progen-labs-avatar.png', 800, box(800, ground, sized('progen-seed-mark-still.svg', 456, 650))], // GitHub org, LinkedIn page
+    ['progen-labs-emblem.png', 800, box(800, ground, sized('progen-seed-emblem.svg', 720, 720))], // large uses: banners, slides, posts
     ['apple-touch-icon.png', 180, box(180, ground, sized('progen-seed-mark-still.svg', 112, 160))],
     ['progen-seed-mark.png', 188, box(188, 'transparent', sized('progen-seed-mark-light-still.svg', 132, 188))], // where SVG is not allowed (VS Code Marketplace)
     ['favicon-32.png', 32, box(32, 'transparent', sized('favicon.svg', 32, 32))],

@@ -57,7 +57,8 @@ which the site serves at `https://progen-labs.github.io/website/brand/`:
 | `progen-seed-mark.svg`, `progen-seed-mark-light.svg` | The animated mark alone, for headers and small spaces |
 | `progen-seed-mark-still.svg`, `progen-seed-mark-light-still.svg` | Still versions, for reduced motion |
 | `favicon.svg`, `favicon-32.png`, `apple-touch-icon.png` | Browser and home-screen icons |
-| `progen-labs-avatar.png` | The 800×800 avatar for the GitHub organization and the LinkedIn page |
+| `progen-labs-avatar.png` | The 800×800 avatar (the mark alone, which stays bold when small) for the GitHub organization and the LinkedIn page |
+| `progen-labs-emblem.png` | The 800×800 emblem, for banners, slides and posts |
 | `progen-seed-mark.png` | The mark where SVG is not allowed (the VS Code Marketplace) |
 
 The READMEs of every Progen Labs repository load the logo from that address, so changing it here
