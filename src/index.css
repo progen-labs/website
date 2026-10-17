@@ -567,22 +567,28 @@ strong { color: var(--text); font-weight: 600; }
   cursor: pointer; font-size: 0.9rem; font-family: var(--font-ui);
 }
 .sw-back:hover, .sw-theme:hover { border-color: var(--border-bright); }
+/* the top-right corner: GitHub, npm and the theme switch */
+.sw-top { position: fixed; top: 22px; right: 22px; z-index: 22; display: flex; align-items: center; gap: 8px; }
+.sw-top-link {
+  display: inline-flex; align-items: center; gap: 8px; height: 42px; padding: 0 16px; border: 1px solid var(--border); border-radius: 999px;
+  background: var(--glass); backdrop-filter: blur(10px); color: var(--text); font-size: 0.9rem; font-weight: 500; text-decoration: none;
+}
+.sw-top-link:hover { border-color: var(--border-bright); }
+.sw-top-link svg { width: 16px; height: 16px; fill: currentColor; }
 .sw-theme {
-  position: fixed; top: 22px; right: 22px; z-index: 22;
   width: 42px; height: 42px; display: grid; place-items: center; padding: 0;
   border: 1px solid var(--border); border-radius: 999px;
   background: var(--glass); backdrop-filter: blur(10px); color: var(--text); cursor: pointer;
 }
 .sw-theme svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
-/* the install command, copyable straight from the hero */
-.sw-install {
-  display: flex; align-items: center; gap: 12px; max-width: 620px; margin-top: 28px;
-  padding: 8px 8px 8px 18px; border: 1px solid var(--border); border-radius: 14px;
-  background: var(--panel); box-shadow: 0 10px 34px var(--panel-shadow);
-}
+/* the install command: a quiet, copyable line under the two buttons */
+.sw-install { display: flex; align-items: center; gap: 10px; width: fit-content; max-width: 100%; margin-top: 22px; }
+.sw-install .copy-btn { padding: 5px 8px; background: transparent; border-color: transparent; }
+.sw-install .copy-btn:hover { border-color: var(--border); }
+.sw-install .copy-text { display: none; }
 .sw-prompt { font-family: var(--font-mono); color: var(--cyan); user-select: none; }
-.sw-install-cmd { flex: 1; min-width: 0; font-family: var(--font-mono); font-size: 0.92rem; color: var(--code-cmd); overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+.sw-install-cmd { flex: 0 1 auto; min-width: 0; font-family: var(--font-mono); font-size: 0.92rem; color: var(--code-cmd); overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
 .sw-install-cmd::-webkit-scrollbar { display: none; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
@@ -599,10 +605,14 @@ strong { color: var(--text); font-weight: 600; }
 
 @media (max-width: 560px) {
   .sw-back { top: 14px; left: 14px; }
-  .sw-theme { top: 14px; right: 14px; }
+  .sw-top { top: 14px; right: 14px; gap: 6px; }
+  .sw-top-link { width: 42px; padding: 0; justify-content: center; }
+  .sw-top-link span { display: none; }
   .sw-inner { padding-top: 92px; }
-  .sw-install { padding-left: 14px; }
-  .sw-install-cmd { font-size: 0.84rem; white-space: normal; overflow-wrap: anywhere; line-height: 1.5; }
+  .sw-install-cmd { font-size: 0.84rem; white-space: normal; overflow-wrap: normal; line-height: 1.5; } /* wraps at the space before the package name */
+  .sw-cta { gap: 8px; }
+  .sw-cta .btn { padding: 12px 15px; font-size: 0.94rem; }
+  .sw-install-cmd span { white-space: nowrap; }
   .copy-text { display: none; }
   .copy-btn { padding: 8px; }
   .code-block { padding-right: 44px; }
@@ -746,7 +756,7 @@ strong { color: var(--text); font-weight: 600; }
 
 /* the hero's pointer to the latest release */
 .sw-new {
-  display: inline-flex; align-items: center; gap: 10px; margin-top: 22px; padding: 6px 14px 6px 6px; border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 10px; margin: 0 0 26px; padding: 6px 14px 6px 6px; border-radius: 999px;
   border: 1px solid var(--border); background: var(--surface); color: var(--text-dim); font-size: 0.9rem; text-decoration: none;
   transition: border-color 0.2s ease, color 0.2s ease;
 }

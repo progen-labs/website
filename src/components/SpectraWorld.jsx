@@ -92,7 +92,21 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
       <button className="sw-back" onClick={onBack}>
         ← Back to Progen Labs
       </button>
-      {onToggleTheme && <ThemeToggle className="sw-theme" theme={theme} onToggle={onToggleTheme} />}
+      <nav className="sw-top" aria-label="Spectra elsewhere">
+        <a className="sw-top-link" href={LINKS.spectraRepo} target="_blank" rel="noreferrer" title="Spectra on GitHub">
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+          </svg>
+          <span>GitHub</span>
+        </a>
+        <a className="sw-top-link" href={LINKS.npm} target="_blank" rel="noreferrer" title="@progen-labs/spectra on npm">
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M0 0v16h16V0H0zm13 13h-2.5V5.5H8V13H3V3h10v10z" />
+          </svg>
+          <span>npm</span>
+        </a>
+        {onToggleTheme && <ThemeToggle className="sw-theme" theme={theme} onToggle={onToggleTheme} />}
+      </nav>
 
       <div className="sw-scroll">
         <div className="sw-inner">
@@ -102,6 +116,17 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease, delay: 0.1 }}
           >
+            <a
+              className="sw-new"
+              href="#whats-new"
+              onClick={e => {
+                e.preventDefault();
+                document.getElementById('whats-new')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+            >
+              <span className="sw-new-tag">New</span>
+              {LATEST.title}: {LATEST.summary.split(/\.\s/)[0].replace(/\.$/, '').replace(/`/g, '')} →
+            </a>
             <p className="sw-kicker">Frontend performance, measured</p>
             <h1 className="sw-title grad-text">SPECTRA</h1>
             <p className="sw-lead">
@@ -109,13 +134,17 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
               with before-and-after measurements. Fix it yourself, or let its AI harness fix it and keep only what
               measurably helps. Use it from the terminal, VS Code, your AI assistant or CI.
             </p>
-            <div className="sw-install">
-              <span className="sw-prompt" aria-hidden="true">$</span>
-              <code className="sw-install-cmd">{INSTALL}</code>
-              <CopyButton text={INSTALL} label="Copy the npm install command" />
-            </div>
             <div className="sw-cta">
-              <a className="btn btn-primary" href={LINKS.npm} target="_blank" rel="noreferrer">@progen-labs/spectra on npm ↗</a>
+              <a
+                className="btn btn-primary"
+                href={`#spectra/docs/${docPage}`}
+                onClick={e => {
+                  e.preventDefault();
+                  openDoc(docPage);
+                }}
+              >
+                Read the docs
+              </a>
               <a
                 className="btn btn-ghost btn-demo"
                 href="#spectra/demo"
@@ -131,29 +160,15 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
                 </span>
                 Watch the demo
               </a>
-              <a
-                className="btn btn-ghost"
-                href={`#spectra/docs/${docPage}`}
-                onClick={e => {
-                  e.preventDefault();
-                  openDoc(docPage);
-                }}
-              >
-                Documentation
-              </a>
-              <a className="btn btn-ghost" href={LINKS.spectraRepo} target="_blank" rel="noreferrer">GitHub ↗</a>
             </div>
-            <a
-              className="sw-new"
-              href="#whats-new"
-              onClick={e => {
-                e.preventDefault();
-                document.getElementById('whats-new')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
-            >
-              <span className="sw-new-tag">New</span>
-              {LATEST.title}: {LATEST.summary.split(/\.\s/)[0].replace(/\.$/, '').replace(/`/g, '')} →
-            </a>
+            <div className="sw-install">
+              <span className="sw-prompt" aria-hidden="true">$</span>
+              <code className="sw-install-cmd">
+                {/* each word unbroken, so a narrow screen wraps at a space, not inside the package name */}
+                {INSTALL.split(' ').flatMap((word, i) => [i ? ' ' : null, <span key={i}>{word}</span>])}
+              </code>
+              <CopyButton text={INSTALL} label="Copy the npm install command" />
+            </div>
           </motion.header>
 
           <section className="sw-section" id="what-it-does">
