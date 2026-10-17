@@ -699,22 +699,66 @@ strong { color: var(--text); font-weight: 600; }
 .pillar-n { font-family: var(--font-mono); font-size: 0.85rem; color: var(--cyan); }
 .pillar-head h3 { margin: 0; font-family: var(--font-display); font-size: 1.45rem; font-weight: 600; color: var(--text-dim); letter-spacing: -0.01em; }
 .pillar-verb { color: var(--text); font-weight: 700; }
-.pillar .feature-media { margin: 16px -22px 6px; border-top: 1px solid var(--border); }
-.pillar-list { list-style: none; margin: 0; padding: 0; }
-.pillar-list li { border-bottom: 1px solid var(--border); }
-.pillar-list li:last-child { border-bottom: none; }
-.pillar-item {
-  display: flex; align-items: center; gap: 10px; width: 100%; padding: 13px 4px 13px 14px; border: 0; background: none;
-  color: var(--text-dim); font: inherit; font-size: 1rem; font-weight: 600; text-align: left; cursor: pointer;
-  border-left: 2px solid transparent; transition: color 0.2s ease, border-color 0.2s ease;
+.pillar-stage { position: relative; margin: 16px -22px 0; }
+.pillar .feature-media { margin: 0; border-top: 1px solid var(--border); }
+/* on the video: which capability is playing */
+.pillar-now {
+  position: absolute; left: 14px; bottom: 12px; display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px 5px 10px;
+  border-radius: 999px; background: rgba(4, 7, 18, 0.72); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff; font-size: 0.8rem; font-weight: 600; pointer-events: none;
 }
-.pillar-item:hover { color: var(--text); }
-.pillar-item:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; border-radius: 6px; }
-.is-open > .pillar-item { color: var(--text); border-left-color: var(--cyan); }
-.pillar-item .feature-badge { margin-left: 0; }
-.pillar-body { padding: 0 6px 16px 16px; border-left: 2px solid var(--cyan); }
+.pillar-hint {
+  display: flex; align-items: center; gap: 8px; margin: 14px 0 6px; color: var(--text-faint);
+  font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.pillar-hint svg { width: 10px; height: 10px; fill: var(--cyan); }
+/* the playlist: each row is a video you can play */
+.pillar-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.pillar-item {
+  display: flex; align-items: center; gap: 14px; width: 100%; padding: 8px 12px 8px 8px; border: 1px solid transparent; border-radius: 12px;
+  background: none; color: var(--text-dim); font: inherit; font-size: 1rem; font-weight: 600; text-align: left; cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.pillar-item:hover { background: var(--surface-2); border-color: var(--border); color: var(--text); }
+.pillar-item:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.pillar-thumb {
+  position: relative; flex: none; width: 64px; height: 36px; border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--border); background: #070a14;
+}
+.pillar-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0.85; transition: opacity 0.2s ease, transform 0.3s ease; }
+.pillar-thumb-play { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(4, 6, 14, 0.35); }
+.pillar-thumb-play svg {
+  width: 20px; height: 20px; padding: 5px 4px 5px 6px; border-radius: 50%; fill: #fff; background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35); transition: transform 0.2s ease, background 0.2s ease;
+}
+.pillar-item:hover .pillar-thumb img { opacity: 1; transform: scale(1.06); }
+.pillar-item:hover .pillar-thumb-play svg { transform: scale(1.12); background: var(--cyan); border-color: var(--cyan); fill: #04121a; }
+.pillar-item-title { flex: 1 1 auto; min-width: 0; }
+.pillar-item .feature-badge { margin-left: 0; flex: none; }
+.pillar-cue { flex: none; margin-left: auto; font-size: 0.8rem; font-weight: 600; color: var(--text-faint); transition: color 0.2s ease; }
+.pillar-item:hover .pillar-cue { color: var(--cyan); }
+/* the one on screen */
+.is-open > .pillar-item { color: var(--text); background: linear-gradient(90deg, rgba(54, 214, 255, 0.12), rgba(54, 214, 255, 0.02)); border-color: rgba(54, 214, 255, 0.35); }
+.is-open > .pillar-item .pillar-thumb { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan); }
+.is-open > .pillar-item .pillar-thumb-play { background: rgba(4, 6, 14, 0.55); }
+.is-open > .pillar-item .pillar-cue { color: var(--cyan); }
+.pillar-body { padding: 8px 12px 14px 90px; }
 .pillar-body p { margin: 0; color: var(--text-dim); font-size: 0.95rem; line-height: 1.6; }
 .pillar-body .feature-link { margin-top: 10px; }
+/* "playing": three bars rising and falling */
+.eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 12px; }
+.eq i { display: block; width: 3px; height: 100%; border-radius: 1px; background: var(--cyan); transform-origin: bottom; animation: eq 0.9s ease-in-out infinite; }
+.eq i:nth-child(2) { animation-delay: -0.3s; }
+.eq i:nth-child(3) { animation-delay: -0.6s; }
+@keyframes eq { 0%, 100% { transform: scaleY(0.35); } 50% { transform: scaleY(1); } }
+@media (prefers-reduced-motion: reduce) { .eq i { animation: none; transform: scaleY(0.7); } }
+.spectra-world[data-theme='light'] .pillar-thumb-play { background: rgba(4, 6, 14, 0.25); }
+.spectra-world[data-theme='light'] .is-open > .pillar-item { background: linear-gradient(90deg, rgba(8, 145, 178, 0.1), rgba(8, 145, 178, 0.02)); border-color: rgba(8, 145, 178, 0.4); }
+@media (max-width: 560px) {
+  .pillar-item { gap: 12px; }
+  .pillar-thumb { width: 56px; height: 32px; }
+  .pillar-body { padding-left: 12px; }
+}
 @media (max-width: 900px) { .pillars { grid-template-columns: 1fr; } }
 
 /* ---------- Spectra: what's new ---------- */
