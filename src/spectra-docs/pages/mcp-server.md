@@ -99,3 +99,5 @@ The first that applies:
 - The server sends **progress notifications** (run 2 of 3, journey 4 of 6) when the client asks for them.
 - **Cancelling** a call stops it, closes Chrome, and stops any dev server Spectra started.
 - A page load takes about 5 seconds per run; golden paths take about 10 seconds per journey.
+
+Even without the MCP server, every AI agent learns what Spectra does when Spectra is installed in the project, and runs its commands: see [Any AI agent](doc:agents).

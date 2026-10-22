@@ -62,7 +62,7 @@ export const SPECTRA_PILLARS = [
     line: 'with AI that measures',
     features: [
       { title: 'The AI fix harness', media: 'fix', doc: 'harness', badge: 'New in 0.4', body: 'spectra fix hands the costliest findings to a coding agent, one at a time, in a copy of your code, and keeps a change only when your checks pass and Spectra measures it faster.' },
-      { title: 'AI that verifies', media: 'ai', doc: 'claude-code', body: 'An MCP server and a Claude Code plugin let your assistant fix one finding, then prove it helped.' },
+      { title: 'AI that verifies', media: 'ai', doc: 'agents', badge: 'New in 0.6', body: 'Installing Spectra teaches your AI agent (Claude Code, GitHub Copilot, Cursor, Codex and more) what it does, so you ask in plain words. An MCP server and a Claude Code plugin let it fix one finding, then prove it helped.' },
       { title: 'In your editor', media: 'editor', doc: 'vscode', body: 'The VS Code extension shows each finding at its line and render counts above your components.' },
     ],
   },

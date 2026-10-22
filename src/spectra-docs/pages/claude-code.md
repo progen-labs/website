@@ -82,3 +82,5 @@ You get the same tools, without the skills.
 - **Budgets.** If your project has a [`spectra.config.json`](doc:budgets), Claude reports which budgets are still over.
 - **Status.** Run `/mcp` in Claude Code to see that the Spectra server is connected. The tools appear to the model as `mcp__plugin_spectra_spectra__profile_page` and so on.
 - **Long runs.** Golden paths take about ten seconds per journey. Claude Code waits for them, and shows progress as Spectra reports it.
+
+Even without the plugin, Claude Code learns what Spectra does from a `spectra` skill that Spectra adds to the project when it is installed: see [Any AI agent](doc:agents).
