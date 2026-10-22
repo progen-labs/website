@@ -1,15 +1,18 @@
 Spectra is open source under the MIT licence, and contributions are welcome: bug reports, new finding rules, framework adapters and documentation.
 
 - **Code**: [github.com/progen-labs/spectra](https://github.com/progen-labs/spectra)
-- **Issues and ideas**: [github.com/progen-labs/spectra/issues](https://github.com/progen-labs/spectra/issues)
+- **Issues and ideas**: [github.com/progen-labs/spectra/issues](https://github.com/progen-labs/spectra/issues), with forms for bug reports and feature requests
+- **How to contribute**: [CONTRIBUTING.md](https://github.com/progen-labs/spectra/blob/main/CONTRIBUTING.md), and the [Code of Conduct](https://github.com/progen-labs/spectra/blob/main/CODE_OF_CONDUCT.md)
+- **Security problems**: privately, as [SECURITY.md](https://github.com/progen-labs/spectra/blob/main/SECURITY.md) explains
 
 ## Develop locally
 
 ```bash
 git clone https://github.com/progen-labs/spectra.git
 cd spectra
-npm install
+npm ci
 npm test          # the analysis, result, CLI, MCP and harness tests
+npm run lint      # ESLint
 npm run bench     # the AI fix harness's test bench (needs Chrome)
 npm run demo      # a demo app with deliberate performance bugs, on :5188
 npm run dev       # the dashboard in development, on :5178
@@ -74,3 +77,10 @@ node scripts/docs-screenshots.mjs --live <live report id> \
 ```
 
 The scenario clicks the demo's **Long task**, **Layout thrash** and **Layout shift** buttons. The script writes one `.webp` per screenshot and a `manifest.json` of region positions. A docs page then shows a screenshot with a fenced block naming it, a caption line, and one `region: explanation` line per numbered call-out.
+
+## Checks and releases
+
+Every pull request runs lint, the tests on Linux and macOS (with a coverage minimum), the packed package on Linux and Windows, a check of every link in the docs, size budgets, dependency review, the fix harness's bench and the GitHub Action. CodeQL and Socket check it too, and **spectra-bot** comments with every result, linking the failing step, file and line for anything that fails.
+
+Releases are published from GitHub Actions after every check and the maintainer's approval: to npm with provenance, and as a GitHub Release with the [changelog](doc:changelog)'s notes, the package and its SBOM, each with a signed build attestation. Every workflow action is pinned to a commit, and CI installs from the committed lockfile.
+

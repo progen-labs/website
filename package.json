@@ -3,9 +3,10 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Official website of Progen Labs \u2014 an independent, open-source lab building free developer tools.",
+  "description": "Official website of Progen Labs — an independent, open-source lab building free developer tools.",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/changelog.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "brand": "node scripts/brand.mjs"

@@ -1,0 +1,20 @@
+# The broken-link check (lychee) for the README and the Spectra docs pages.
+max_retries = 3
+timeout = 30
+accept = ["200..=206", "429"]
+include_fragments = false
+exclude = [
+  # the docs' own links between pages (doc:<id>), resolved by the site
+  '^doc:',
+  '^https?://(localhost|127\.0\.0\.1|0\.0\.0\.0)',
+  '\.test(/|$)',
+  '^https?://([a-z0-9-]+\.)?example\.(com|org)',
+  # sites that turn away automated checkers, though the links work in a browser
+  '^https://(www\.)?linkedin\.com',
+  '^https://socket\.dev',
+  '^https://packagephobia\.com',
+  '^https://marketplace\.visualstudio\.com',
+  '^https://www\.npmjs\.com',
+  '^https://img\.shields\.io',
+  '^https://github\.com/progen-labs/spectra/(settings|security/advisories/new|releases/tag)',
+]
