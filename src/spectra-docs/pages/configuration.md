@@ -11,7 +11,7 @@ Most settings are command-line options. Budgets and how to sign in live in [`spe
 | `PERF_TARGET_NAME` | the `name` in your `package.json` | The project name shown in the dashboard and PDFs |
 | `PORT` | `4321` | The dashboard's port, when `--port` is not given |
 | `SPECTRA_MCP_ALLOW_REMOTE` | unset | Set to `1` to let the [MCP server](doc:mcp-server) profile pages that are not on this machine |
-| `SPECTRA_AGENT_DOCS` | unset | Set to `0` so the install step doesn't write the [knowledge doc for AI agents](doc:agents) |
+| `SPECTRA_AGENT_DOCS` | unset | Set to `0` so Spectra doesn't write its [knowledge doc for AI agents](doc:agents) on its first run |
 | `SPECTRA_LOGIN_PASSWORD` | unset | The password for [signing in](doc:signing-in), with a login form or the browser prompt |
 | `SPECTRA_LOGIN_USER` | unset | The username, when `--login-user` and `spectra.config.json` don't give one |
 | `SPECTRA_LOGIN_TOTP_SECRET` | unset | An authenticator app's secret, so Spectra can answer one-time code steps |

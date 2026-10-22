@@ -23,6 +23,7 @@ The demo app has a slow component, a 260 ms click handler, a component that re-r
 bin/spectra.js             the CLI
 server/recorder.js         drives Chrome: start, stop, trace, metrics, sign-in
 server/agents.js           the knowledge doc for AI agents (agents/spectra.md): where each agent reads it
+.github/workflows/         checks.yml: every check, and spectra-bot's pull request report (pr-comment.yml)
 server/signin.js           signing in: login forms, authenticator codes, prompts, tokens, links
 server/probe.browser.js    the in-page probe: framework hooks and vitals
 server/analysis/           trace, CPU profile, source mapping, report, findings

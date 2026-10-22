@@ -1,4 +1,4 @@
-Installing Spectra teaches your AI coding agent what Spectra does. You can then ask in plain words, and the agent runs the right Spectra command and reads the result for you:
+Spectra teaches your AI coding agent what it does. You can then ask in plain words, and the agent runs the right Spectra command and reads the result for you:
 
 - "Why is the checkout page slow?"
 - "Profile the home page three times and tell me the worst problem."
@@ -6,13 +6,14 @@ Installing Spectra teaches your AI coding agent what Spectra does. You can then 
 - "Fail the build if total blocking time goes over 200 ms."
 - "The app needs a login. Profile the dashboard behind it."
 
-## What happens when you install it
+## What happens the first time it runs
 
 ```bash
 npm install --save-dev @progen-labs/spectra
+npx spectra performance
 ```
 
-After the install, Spectra writes its **knowledge doc** where your agents read their project instructions. The doc covers what Spectra does, which command answers which request, how to read the JSON results, how to prove a change made things faster, budgets, signing in, and the rules an agent should follow, such as never asking for a password in the chat. You can read it with `npx spectra agents --print`.
+The first time Spectra runs in your project, it writes its **knowledge doc** where your agents read their project instructions. There is no install script, so your package manager and supply-chain scanners have nothing to flag. The doc covers what Spectra does, which command answers which request, how to read the JSON results, how to prove a change made things faster, budgets, signing in, and the rules an agent should follow, such as never asking for a password in the chat. You can read it with `npx spectra agents --print`.
 
 | Agent | Where it goes |
 | --- | --- |
@@ -24,13 +25,13 @@ After the install, Spectra writes its **knowledge doc** where your agents read t
 | **Cline** and **Roo Code** | `.clinerules/spectra.md` and `.roo/rules/spectra.md` |
 | **Gemini CLI** | A Spectra block in `GEMINI.md` |
 
-`AGENTS.md` is always written. The others are written for the agents your project or machine uses: Spectra looks for each agent's folder in the project (such as `.cursor`) or in your home folder (such as `~/.claude`, or VS Code for Copilot). Commit the files, and everyone on the team gets the same help.
+`AGENTS.md` is always written. The others are written for the agents your project or machine uses: Spectra looks for each agent's folder in the project (such as `.cursor`) or in your home folder (such as `~/.claude`, or VS Code for Copilot). Commit the files, and everyone on the team gets the same help. Spectra does this once per version: after an update it refreshes the doc where it already is, and after `npx spectra agents --remove` it leaves your project alone.
 
 **Your own text is never touched.** In a shared file such as `AGENTS.md` or `CLAUDE.md`, Spectra only writes between `<!-- spectra:start -->` and `<!-- spectra:end -->`. A file of Spectra's own carries a `spectra:managed` marker, and Spectra never overwrites a file without it. Updating Spectra updates the doc, and only the doc.
 
 ## Do it by hand
 
-pnpm and Bun don't run a package's install step until you allow it, and npm skips it with `--ignore-scripts`. In those cases, or to update or pick the agents yourself:
+To write it before Spectra's first run, or to pick the agents yourself:
 
 ```bash
 npx spectra agents                       # the agents this project or machine uses, and AGENTS.md
@@ -44,7 +45,7 @@ The agent ids are `agents-md`, `claude`, `cursor`, `copilot`, `windsurf`, `cline
 
 ## Turn it off
 
-For one install, set `SPECTRA_AGENT_DOCS=0`. For the whole project, in `spectra.config.json`:
+For one run, set `SPECTRA_AGENT_DOCS=0`. For the whole project, in `spectra.config.json`:
 
 ```json
 { "agentDocs": false }

@@ -117,14 +117,22 @@
   transition: opacity 0.15s ease, box-shadow 0.15s ease;
 }
 .shot:not(.is-ready) .shot-box { visibility: hidden; }
+.shot-box { cursor: pointer; }
 .shot.has-active .shot-box { opacity: 0.28; }
-.shot.has-active .shot-box.is-active { opacity: 1; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45), 0 0 0 4px rgba(255, 181, 71, 0.35); background: rgba(255, 181, 71, 0.08); }
+.shot.has-active .shot-box.is-active { opacity: 1; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45), 0 0 0 4px rgba(255, 181, 71, 0.35), 0 0 22px rgba(255, 181, 71, 0.45); }
+.shot.has-active .shot-box.is-active .shot-badge { transform: translate(-45%, -45%) scale(1.18); }
+/* the spotlight: everything but the part being explained dims */
+.shot-dim { position: absolute; inset: 0; overflow: hidden; border-radius: 11px; pointer-events: none; }
+.shot-spot {
+  position: absolute; border-radius: 8px; box-shadow: 0 0 0 9999px rgba(4, 7, 16, 0.5);
+  transition: left 0.35s ease, top 0.35s ease, width 0.35s ease, height 0.35s ease;
+}
 .shot-badge, .shot-num {
   display: inline-grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 50%;
   background: var(--callout); color: var(--callout-ink); font: 700 0.74rem/1 var(--font-ui);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
 }
-.shot-badge { position: absolute; top: 0; left: 0; transform: translate(-45%, -45%); }
+.shot-badge { position: absolute; top: 0; left: 0; transform: translate(-45%, -45%); transition: transform 0.2s ease; }
 .shot figcaption {
   display: flex; justify-content: space-between; gap: 12px; margin-top: 10px;
   font-size: 0.86rem; color: var(--text-faint);
@@ -136,10 +144,35 @@
   display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 6px 18px;
 }
 .shot-legend li {
-  display: flex; gap: 10px; align-items: flex-start; padding: 6px 8px; margin: 0; border-radius: 8px;
+  position: relative; overflow: hidden;
+  display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; margin: 0; border-radius: 10px;
+  border: 1px solid transparent; cursor: pointer;
   font-size: 0.92rem; line-height: 1.55; color: var(--text-dim);
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
-.shot-legend li.is-active { background: var(--surface-2); }
+.shot-legend li:hover { background: var(--surface-2); }
+.shot-legend li.is-active { background: rgba(255, 181, 71, 0.1); border-color: rgba(255, 181, 71, 0.55); color: var(--text); }
+.shot-legend li:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+.shot-legend li.is-active .shot-num { box-shadow: 0 0 0 4px rgba(255, 181, 71, 0.25); }
+/* fills while the tour stays on this part */
+.shot-progress {
+  position: absolute; left: 0; bottom: 0; height: 2px; width: 100%; background: var(--callout);
+  transform-origin: left; animation: shot-progress linear forwards;
+}
+@keyframes shot-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+/* the tour's controls, between the screenshot and its legend */
+.shot-tour { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 12px; font-size: 0.84rem; color: var(--text-faint); }
+.shot-tour-btn {
+  display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px 5px 10px; border-radius: 999px;
+  border: 1px solid rgba(255, 181, 71, 0.5); background: rgba(255, 181, 71, 0.1); color: var(--text);
+  font: 600 0.82rem var(--font-ui); cursor: pointer;
+}
+.shot-tour-btn:hover { background: rgba(255, 181, 71, 0.18); }
+.shot-tour-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+.shot-tour-btn svg { width: 14px; height: 14px; fill: var(--callout); }
+.shot-tour-dots { display: inline-flex; gap: 5px; }
+.shot-tour-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--border-bright, rgba(255, 255, 255, 0.25)); transition: background 0.2s ease, transform 0.2s ease; }
+.shot-tour-dots i.is-on { background: var(--callout); transform: scale(1.3); }
 .shot-legend .shot-num { margin-top: 1px; box-shadow: none; }
 .md .shot-legend li::marker { content: none; }
 
@@ -177,5 +210,6 @@
   .shot-legend { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .docs-pager-link, .shot-box { transition: none; }
+  .docs-pager-link, .shot-box, .shot-spot, .shot-badge, .shot-legend li, .shot-tour-dots i { transition: none; }
+  .shot-progress { display: none; }
 }

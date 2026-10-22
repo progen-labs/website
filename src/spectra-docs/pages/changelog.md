@@ -1,5 +1,9 @@
 Update an existing install with `npm install --save-dev @progen-labs/spectra@latest`, and check yours with `npx spectra --version`.
 
+## 0.6.1 (22 October 2026)
+
+- **No install script.** Spectra's knowledge doc for AI agents is now written the first time Spectra runs in your project, instead of during `npm install`, so package managers and supply-chain scanners such as Socket have no install script to flag. It works the same with npm, pnpm, Yarn and Bun, once per version, and never comes back after `npx spectra agents --remove`. See [Any AI agent](doc:agents).
+
 ## 0.6.0 (22 October 2026)
 
 **Your AI agent knows Spectra.** Installing Spectra now teaches your coding agent what it does: which command answers which request, how to read the results, how to prove a change made things faster, and the rules to follow. So you can ask in plain words ("why is checkout slow?", "did my change help?") and the agent runs Spectra for you. The knowledge doc goes into `AGENTS.md` (Codex, GitHub Copilot's coding agent, Cursor, Windsurf, Zed and others) and, for the agents your project or machine uses, a Claude Code skill, GitHub Copilot instructions, a Cursor rule, and Windsurf, Cline, Roo Code and Gemini CLI files. Your own text is never touched. `npx spectra agents` does it by hand (pnpm and Bun skip install steps until you allow them), and `--remove` takes it out. See [Any AI agent](doc:agents).
