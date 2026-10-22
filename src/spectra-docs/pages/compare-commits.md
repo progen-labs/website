@@ -35,7 +35,7 @@ Why snapshots and not raw traces? A raw Chrome trace has no component data and n
 - **What changed, in detail**: for components, files and functions, what degraded, improved, became newly active or stopped being active, and which sub-metric moved. Plus **Problems**: findings that are new, resolved or persisting.
 
 ```screenshot compare-verdict
-The result of comparing the base commit with one that memoises a list row.
+The result of comparing the base commit with one that memoises the list rows and moves the ticker out of `App`.
 commits: **The two commits** being compared, with their authors.
 pdf: **PDF summary** and **PDF detailed report**, printed locally.
 verdict: **Verdict**, confidence and the count of metrics that improved, degraded or stayed the same.

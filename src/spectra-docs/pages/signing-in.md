@@ -20,6 +20,16 @@ Spectra signs in **before** it starts recording, so the login never appears in a
 
 Turn on **My app needs a sign-in** under **Page to profile**, pick how your app signs in, fill in what it asks for, and press **Launch Chrome**. While it signs in the session card says so (**Waiting for you to sign in** for *I'll sign in myself*), and once it is through it shows **✓ Signed in**.
 
+```screenshot dashboard-signin
+The sign-in panel, set up for a login form.
+switch: **My app needs a sign-in.** Turns signing in on for this launch.
+methods: **How your app signs in.** Login form, I'll sign in myself, Browser prompt, Token or cookie, or Sign-in link. The fields below change with it.
+page: **Login page.** Optional: leave it empty to sign in wherever the app sends a signed-out visitor.
+credentials: **Username and password.** The password is marked *not saved*: it stays in this tab's memory only.
+more: **One-time codes and fields.** The authenticator secret, and selectors for when Spectra can't find the controls.
+note: **What happens to secrets.** A reminder that nothing secret is saved, logged or put in a report.
+```
+
 - **Login page** is optional for a login form: leave it empty and Spectra signs in wherever your app sends a signed-out visitor. Give it when your app shows its login only behind a button or on a separate page.
 - **One-time codes and fields** holds the authenticator secret, and CSS selectors for the fields and buttons when Spectra can't find them by itself (it usually can).
 - The page URL, the method, the login page and the username are remembered in your browser. **Passwords, codes, tokens and cookies are not**: they stay in that browser tab's memory until it reloads.

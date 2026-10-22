@@ -7,7 +7,7 @@ The (at most) 12 functions that cost the most, as labels on a slowly rotating sp
 Next to it, the same culprits as a ranked list, and an **insight card** for the hovered or clicked one: its file and line with an **↗ editor** link, its time, how many findings it appears in, **What to do**, and **Show the finding**, which jumps to the full finding below.
 
 ```screenshot culprits-top
-Top culprits for a recording of the demo app: a 2.58 s click handler leads.
+Top culprits for a recording of the demo app: `burn()`, run by a click handler, leads with 4.83 s.
 sphere: **Culprit sphere.** Label size is time, colour is severity. Drag to spin it; hover a label to pause.
 insight: **Insight card.** The selected culprit's file and line, its time, the findings it appears in, and what to do about it.
 rank: **Ranked list.** The same culprits in order, easier to read exactly. Click one to select it.
@@ -53,7 +53,7 @@ Findings, with one root cause expanded.
 filters: **Severity filter**, with the number of findings of each kind.
 category: **Category** menu: CPU, React, Main thread, Layout, Network and so on.
 expand: **Expand all** and **Collapse all.**
-group: **A root cause.** One function, `burn()`, is behind six findings, so they are grouped under it.
+group: **A root cause.** One function, `burn()`, is behind eleven findings, so they are grouped under it.
 fix: **What to do**: the suggested fix comes first.
 culprits: **The culprits**: function, file and line, and time.
 members: **Findings it causes**, each of which expands in turn.

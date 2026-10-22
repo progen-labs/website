@@ -55,7 +55,7 @@ why: **Why it rendered**: every render came from its parent `App`, and no prop c
 A timeline of main-thread tasks, and every task of 50 ms or more with its trigger, a scripting, layout, style, paint and garbage-collection breakdown, and its top files and functions. Below it, every **forced reflow** with the line that caused it.
 
 ```screenshot tab-long-tasks
-Long tasks: two click handlers blocked the main thread for over 250 ms each.
+Long tasks: each of eight clicks on **Long task** blocked the main thread for about 260 ms.
 timeline: **Timeline.** Every task in the recording; the dashed line marks 50 ms.
 head: **A long task**: its length, when it started, and what triggered it.
 breakdown: **Breakdown** of the task into scripting, layout, style, paint and garbage collection.
