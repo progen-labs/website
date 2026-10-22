@@ -18,11 +18,12 @@ npx spectra performance [options]
 | `--command "<cmd>"` | your npm dev script | The command that starts your dev server |
 | `--boot-timeout <s>` | `60` | How long to wait for the dev server |
 | `--headed` | off | Show the browser window while it runs |
-| `--sign-in <url>` | none | Sign-in URL template, see [Signing in](doc:signing-in) |
+| `--login-url <url>`, `--login-user <name>` | none | Sign in before profiling: the login page and the username. The password comes from `SPECTRA_LOGIN_PASSWORD`. See [Signing in](doc:signing-in) |
+| `--login <method>` | guessed | `form`, `link`, `http`, `token` or `manual` (you sign in in the Chrome window), see [Signing in](doc:signing-in) |
 | `--quick` | off | One page-load profile instead of the suite, see [Quick and repeated profiles](doc:quick-profiles) |
 | `--json` | off | Print a machine-readable result on stdout, see [JSON output](doc:json-output) |
 | `--out <file>` | none | Also write that result to a file |
-| `--config <file>` | `spectra.config.json` | Budgets file, see [Budgets and CI](doc:budgets) |
+| `--config <file>` | `spectra.config.json` | Budgets and sign-in file, see [Budgets and CI](doc:budgets) |
 
 ## Examples
 

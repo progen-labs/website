@@ -72,6 +72,7 @@ export const SPECTRA_PILLARS = [
     line: 'wherever you work',
     features: [
       { title: 'Visual dashboard', media: 'dashboard', doc: 'dashboard', body: 'Culprits, a page map, the call tree and long tasks for every run, on your own machine.' },
+      { title: 'Behind a login', media: 'signin', doc: 'signing-in', badge: 'New in 0.5', body: 'Signs in first: a login form (one or two steps, single sign-on, authenticator codes), the browser prompt, a token or cookie, or you, in the window. Secrets stay in memory.' },
       { title: 'JSON for any tool', media: 'json', doc: 'json-output', body: 'A versioned, schema-described result for scripts, dashboards and AI agents.' },
       { title: 'Safe by default', media: 'safe', doc: 'privacy', body: 'Never clicks delete, pay or log out, and never submits a form that changes data.' },
     ],

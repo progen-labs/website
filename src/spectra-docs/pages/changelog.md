@@ -1,5 +1,15 @@
 Update an existing install with `npm install --save-dev @progen-labs/spectra@latest`, and check yours with `npx spectra --version`.
 
+## 0.5.0 (22 October 2026)
+
+Spectra signs in, and every label names your framework.
+
+- **Signing in, every kind of login.** Most production frontends sit behind a login; now Spectra signs in before it profiles. A **login form** (one or two steps, forms that render late, in iframes or web components, behind a **Sign in** button, on your identity provider), with **authenticator codes** from a TOTP secret; **signing in yourself** in the Chrome window for SMS or email codes, passkeys and CAPTCHAs; the **browser's login prompt** (HTTP Basic or Digest); a **token, cookie or localStorage entry**; or a **sign-in link**. In the dashboard, turn on **My app needs a sign-in**; on the command line use `--login-url` and `--login-user` with `SPECTRA_LOGIN_PASSWORD`, or put the non-secret parts in `spectra.config.json` for every tool. Secrets stay in memory, are never written to disk, a report or a log, and the config file refuses them. See [Signing in](doc:signing-in).
+- **Framework-agnostic labels.** The dashboard, findings, comparisons and PDFs say **Components**, **Component render time** and the framework the page runs (React, Vue or Angular), instead of "React" everywhere.
+- **The framework is detected in the page.** The probe is ready for React, Vue and Angular on every page, so an Angular or Vue app is profiled as itself even when Spectra starts from another folder, a monorepo root or an editor. Before, it took the framework from the `package.json` where Spectra started and fell back to React.
+- **Page map for every app.** The page screenshot is now always taken, and Vue and Angular components are pinned on it, not only React ones.
+- **Fixed**: a plain JavaScript page no longer gets a "No React renderer was seen" finding, and the dashboard's pill says **No component framework seen** without looking like an error.
+
 ## 0.4.1 (17 October 2026)
 
 - **`spectra fix` skips findings that are already fixed.** One fix often clears several findings. After each kept fix, a finding the new measurement no longer shows is listed as skipped ("already resolved by an earlier kept change") instead of being handed to the agent, which saves its time and cost. Found by the first [real-agent bench run](doc:harness-bench), where one of three attempts went to a finding the first fix had cleared.

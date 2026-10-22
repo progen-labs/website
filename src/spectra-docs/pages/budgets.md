@@ -18,6 +18,8 @@ Create `spectra.config.json` in your project root:
 
 The `$schema` line is optional. It gives your editor autocompletion and validation. Use `--config <file>` to read budgets from another file.
 
+The same file can also say how Spectra [signs in](doc:signing-in) to your app, under `"signIn"`. Secrets never go in it.
+
 ## Available budgets
 
 Every budget is an upper limit, and lower is better for all of them.

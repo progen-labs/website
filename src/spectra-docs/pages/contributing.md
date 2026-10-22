@@ -22,6 +22,7 @@ The demo app has a slow component, a 260 ms click handler, a component that re-r
 ```
 bin/spectra.js             the CLI
 server/recorder.js         drives Chrome: start, stop, trace, metrics, sign-in
+server/signin.js           signing in: login forms, authenticator codes, prompts, tokens, links
 server/probe.browser.js    the in-page probe: framework hooks and vitals
 server/analysis/           trace, CPU profile, source mapping, report, findings
 server/explore/            dev-server boot, discovery and the golden-path runner

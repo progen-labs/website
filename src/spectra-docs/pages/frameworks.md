@@ -13,7 +13,9 @@ Spectra profiles any web frontend. For the frameworks below it also measures **c
 
 ## Detection
 
-Spectra reads your `package.json` and project files: `next`, or a `next.config.js` or `pages/` folder, means Next.js; `react` with `react-dom` means React; `vue` or `vue.config.js` means Vue; `svelte` or `svelte.config.js` means Svelte; `@angular/core` or `angular.json` means Angular. A Vite config or dependency marks the bundler as Vite. Detection also decides how the dev server is started when you don't pass `--url`.
+**In the page.** The probe is ready for React, Vue and Angular on every page, and each part wakes up only when its framework shows up. So the framework is the one your page really runs, wherever you start Spectra from: the project folder, a monorepo root, an Nx or Turborepo workspace, or an editor. The dashboard's framework pill, the Components tab, the page map and the findings all name it.
+
+**In the project.** To start your dev server when you don't pass `--url`, Spectra reads your `package.json` and project files: `next`, or a `next.config.js` or `pages/` folder, means Next.js; `react` with `react-dom` means React; `vue` or `vue.config.js` means Vue; `svelte` or `svelte.config.js` means Svelte; `@angular/core` or `angular.json` means Angular. A Vite config or dependency marks the bundler as Vite.
 
 ## React and Next.js
 

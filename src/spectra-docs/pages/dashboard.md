@@ -16,7 +16,7 @@ The dashboard listens on `127.0.0.1` only, so it is not reachable from other mac
 The Spectra dashboard with a recording open on the Culprits tab.
 picker: **Report picker.** Every report in `.spectra/reports`, newest first, including the ones the CLI recorded. **Delete** sits beside it.
 appearance: **Appearance.** Two themes, each with light and dark modes. See [Appearance](doc:appearance).
-connect: **Page to profile.** The page to record, **Launch Chrome**, and **Advanced** for a sign-in URL, headless mode or attaching to a running Chrome.
+connect: **Page to profile.** The page to record, **Launch Chrome**, **My app needs a sign-in** for apps behind a login, and **Advanced** for headless mode or attaching to a running Chrome.
 reportbar: **Report bar.** How this report was recorded (mode, duration, source attribution, commit), with **Snapshot for comparison** and **Trace for Chrome DevTools**.
 tabs: **Report tabs.** Culprits, Page map, File tree, Call tree, Components, Long tasks, Network & memory, Golden paths and Compare commits.
 hide: **Hide node_modules.** Focuses every view on your own code.
@@ -25,8 +25,8 @@ content: **The open tab.** Here, [the Culprits tab](doc:culprits).
 
 ## Record from the dashboard
 
-1. **Page to profile.** Enter the page to measure, for example `http://localhost:3000/settings`. Open **Advanced** for a **Sign-in URL** (see [Signing in](doc:signing-in)), **Headless**, or **Attach to a running Chrome**.
-2. **Launch Chrome.** A separate Chrome window opens on your page. The session card shows the tab, its URL, **Go**, **Reload**, a framework pill such as **✓ React 18.x**, and **Close Chrome**. If it shows **No React seen**, press **Reload** once: the probe has to be installed before your framework loads.
+1. **Page to profile.** Enter the page to measure, for example `http://localhost:3000/settings`. If your app is behind a login, turn on **My app needs a sign-in** and say how it signs in: a login form (username and password, with optional authenticator codes), signing in yourself, the browser's login prompt, a token or cookie, or a sign-in link (see [Signing in](doc:signing-in)). Open **Advanced** for **Headless** or **Attach to a running Chrome**.
+2. **Launch Chrome.** A separate Chrome window opens on your page, signed in first when you asked for it. The session card shows the tab, its URL, **Go**, **Reload**, **✓ Signed in** when Spectra signed in, a framework pill such as **✓ React 18.x**, **✓ Vue** or **✓ Angular**, and **Close Chrome**. If it shows **No component framework seen** on a React, Vue or Angular app, press **Reload** once: the probe has to be installed before your framework loads. On any other app that is expected: files and functions are still profiled.
 3. **Choose what to measure.**
    - **Record interaction**: press it, use the page in the Chrome window for 10 to 30 seconds, then press **Stop & analyse**.
    - **Record page load**: reloads with the cache disabled and stops by itself a few seconds after the load event. Use it for startup cost, FCP and LCP.
@@ -37,7 +37,7 @@ content: **The open tab.** Here, [the Culprits tab](doc:culprits).
 ```screenshot dashboard-session
 The session card once Chrome is running on the page.
 tab: **Tab.** The tab of the launched Chrome that will be recorded.
-address: **Address.** Type a URL and press **Go** to navigate. The sign-in URL is used when the page needs it.
+address: **Address.** Type a URL and press **Go** to navigate. If the page asks for a login, Spectra signs in again with the details you launched with.
 nav: **Go and Reload.** Reload once if the framework pill reports that nothing was seen.
 pill: **Framework pill.** Confirms the probe sees your framework, and which version.
 close: **Close Chrome.** Ends the session.

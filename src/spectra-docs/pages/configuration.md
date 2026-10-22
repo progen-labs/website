@@ -1,4 +1,4 @@
-Most settings are command-line options. Budgets live in [`spectra.config.json`](doc:budgets). Everything else is an environment variable, all of them optional.
+Most settings are command-line options. Budgets and how to sign in live in [`spectra.config.json`](doc:budgets). Everything else is an environment variable, all of them optional.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
@@ -11,6 +11,12 @@ Most settings are command-line options. Budgets live in [`spectra.config.json`](
 | `PERF_TARGET_NAME` | the `name` in your `package.json` | The project name shown in the dashboard and PDFs |
 | `PORT` | `4321` | The dashboard's port, when `--port` is not given |
 | `SPECTRA_MCP_ALLOW_REMOTE` | unset | Set to `1` to let the [MCP server](doc:mcp-server) profile pages that are not on this machine |
+| `SPECTRA_LOGIN_PASSWORD` | unset | The password for [signing in](doc:signing-in), with a login form or the browser prompt |
+| `SPECTRA_LOGIN_USER` | unset | The username, when `--login-user` and `spectra.config.json` don't give one |
+| `SPECTRA_LOGIN_TOTP_SECRET` | unset | An authenticator app's secret, so Spectra can answer one-time code steps |
+| `SPECTRA_LOGIN_HEADER` | unset | A header to sign in with, as `Name: value`, sent only to the page's own origin |
+| `SPECTRA_LOGIN_COOKIES` | unset | Cookies to sign in with, as `name=value; name2=value2` |
+| `SPECTRA_LOGIN_STORAGE` | unset | localStorage entries to sign in with, as `key=value; key2=value2` |
 
 ## Data on disk
 
@@ -18,5 +24,5 @@ Most settings are command-line options. Budgets live in [`spectra.config.json`](
 | --- | --- |
 | `.spectra/reports/` | Reports, page screenshots, optional raw traces and golden-path summaries. Keep it out of git |
 | `.spectra/fix/` | [spectra fix](doc:cli-fix) sessions: each one's report, profiles and (while it runs) its copy of your project, plus `history.json`. Spectra keeps it out of git for you |
-| `spectra.config.json` | Your budgets, if any. Commit it |
+| `spectra.config.json` | Your budgets and how to sign in, if any (never secrets: Spectra refuses them). Commit it |
 | Temp directory, `spectra-chrome/<project>-<hash>` | Spectra's private Chrome profile, separate from your own, so your extensions can't distort measurements |

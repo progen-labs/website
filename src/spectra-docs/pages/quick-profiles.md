@@ -64,7 +64,7 @@ The recording lasts exactly as long as the scenario. With `--runs`, the page is 
 | `--throttle <n>` | `1` | Slow the CPU down n times (try 4 or 6) to expose problems a fast laptop hides |
 | `--save-trace` | off | Keep the raw Chrome trace next to the report, for Chrome DevTools |
 | `--headed` | off | Show the browser window |
-| `--sign-in <url>` | none | Sign-in URL template, see [Signing in](doc:signing-in) |
+| `--login-url`, `--login-user`, `--login` | none | Sign in before profiling, see [Signing in](doc:signing-in) |
 | `--json`, `--out`, `--config` | | As for [`spectra performance`](doc:cli-performance) |
 
 `--quick` cannot be combined with `--mode live` or `--scenario`. `--runs` applies only to single-page profiles, because the golden-path suite records each journey once.
