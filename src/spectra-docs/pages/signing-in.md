@@ -122,10 +122,11 @@ Command-line options win over the file, and the file wins over `SPECTRA_LOGIN_US
 | --- | --- |
 | *No login form was found* | Give the login page (`--login-url`), or point at the controls with the selector options |
 | *did not accept the username and password* | The app said the details are wrong: check them, and whether the account needs a one-time code |
+| *submitting it sent nothing* | The sign-in button didn't send the form, even after Spectra pressed Enter: give the button's selector (`--login-submit`, or `submitSelector`) |
 | *asks for a one-time code* | Give the authenticator secret (`SPECTRA_LOGIN_TOTP_SECRET`), or sign in yourself |
 | *shows a CAPTCHA* | Choose *I'll sign in myself* (`--login manual`) |
 | An identity provider refuses the sign-in, or asks for more checks | Some providers block automated browsers. Choose *I'll sign in myself*: Spectra's Chrome keeps its own profile per project, so a provider that remembers the browser may ask less often |
 | *Signed in, but … still shows a login* | The app signed in somewhere else: give the login page your app really uses |
 | The page answers with an HTTP error | The dashboard shows a red banner and the report starts with *The page itself failed to load*, because a recording of an error page tells you nothing about your app |
 
-Spectra's sign-in is tested end to end against a [test app](https://github.com/progen-labs/spectra/tree/main/fixtures/login-demo) with each of these logins: a classic form, two steps, a late single-page-app form, an iframe, a web component, a modal, authenticator codes in one box or six, the browser prompt, a header, a cookie, a storage entry, a sign-in link, a wrong password and a CAPTCHA.
+Spectra's sign-in is tested end to end against a [test app](https://github.com/progen-labs/spectra/tree/main/fixtures/login-demo) with each of these logins: a classic form, two steps, a late single-page-app form, an iframe, a web component, a modal, authenticator codes in one box or six, the browser prompt, a header, a cookie, a storage entry, a sign-in link, a button that ignores its first click, a wrong password and a CAPTCHA.
