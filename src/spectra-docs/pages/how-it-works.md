@@ -23,7 +23,7 @@ Every recording runs three independent recorders over the same window, and recon
 - The stall caused by starting the CPU profiler is detected and discarded, with a note in the report.
 - LCP and FCP are reported for page-load recordings only.
 - Ratio-based rules wait for enough activity before they fire.
-- Several runs are reduced to their median, and [compare](doc:compare) ignores differences smaller than the run-to-run spread.
+- Several runs are reduced to their median, and [compare](doc:compare) ignores differences no bigger than the run-to-run spread.
 
 ## Known limits
 
