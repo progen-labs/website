@@ -203,13 +203,17 @@ function CodeBlock({ lang, text }) {
   const copyable = COPYABLE.has(lang);
   return (
     <div className={`md-code ${copyable ? '' : 'is-output'}`}>
-      {lang && <span className="md-code-lang">{lang}</span>}
-      {copyable && (
-        <CopyButton
-          text={lang === 'bash' || lang === 'sh' ? commandsOf(text) : text}
-          label={lang === 'bash' || lang === 'sh' ? 'Copy the commands' : 'Copy the code'}
-          className="copy-btn-float"
-        />
+      {/* the language and Copy sit in a bar above the code, so a long line never runs under them */}
+      {(lang || copyable) && (
+        <div className="md-code-bar">
+          <span className="md-code-lang">{lang}</span>
+          {copyable && (
+            <CopyButton
+              text={lang === 'bash' || lang === 'sh' ? commandsOf(text) : text}
+              label={lang === 'bash' || lang === 'sh' ? 'Copy the commands' : 'Copy the code'}
+            />
+          )}
+        </div>
       )}
       <pre>
         <code>
