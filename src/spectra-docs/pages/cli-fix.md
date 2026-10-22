@@ -12,7 +12,7 @@ npx spectra fix
 - **A dev script** (`dev`, `start`, `serve` or `develop` in `package.json`), as for [`spectra performance`](doc:cli-performance), or `--command`.
 - **At least one check.** By default: your `test` script, a type-check script (`typecheck`, `type-check`, `check-types` or `tsc`) and your `build` script. See [Checks and safety](doc:harness-safety).
 - **An agent.** By default, [Claude Code](https://claude.com/claude-code), signed in. Spectra runs `claude`, or the path in `SPECTRA_CLAUDE`. Or pass `--agent "<command>"`.
-- Node.js 18 or newer and Chrome, Chromium or Edge, as for any Spectra run.
+- Node.js 22.12 or newer and Chrome, Chromium or Edge, as for any Spectra run.
 
 ## A session
 

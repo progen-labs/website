@@ -1,7 +1,7 @@
 | Symptom | Cause and fix |
 | --- | --- |
 | **Chrome was not found** | Set `CHROME_PATH` to the executable, for example `CHROME_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"`. The same applies when printing a PDF |
-| Syntax or engine errors when starting | Spectra needs Node.js 18 or newer. Check with `node -v` |
+| Syntax or engine errors when starting | Spectra needs Node.js 22.12 or newer. Check with `node -v` |
 | **No --url given** and the dev server never becomes ready | Spectra waits for your dev command to print a localhost URL. Pass `--command "<your dev command>"`, raise `--boot-timeout`, or start the server yourself and pass `--url` |
 | Red banner: **The page answered HTTP 4xx/5xx** | The page failed to load: usually signed out, or the backend or dev server is down. See [Signing in](doc:signing-in) |
 | Amber pill: **No React seen** | Press **Reload**, or record a page load. The probe must be installed before the framework loads |

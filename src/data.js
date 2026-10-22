@@ -95,7 +95,7 @@ export const USAGE = [
     lang: 'bash',
     code: `# add Spectra to your project
 npm install --save-dev @progen-labs/spectra`,
-    note: 'Needs Node.js 18 or newer and Chrome, Chromium or Edge. Spectra drives the browser you already have.',
+    note: 'Needs Node.js 22.12 or newer and Chrome, Chromium or Edge. Spectra drives the browser you already have.',
   },
   {
     id: 'profile',

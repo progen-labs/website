@@ -2,7 +2,7 @@
 
 | Need | Details |
 | --- | --- |
-| **Node.js 18 or newer** | Check with `node -v`. |
+| **Node.js 22.12 or newer** | Check with `node -v`. |
 | **Chrome, Chromium or Edge** | Spectra drives the browser you already have and never downloads one. It is found automatically on macOS, Linux and Windows; otherwise set `CHROME_PATH`. |
 | **Your app's dev server** | Spectra can start it for you, or profile a URL that is already running. |
 

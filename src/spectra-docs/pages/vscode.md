@@ -17,7 +17,7 @@ A real recording of VS Code: profile a page, see each finding at its line, chang
 
 ## Install
 
-You need Node.js 18 or newer and Chrome, Chromium or Edge. Add Spectra to your project, so the extension uses your version:
+You need Node.js 22.12 or newer and Chrome, Chromium or Edge. Add Spectra to your project, so the extension uses your version:
 
 ```bash
 npm install --save-dev @progen-labs/spectra

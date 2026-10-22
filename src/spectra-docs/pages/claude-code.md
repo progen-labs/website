@@ -15,7 +15,7 @@ In Claude Code:
 /plugin install spectra@progen-labs
 ```
 
-You also need Node.js 18 or newer and Chrome, Chromium or Edge. For the fastest start, add Spectra to your project too, so the plugin doesn't download it on first use:
+You also need Node.js 22.12 or newer and Chrome, Chromium or Edge. For the fastest start, add Spectra to your project too, so the plugin doesn't download it on first use:
 
 ```bash
 npm install --save-dev @progen-labs/spectra
