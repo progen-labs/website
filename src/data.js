@@ -123,7 +123,7 @@ npx spectra compare before.json after.json`,
     label: 'Pull requests',
     lang: 'yaml',
     code: `# .github/workflows/performance.yml (steps)
-- uses: actions/checkout@v4
+- uses: actions/checkout@v7
 - run: npm ci
 - uses: progen-labs/spectra@v1
   with:
