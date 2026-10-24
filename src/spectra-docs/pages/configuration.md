@@ -24,7 +24,7 @@ Most settings are command-line options. Budgets and how to sign in live in [`spe
 | Location | Contents |
 | --- | --- |
 | `.spectra/reports/` | Reports, page screenshots, optional raw traces and golden-path summaries. Keep it out of git |
-| `.spectra/fix/` | [spectra fix](doc:cli-fix) sessions: each one's report, profiles and (while it runs) its copy of your project, plus `history.json`. Spectra keeps it out of git for you |
+| `.spectra/improve/` | [spectra improve](doc:improve) sessions: each one's report and measurements, the open guided session (`current.json`), an unattended session's copy of your project while it runs, and `history.json`. Spectra keeps it out of git for you |
 | `spectra.config.json` | Your budgets, how to sign in, and `agentDocs`, if any (never secrets: Spectra refuses them). Commit it |
 | `AGENTS.md`, `.claude/skills/spectra/`, `.github/instructions/spectra.instructions.md` and the like | Spectra's [knowledge doc for AI agents](doc:agents). Commit them; `npx spectra agents --remove` takes them out |
 | Temp directory, `spectra-chrome/<project>-<hash>` | Spectra's private Chrome profile, separate from your own, so your extensions can't distort measurements |

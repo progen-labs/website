@@ -34,7 +34,8 @@ server/explore/            dev-server boot, discovery and the golden-path runner
 server/cli.js              single-page profiles (--quick, --mode, --runs)
 server/compare-cli.js      spectra compare
 server/mcp.js              spectra mcp: the MCP server
-server/fix/                spectra fix: the AI fix harness (policy, loop, git copy, agents, checks)
+server/fix/                spectra improve, unattended: the harness (policy, loop, git copy, agents, checks)
+server/improve/            spectra improve: the command, and the guided session (next, check, report, stop)
 bench/                     the harness's test bench (npm run bench)
 shared/compare.js          the comparison engine, shared by the CLI, dashboard and PDF
 shared/result.js           summaries, budgets and the JSON results

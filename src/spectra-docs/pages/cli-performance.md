@@ -1,4 +1,4 @@
-`spectra performance` profiles your app. By default it runs the **golden-path suite**: a baseline page load plus a set of automatically discovered user journeys. Add `--quick` or `--mode` for a [single-page profile](doc:quick-profiles) instead.
+`spectra performance` measures your app without changing anything. By default it runs the **golden-path suite**: a baseline page load plus a set of automatically discovered user journeys. Add `--quick` or `--mode` for a [single-page profile](doc:quick-profiles) instead. To have the problems it finds fixed, see [Improve the performance](doc:improve).
 
 ```bash
 npx spectra performance [options]

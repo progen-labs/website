@@ -1,9 +1,9 @@
-`spectra mcp` runs Spectra as a [Model Context Protocol](https://modelcontextprotocol.io) server, so AI coding assistants can profile a page, read the findings, change the code and verify the change. It works with any MCP client: Claude Code, Claude Desktop, Cursor, VS Code, Windsurf and others.
+`spectra mcp` runs Spectra as a [Model Context Protocol](https://modelcontextprotocol.io) server, so an AI coding assistant gets Spectra's loop as tools: measure, name the problem, check the change, report. It works with any MCP client: Claude Code, Claude Desktop, Cursor, VS Code, Windsurf and others.
 
 > **New in 0.3.0.** Needs Spectra 0.3.0 or later.
 
 ```video mcp-server
-Setup, the six tools, a profile_page call with live progress, and verify_change. Every result shown is real output from the server.
+Setup, the tools, a profile_page call with live progress, and verify_change. Every result shown is real output from the server.
 ```
 
 ```bash
@@ -55,6 +55,9 @@ On Windows, if your client can't start `npx` directly, use `"command": "cmd"` wi
 
 | Tool | Arguments | Returns |
 | --- | --- | --- |
+| `improve_next` | `url`, `runs` (default 3), `maxFixes` (default 5), `restart` | Starts a session when there is none (measures the page, finds the problems in the project's own code) and returns the problem to fix now: file, line, cost, suggested change. See [Improve the performance](doc:improve) |
+| `improve_check` | none | After the change: runs the project's checks, measures again, compares beyond the noise, says **keep** or **undo**, and returns the next problem |
+| `improve_report` | `stop` | What the session achieved: each problem fixed or undone and why, and the overall before → after. `stop: true` ends the session |
 | `profile_page` | `url`, `runs` (1–10, default 3), `mode` (`load` or `live`), `scenario`, `duration`, `throttle`, `maxFindings` | Medians and spread, budgets, the ranked findings with file, line and fix, report ids, and a **result file** |
 | `verify_change` | `baseline` (a `profile_page` result file), `runs`, `scenario`, `maxFindings` | Re-profiles the same page the same way, then the verdict, confidence, metrics beyond the noise, and findings resolved or new |
 | `compare_profiles` | `before`, `after`: result files, report ids or comma-joined ids | The same comparison, without recording |
@@ -62,7 +65,7 @@ On Windows, if your client can't start `npx` directly, use `"command": "cmd"` wi
 | `list_reports` | `limit` | Saved reports, newest first |
 | `get_report` | `id`, `section` (`overview`, `findings`, `components`, `functions`, `files`, `long_tasks`, `network`), `limit` | One section of a report |
 
-Leave out `url` and Spectra starts the project's dev server, as [`spectra performance`](doc:cli-performance) does. Every profiling tool runs the regular CLI with `--json`, so the numbers match a run by hand, and every report lands in `.spectra/reports` where the [dashboard](doc:dashboard) can open it.
+The three `improve_*` tools are the guided loop of [`spectra improve`](doc:improve); the Claude Code plugin's skill uses them, and `instructions` tells any client to. Leave out `url` and Spectra starts the project's dev server, as [`spectra performance`](doc:cli-performance) does. Every profiling tool runs the regular CLI with `--json`, so the numbers match a run by hand, and every report lands in `.spectra/reports` where the [dashboard](doc:dashboard) can open it.
 
 Each result is a short text written for the model, plus the full data as structured content:
 
@@ -100,4 +103,4 @@ The first that applies:
 - **Cancelling** a call stops it, closes Chrome, and stops any dev server Spectra started.
 - A page load takes about 5 seconds per run; golden paths take about 10 seconds per journey.
 
-Even without the MCP server, every AI agent learns what Spectra does when Spectra is installed in the project, and runs its commands: see [Any AI agent](doc:agents).
+Even without the MCP server, every AI agent learns what Spectra does from the knowledge doc Spectra writes in the project, and runs the same loop with `npx spectra improve next` and `check`: see [Your AI agent](doc:agents).

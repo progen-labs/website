@@ -1,8 +1,8 @@
-The **test bench** checks that the [AI fix harness](doc:harness) makes the right decisions, and measures what a real agent achieves with it. It lives in Spectra's repository (`bench/`) and runs in CI on every change.
+The **test bench** checks that [`spectra improve`](doc:improve) makes the right decisions, and measures what a real agent achieves with it. It lives in Spectra's repository (`bench/`) and runs in CI on every change.
 
 ## The cases
 
-Each case copies Spectra's React demo app into a fresh git project with a behaviour check (`npm test` loads the running app at `$SPECTRA_FIX_URL` and checks its heading, three buttons and all 120 rows), runs `spectra fix` on it, and states what the harness must decide. A scripted agent applies each case's change, so the decision is the only thing being tested.
+Each case copies Spectra's React demo app into a fresh git project with a behaviour check (`npm test` loads the running app at `$SPECTRA_FIX_URL` and checks its heading, three buttons and all 120 rows), runs `spectra improve` on it unattended, and states what Spectra must decide. A scripted agent applies each case's change, so the decision is the only thing being tested.
 
 | Case | The change | The harness must |
 | --- | --- | --- |

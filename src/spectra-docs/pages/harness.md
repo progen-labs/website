@@ -1,6 +1,6 @@
-Spectra's **AI fix harness** turns "find the slow code, fix it, check the fix" into one unattended step. `spectra fix` hands the costliest findings in your own code to a coding agent, one at a time, and keeps a change only when your checks still pass and Spectra measures the page faster, beyond run-to-run noise. Kept changes arrive as commits on a new branch, ready for you to review.
+[`spectra improve`](doc:improve) makes every decision itself; the agent only edits. This page is the rules. They are the same whether the AI agent you are talking to makes the changes (the guided loop: `next`, `check`, `report`) or a coding agent on your machine does, unattended, in a copy of your code. The unattended mode, Spectra's **harness**, is what the diagram below shows.
 
-> **New in 0.4.0.** Update with `npm install --save-dev @progen-labs/spectra@latest`.
+> Since 0.4.0 (as `spectra fix`); the guided loop since 0.7.0.
 
 ```video fix-harness
 A test-bench run on Spectra's demo app: the harness keeps a real fix (JavaScript CPU time 1.57 s → 152 ms) and undoes a "faster" change that broke the page.
@@ -10,7 +10,7 @@ A test-bench run on Spectra's demo app: the harness keeps a real fix (JavaScript
 
 A coding agent is a model that can read and edit code: Claude Code, for example. A **harness** is the program around the agent. It decides what the agent works on, what it may change, how its work is checked, and what happens when the work isn't good enough.
 
-Spectra's harness keeps every one of those decisions in Spectra's own code rather than in the agent's instructions. A change is never kept because the agent says it worked: it is kept because your checks passed and Spectra measured the improvement.
+Spectra keeps every one of those decisions in its own code rather than in the agent's instructions. A change is never kept because the agent says it worked: it is kept because your checks passed and Spectra measured the improvement. In the guided loop the agent is told to undo a change that failed, and the report records what happened either way.
 
 ## Who does what
 
@@ -23,12 +23,12 @@ Spectra's harness keeps every one of those decisions in Spectra's own code rathe
 | Decide | | Keeps the change as a commit, or undoes it, by fixed rules |
 | Record | One sentence about its change | The commit with its evidence, a report and a history |
 
-By default the agent is [Claude Code](https://claude.com/claude-code) in headless mode, allowed only to read and edit files: no shell, no web access, no MCP servers. Any other agent works through `--agent`. See [spectra fix](doc:cli-fix).
+Unattended, the agent is one Spectra finds on your machine (Claude Code, Codex, Gemini CLI, Copilot CLI, Cursor, OpenCode or Amp); Claude Code runs allowed only to read and edit files. Any other agent works through `--agent`. See [Your own agent](doc:cli-fix).
 
 ## The loop
 
 ```
-your last commit ──▶ a copy on branch spectra/fix-<time>   (your files are never touched)
+your last commit ──▶ a copy on branch spectra/improve-<time>   (your files are never touched)
                          │  its own dev server · your checks must pass first
                          ▼
                      baseline: 3 page loads
@@ -68,4 +68,4 @@ It makes one small change per finding. Architectural problems, such as data-fetc
 
 ## How we know it works
 
-The [test bench](doc:harness-bench) runs the harness against Spectra's demo app in CI on every change: a real fix must be kept, a change that breaks the page must be caught by the checks, a cosmetic change must not count, and an edit to `package.json` must be refused.
+The [test bench](doc:harness-bench) runs the harness against Spectra's demo app in CI on every change: a real fix must be kept, a change that breaks the page must be caught by the checks, a cosmetic change must not count, and an edit to `package.json` must be refused. The guided loop shares the code that ranks problems and judges changes, and has its own tests.

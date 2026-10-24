@@ -1,16 +1,34 @@
-From the root of your project:
+From the root of your project, after [installing](doc:installation):
+
+```bash
+npx spectra
+```
+
+That prints what Spectra can do and, the first time, teaches your AI coding agent about it. Then:
+
+## Ask your agent
+
+In Claude Code, Cursor, GitHub Copilot, Codex, Gemini CLI, Windsurf or any other coding agent:
+
+> improve the performance
+
+The agent runs Spectra's loop: Spectra measures the app and names the first problem; the agent changes the code; Spectra runs your checks, measures again and says keep or undo; and so on. At the end the agent tells you what got faster, with the before → after numbers. The changes are in your working tree for you to review. See [Improve the performance](doc:improve).
+
+## Or run it yourself
+
+```bash
+npx spectra improve
+```
+
+Unattended: Spectra finds a coding agent on your machine (Claude Code, Codex, Gemini CLI, Copilot CLI, Cursor…), works in a copy of your last commit, and puts the kept fixes on a branch. Without an agent installed, it names the first problem and waits for you: make the change, then `npx spectra improve check`.
+
+## Measure only
 
 ```bash
 npx spectra performance
 ```
 
-With no `--url`, Spectra:
-
-1. detects your framework and starts your dev server,
-2. records a baseline page load,
-3. discovers the actionable elements on the page (links, buttons, inputs, forms),
-4. synthesizes and runs **golden-path journeys**, skipping anything destructive,
-5. prints a performance matrix, saves a report for every journey, and stops the server.
+With no `--url`, Spectra detects your framework and starts your dev server, records a page load, discovers the actionable elements on the page (links, buttons, inputs, forms), runs **golden-path journeys** through them (skipping anything destructive), prints a performance matrix, saves a report for every journey, and stops the server.
 
 ```
 #  Golden path              Result     TBT     LCP  LongT  Top finding
@@ -20,15 +38,7 @@ With no `--url`, Spectra:
 Automation: 2/2 golden paths passed.
 ```
 
-## The fast loop
-
-The full suite takes a minute or two. While you work on one page, profile just its load, which takes seconds:
-
-```bash
-npx spectra performance --quick
-```
-
-> `--quick`, `--runs`, `spectra compare`, `spectra reports`, budgets and `--json` need Spectra 0.2.0 or later. Check yours with `npx spectra --version`; update with `npm install --save-dev @progen-labs/spectra@latest`.
+The full suite takes a minute or two. While you work on one page, profile just its load, which takes seconds: `npx spectra performance --quick`. See [Measure a page](doc:cli-performance) and [Quick and repeated profiles](doc:quick-profiles).
 
 ## Open the dashboard
 
@@ -40,8 +50,7 @@ Every report from this project is listed there, with the culprits, the page map,
 
 ## Next steps
 
-- [Measure, change, verify](doc:compare) a fix.
+- Prove a change of your own: [Compare before and after](doc:compare).
 - Set [budgets](doc:budgets) and run Spectra in CI.
 - Learn to read [the Culprits tab](doc:culprits).
-- Let your AI assistant do the loop: [Claude Code plugin](doc:claude-code).
-- Or hand the findings to the [AI fix harness](doc:harness): `npx spectra fix`.
+- See how a change is kept or undone: [How improve decides](doc:harness).

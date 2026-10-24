@@ -10,15 +10,16 @@
 
 ```bash
 npm install --save-dev @progen-labs/spectra
+npx spectra
 ```
 
-That adds the `spectra` command to your project, and teaches your AI coding agent (Claude Code, GitHub Copilot, Cursor, Codex and others) what Spectra does, so you can ask it in plain words: see [Any AI agent](doc:agents). Run it with `npx spectra …`, or from your own npm scripts:
+The first command adds the `spectra` command to your project. The second prints what Spectra can do and, the first time it runs in the project, teaches your AI coding agent (Claude Code, GitHub Copilot, Cursor, Codex and others) what Spectra does, so you can ask it in plain words: see [Your AI agent](doc:agents). Nothing happens at install time. Run Spectra with `npx spectra …`, or from your own npm scripts:
 
 ```json
 {
   "scripts": {
-    "perf": "spectra performance",
-    "perf:quick": "spectra performance --quick --runs 3"
+    "perf": "spectra improve",
+    "perf:measure": "spectra performance --quick --runs 3"
   }
 }
 ```

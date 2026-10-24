@@ -5,6 +5,7 @@
 import introduction from './pages/introduction.md?raw';
 import installation from './pages/installation.md?raw';
 import quickStart from './pages/quick-start.md?raw';
+import improve from './pages/improve.md?raw';
 import cliPerformance from './pages/cli-performance.md?raw';
 import quickProfiles from './pages/quick-profiles.md?raw';
 import compare from './pages/compare.md?raw';
@@ -39,17 +40,19 @@ import contributing from './pages/contributing.md?raw';
 
 export const DOC_GROUPS = [
   {
-    title: 'Getting started',
+    title: 'Start here',
     pages: [
       { id: 'introduction', title: 'Introduction', body: introduction },
       { id: 'installation', title: 'Installation', body: installation },
       { id: 'quick-start', title: 'Quick start', body: quickStart },
+      { id: 'improve', title: 'Improve the performance', body: improve },
+      { id: 'agents', title: 'Your AI agent', body: agents },
     ],
   },
   {
-    title: 'Command line',
+    title: 'Measure',
     pages: [
-      { id: 'cli-performance', title: 'spectra performance', body: cliPerformance },
+      { id: 'cli-performance', title: 'Measure a page', body: cliPerformance },
       { id: 'quick-profiles', title: 'Quick and repeated profiles', body: quickProfiles },
       { id: 'compare', title: 'Compare before and after', body: compare },
       { id: 'reports', title: 'spectra reports', body: reports },
@@ -58,21 +61,20 @@ export const DOC_GROUPS = [
     ],
   },
   {
-    title: 'AI and editors',
+    title: 'AI tools and editors',
     pages: [
-      { id: 'agents', title: 'Any AI agent', body: agents },
       { id: 'claude-code', title: 'Claude Code plugin', body: claudeCode },
       { id: 'mcp-server', title: 'MCP server', body: mcpServer },
       { id: 'vscode', title: 'VS Code extension', body: vscodeExt },
     ],
   },
   {
-    title: 'AI fix harness',
+    title: 'How improve decides',
     pages: [
-      { id: 'harness', title: 'How the harness works', body: harness },
-      { id: 'cli-fix', title: 'spectra fix', body: cliFix },
+      { id: 'harness', title: 'The rules', body: harness },
       { id: 'harness-safety', title: 'Checks and safety', body: harnessSafety },
       { id: 'harness-bench', title: 'The test bench', body: harnessBench },
+      { id: 'cli-fix', title: 'Your own agent', body: cliFix },
     ],
   },
   {

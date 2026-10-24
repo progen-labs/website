@@ -1,4 +1,4 @@
-Most production frontends sit behind a login, and the Chrome window Spectra launches starts **signed out** every time. Tell Spectra how your app signs in and it signs in first, then profiles the page you asked for. It works the same in the dashboard, on the command line, in CI, in the [VS Code extension](doc:vscode), the [MCP server](doc:mcp-server) and [spectra fix](doc:cli-fix).
+Most production frontends sit behind a login, and the Chrome window Spectra launches starts **signed out** every time. Tell Spectra how your app signs in and it signs in first, then profiles the page you asked for. It works the same in the dashboard, on the command line, in CI, in the [VS Code extension](doc:vscode), the [MCP server](doc:mcp-server) and [spectra improve](doc:improve).
 
 ```video signing-in
 Spectra signing in to a store's protected page through its own login form, from the dashboard and from the command line.
@@ -86,7 +86,7 @@ In GitHub Actions, put them in repository secrets:
 
 ## Once, for every tool: spectra.config.json
 
-Put how your app signs in next to your [budgets](doc:budgets), and every command, the VS Code extension, the MCP server and `spectra fix` use it. Only the non-secret parts belong here; Spectra refuses a config file that holds a password, a code secret, a header value, cookies or storage entries, and names the environment variable to use instead.
+Put how your app signs in next to your [budgets](doc:budgets), and every command, the VS Code extension, the MCP server and `spectra improve` use it. Only the non-secret parts belong here; Spectra refuses a config file that holds a password, a code secret, a header value, cookies or storage entries, and names the environment variable to use instead.
 
 ```json
 {

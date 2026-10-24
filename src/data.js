@@ -59,10 +59,10 @@ export const SPECTRA_PILLARS = [
   {
     id: 'fix',
     title: 'Fix',
-    line: 'with AI that measures',
+    line: 'with your AI agent, measured',
     features: [
-      { title: 'The AI fix harness', media: 'fix', doc: 'harness', badge: 'New in 0.4', body: 'spectra fix hands the costliest findings to a coding agent, one at a time, in a copy of your code, and keeps a change only when your checks pass and Spectra measures it faster.' },
-      { title: 'AI that verifies', media: 'ai', doc: 'agents', badge: 'New in 0.6', body: 'Spectra teaches your AI agent (Claude Code, GitHub Copilot, Cursor, Codex and more) what it does, so you ask in plain words. An MCP server and a Claude Code plugin let it fix one finding, then prove it helped.' },
+      { title: 'Ask your agent to improve it', media: 'fix', doc: 'improve', badge: 'New in 0.7', body: 'spectra improve: Spectra measures and names the problem, your AI agent changes the code, Spectra measures again and keeps only what helped. Or unattended, with a coding agent on your machine, on a branch.' },
+      { title: 'Any AI agent', media: 'ai', doc: 'agents', body: 'Spectra teaches your AI agent (Claude Code, GitHub Copilot, Cursor, Codex, Gemini and more) what it does, so you ask in plain words. An MCP server and a Claude Code plugin give it the same loop as tools.' },
       { title: 'In your editor', media: 'editor', doc: 'vscode', body: 'The VS Code extension shows each finding at its line and render counts above your components.' },
     ],
   },
@@ -93,15 +93,29 @@ export const USAGE = [
     id: 'install',
     label: 'Install',
     lang: 'bash',
-    code: `# add Spectra to your project
-npm install --save-dev @progen-labs/spectra`,
+    code: `# add Spectra to your project, then run it once: it teaches your AI agent about Spectra
+npm install --save-dev @progen-labs/spectra
+npx spectra`,
     note: 'Needs Node.js 22.12 or newer and Chrome, Chromium or Edge. Spectra drives the browser you already have.',
+  },
+  {
+    id: 'improve',
+    label: 'Improve',
+    lang: 'bash',
+    code: `# ask your AI agent, in plain words:  "improve the performance"
+# it runs this loop: Spectra names the problem, the agent changes the code, Spectra measures it
+npx spectra improve next
+npx spectra improve check
+
+# or unattended, with a coding agent on your machine, on a branch
+npx spectra improve`,
+    note: 'New in 0.7.0. Spectra measures, picks the problem and decides; a change is kept only when your checks pass and it measures faster beyond run-to-run noise.',
   },
   {
     id: 'profile',
     label: 'Profile',
     lang: 'bash',
-    code: `# from your project root: starts the dev server and runs the user journeys
+    code: `# measure only: starts the dev server and runs the user journeys
 npx spectra performance
 
 # the fast loop: one page, three loads, medians
@@ -138,19 +152,7 @@ npx spectra compare before.json after.json`,
     code: `# in Claude Code
 /plugin marketplace add progen-labs/spectra
 /plugin install spectra@progen-labs`,
-    note: 'Then ask Claude to "make the dashboard page faster". It keeps a change only when Spectra measures an improvement. Other MCP clients run npx -y @progen-labs/spectra mcp. Requires Spectra 0.3.0.',
-  },
-  {
-    id: 'fix',
-    label: 'AI fix',
-    lang: 'bash',
-    code: `# let a coding agent fix the costliest findings, proven
-npx spectra fix
-
-# your own checks, more findings, or your own agent
-npx spectra fix --check "npm run e2e" --max-fixes 5
-npx spectra fix --agent "./my-agent.sh"`,
-    note: 'New in 0.4.0. Works in a copy of your last commit. A change is kept only if your checks pass and Spectra measures it faster; the fixes arrive as commits on a spectra/fix-<time> branch.',
+    note: 'Then ask Claude to "improve the performance". Spectra measures each change and says keep or undo. Other MCP clients run npx -y @progen-labs/spectra mcp.',
   },
   {
     id: 'vscode',

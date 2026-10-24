@@ -127,12 +127,12 @@ export default function SpectraWorld({ onBack, theme = 'dark', onToggleTheme }) 
               <span className="sw-new-tag">New</span>
               {LATEST.title}: {LATEST.summary.split(/\.\s/)[0].replace(/\.$/, '').replace(/`/g, '')} →
             </a>
-            <p className="sw-kicker">Frontend performance, measured</p>
+            <p className="sw-kicker">Make your web app faster</p>
             <h1 className="sw-title grad-text">SPECTRA</h1>
             <p className="sw-lead">
-              Spectra finds the exact file, function and component slowing your frontend, and proves each fix
-              with before-and-after measurements. Fix it yourself, or let its AI harness fix it and keep only what
-              measurably helps. Use it from the terminal, VS Code, your AI assistant or CI.
+              Install it, then ask your AI agent to improve the performance. Spectra measures your app, names the
+              exact file, function and component that slow it down, has each problem fixed, measures again, and
+              keeps only what measurably helped. Or run one command and let it work unattended.
             </p>
             <div className="sw-cta">
               <a
