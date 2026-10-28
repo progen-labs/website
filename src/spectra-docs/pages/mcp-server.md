@@ -1,6 +1,6 @@
 `spectra mcp` runs Spectra as a [Model Context Protocol](https://modelcontextprotocol.io) server, so an AI coding assistant gets Spectra's loop as tools: measure, name the problem, check the change, report. It works with any MCP client: Claude Code, Claude Desktop, Cursor, VS Code, Windsurf and others.
 
-> **New in 0.3.0.** Needs Spectra 0.3.0 or later.
+> Since 0.3.0. The `improve_next`, `improve_check` and `improve_report` tools need Spectra 0.7.0 or later.
 
 ```video mcp-server
 Setup, the tools, a profile_page call with live progress, and verify_change. Every result shown is real output from the server.
